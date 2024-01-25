@@ -1,0 +1,11 @@
+departement_id,name,username,email,password
+2103,"Pendidikan Masyarakat","sekjurpenmas","mas@unsil.ac.id","fkippenmas"
+2121,"Pendidikan Bahasa Indonesia","sekjurindonesia","ind@unsil.ac.id","fkipindonesia"
+2122,"Pendidikan Bahasa Inggris","sekjuringgris","eng@unsil.ac.id","fkipinggris"
+2151,"Pendidikan Matematika","sekjurmatematika","mat@unsil.ac.id","fkipmatematika"
+2153,"Pendidikan Fisika","sekjurfisika","fis@unsil.ac.id","fkipfisika"
+2154,"Pendidikan Biologi","sekjurbiologi","bio@unsil.ac.id","fkipbiologi"
+2165,"Pendidikan Ekonomi","sekjurekonomi","eko@unsil.ac.id","fkipekonomi"
+2170,"Pendidikan Geografi","sekjurgeografi","geo@unsil.ac.id","fkipgeografi"
+2171,"Pendidikan Sejarah","sekjursejarah","sej@unsil.ac.id","fkipsejarah"
+2191,"Pendidikan Jasmani","sekjurpenjas","jas@unsil.ac.id","fkippenjas"
