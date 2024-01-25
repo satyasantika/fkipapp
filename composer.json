@@ -12,6 +12,7 @@
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.4",
         "spatie/laravel-permission": "^6.3",
+        "staudenmeir/laravel-migration-views": "^1.7",
         "yajra/laravel-datatables": "^10.1"
     },
     "require-dev": {

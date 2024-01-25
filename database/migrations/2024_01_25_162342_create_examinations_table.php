@@ -15,20 +15,20 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::create('exam_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->nullable();
+            $table->string('kode')->nullable();
+            $table->string('singkat')->nullable();
+            $table->timestamps();
+        });
+
         Schema::create('exam_dates', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Departement::class);
             $table->string('name')->nullable();
             $table->date('tanggal_ujian')->nullable();
             $table->string('kelompok_ujian')->nullable(); //berisi tahun-bulan format (YYYYYMM) untuk admin
-            $table->timestamps();
-        });
-
-        Schema::create('exam_types', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->nullable();
-            $table->string('kode')->nullable();
-            $table->string('singkat')->nullable();
             $table->timestamps();
         });
 
@@ -40,8 +40,8 @@ return new class extends Migration
             $table->integer('ujianke')->nullable();
             $table->text('judul')->nullable();
             $table->string('ipk')->nullable();
-            $table->time('pukul_awal')->nullable();
-            $table->time('pukul_akhir')->nullable();
+            $table->time('waktu_mulai')->nullable();
+            $table->time('waktu_akhir')->nullable();
             $table->string('tempat')->nullable();
             $table->foreignId('dosen1')->nullable();
             $table->foreignId('dosen2')->nullable();
