@@ -33,9 +33,15 @@ return new class extends Migration
             $table->date('tmt_golongan')->nullable();
             $table->string('kualifikasi')->nullable();
             $table->date('tmt_kualifikasi')->nullable();
+            $table->string('tempat_lahir')->nullable();
+            $table->date('tanggal_lahir')->nullable();
             $table->string('rekening')->nullable();
             $table->string('bank')->nullable();
             $table->string('npwp')->nullable();
+            $table->string('ktp')->nullable();
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('alamat')->nullable();
             $table->timestamps();
         });
         Schema::create('students', function (Blueprint $table) {
@@ -43,6 +49,8 @@ return new class extends Migration
             $table->foreignIdFor(Departement::class);
             $table->string('name')->nullable();
             $table->string('nim')->nullable();
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
             $table->timestamps();
         });
     }
