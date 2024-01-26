@@ -20,3 +20,8 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::resource('setting/users', App\Http\Controllers\Setting\UserController::class)->except('show');
+Route::resource('setting/students', App\Http\Controllers\Setting\StudentController::class)->except('show');
+Route::resource('setting/lectures', App\Http\Controllers\Setting\LectureController::class)->except('show');
+Route::resource('setting/view-exam-registrations', App\Http\Controllers\Setting\ExamRegistrationController::class)->except('show');
+Route::resource('setting/view-exam-dates', App\Http\Controllers\Setting\ExamDateController::class)->except('show');

@@ -17,6 +17,7 @@ return new class extends Migration
 
         // view registrasi ujian
         $query = "SELECT exam_registrations.*,
+                        exam_dates.tanggal_ujian AS tanggal,
                         departements.name AS prodi,
                         students.name AS mahasiswa,
                         students.nim AS nim,

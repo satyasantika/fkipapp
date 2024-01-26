@@ -26,7 +26,7 @@ return new class extends Migration
         Schema::create('exam_dates', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Departement::class);
-            $table->string('name')->nullable();
+            // $table->string('name')->nullable();
             $table->date('tanggal_ujian')->nullable();
             $table->string('kelompok_ujian')->nullable(); //berisi tahun-bulan format (YYYYYMM) untuk admin
             $table->timestamps();
