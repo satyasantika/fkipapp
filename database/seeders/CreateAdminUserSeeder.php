@@ -30,6 +30,10 @@ class CreateAdminUserSeeder extends Seeder
 
         $role = Role::create(['name' => 'jurusan']);
         $role->GivePermissionTo('active');
+        $role = Role::create(['name' => 'keuangan']);
+        $role->GivePermissionTo('active');
+        $role = Role::create(['name' => 'dekanat']);
+        $role->GivePermissionTo('active');
 
         // Import Data Akun Jurusan
         $csvData = fopen(base_path('/database/seeders/csvs/operators.csv'), 'r');

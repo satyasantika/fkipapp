@@ -25,3 +25,7 @@ Route::resource('setting/students', App\Http\Controllers\Setting\StudentControll
 Route::resource('setting/lectures', App\Http\Controllers\Setting\LectureController::class)->except('show');
 Route::resource('setting/view-exam-registrations', App\Http\Controllers\Setting\ExamRegistrationController::class)->except('show');
 Route::resource('setting/view-exam-examiners', App\Http\Controllers\Setting\ExamExaminerController::class)->except('show');
+Route::resource('departement-students', App\Http\Controllers\Departement\StudentController::class)->except('show');
+Route::resource('departement-lectures', App\Http\Controllers\Departement\LectureController::class)->except('show');
+Route::resource('departement-exam-registrations', App\Http\Controllers\Examination\ExamRegistrationController::class)->except('show');
+Route::resource('departement-exam-examiners', App\Http\Controllers\Examination\ExamRegistrationController::class)->except('show');
