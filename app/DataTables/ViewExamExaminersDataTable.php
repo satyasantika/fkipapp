@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\ViewExamRegistration;
+use App\Models\ViewExamExaminer;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -12,7 +12,7 @@ use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class ViewExamRegistrationsDataTable extends DataTable
+class ViewExamExaminersDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -22,14 +22,14 @@ class ViewExamRegistrationsDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('action', 'viewexamregistrations.action')
+            ->addColumn('action', 'viewexamexaminers.action')
             ->setRowId('id');
     }
 
     /**
      * Get the query source of dataTable.
      */
-    public function query(ViewExamRegistration $model): QueryBuilder
+    public function query(ViewExamExaminer $model): QueryBuilder
     {
         return $model->newQuery();
     }
@@ -40,14 +40,13 @@ class ViewExamRegistrationsDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('viewexamregistrations-table')
+                    ->setTableId('viewexamexaminers-table')
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     //->dom('Bfrtip')
                     ->orderBy(1)
                     ->selectStyleSingle()
                     ->buttons([
-                        Button::make('add'),
                         Button::make('excel'),
                         Button::make('csv'),
                         Button::make('pdf'),
@@ -72,7 +71,8 @@ class ViewExamRegistrationsDataTable extends DataTable
             Column::make('tanggal_ujian'),
             Column::make('ujian'),
             Column::make('mahasiswa'),
-            Column::make('nim'),
+            Column::make('dosen'),
+            Column::make('pengujike'),
         ];
     }
 
@@ -81,6 +81,6 @@ class ViewExamRegistrationsDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'ViewExamRegistrations_' . date('YmdHis');
+        return 'ViewExamExaminers_' . date('YmdHis');
     }
 }

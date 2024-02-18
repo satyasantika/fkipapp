@@ -29,6 +29,8 @@ return new class extends Migration
         $query = "SELECT exam_examiners.*,
                         exam_types.kode AS kode_ujian,
                         exam_types.singkatan AS ujian,
+                        exam_registrations.departement_id,
+                        exam_registrations.tanggal_ujian,
                         departements.name AS prodi,
                         lectures.name AS dosen,
                         students.name AS mahasiswa,

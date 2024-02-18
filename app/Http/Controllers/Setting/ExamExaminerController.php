@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Setting;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\DataTables\ViewExamDatesDataTable;
+use App\DataTables\ViewExamExaminersDataTable;
 
-class ExamDateController extends Controller
+class ExamExaminerController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(ViewExamDatesDataTable $dataTable)
+    public function index(ViewExamExaminersDataTable $dataTable)
     {
         // dd($dataTable);
         return $dataTable->render('layouts.setting');
