@@ -5,13 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ExamDate extends Model
+class ExamPayment extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
 
-    protected $casts = [
-        'tanggal_ujian' => 'date',
-    ];
-
+    public function examiners(): HasMany
+    {
+        return $this->hasMany(ExamExaminer::class);
+    }
 }

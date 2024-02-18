@@ -11,29 +11,44 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // view tanggal ujian
-        $query = "SELECT exam_dates.*,departements.name AS prodi FROM exam_dates JOIN departements ON departements.id=exam_dates.departement_id";
-        Schema::createOrReplaceView('view_exam_dates', $query);
-
         // view registrasi ujian
         $query = "SELECT exam_registrations.*,
-                        exam_dates.tanggal_ujian AS tanggal,
+                        exam_types.kode AS kode_ujian,
+                        exam_types.singkatan AS ujian,
                         departements.name AS prodi,
                         students.name AS mahasiswa,
-                        students.nim AS nim,
-                        exam_types.name AS ujian,
-                        (SELECT lectures.name FROM lectures WHERE lectures.id=exam_registrations.dosen1) AS penguji1,
-                        (SELECT lectures.name FROM lectures WHERE lectures.id=exam_registrations.dosen2) AS penguji2,
-                        (SELECT lectures.name FROM lectures WHERE lectures.id=exam_registrations.dosen3) AS penguji3,
-                        (SELECT lectures.name FROM lectures WHERE lectures.id=exam_registrations.dosen4) AS penguji4,
-                        (SELECT lectures.name FROM lectures WHERE lectures.id=exam_registrations.dosen5) AS penguji5
+                        students.nim AS nim
                 FROM exam_registrations
-                    JOIN exam_dates ON exam_dates.id=exam_registrations.exam_date_id
-                    JOIN students ON students.id=exam_registrations.student_id
                     JOIN exam_types ON exam_types.id=exam_registrations.exam_type_id
-                    JOIN departements ON departements.id=exam_dates.departement_id
+                    JOIN students ON students.id=exam_registrations.student_id
+                    JOIN departements ON departements.id=exam_registrations.departement_id
                 ";
         Schema::createOrReplaceView('view_exam_registrations', $query);
+
+        // view penguji
+        $query = "SELECT exam_examiners.*,
+                        exam_types.kode AS kode_ujian,
+                        exam_types.singkatan AS ujian,
+                        departements.name AS prodi,
+                        lectures.name AS dosen,
+                        students.name AS mahasiswa,
+                        students.nim AS nim,
+                        exam_payments.name AS pembayaran,
+                        lectures.rekening AS rekening,
+                        lectures.bank AS bank,
+                        lectures.npwp AS npwp,
+                        lectures.nik AS nik,
+                        lectures.email AS email,
+                        lectures.phone AS phone
+                FROM exam_examiners
+                    JOIN exam_registrations ON exam_registrations.id=exam_examiners.exam_registration_id
+                    JOIN exam_payments ON exam_payments.id=exam_examiners.exam_payment_id
+                    JOIN lectures ON lectures.id=exam_examiners.lecture_id
+                    JOIN students ON students.id=exam_registrations.student_id
+                    JOIN exam_types ON exam_types.id=exam_registrations.exam_type_id
+                    JOIN departements ON departements.id=exam_registrations.departement_id
+                ";
+        Schema::createOrReplaceView('view_exam_examiners', $query);
     }
 
     /**
@@ -41,7 +56,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropViewIfExists('view_exam_examiners');
         Schema::dropViewIfExists('view_exam_registrations');
-        Schema::dropViewIfExists('view_exam_dates');
     }
 };

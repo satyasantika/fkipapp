@@ -11,9 +11,9 @@ class Departement extends Model
     use HasFactory;
     protected $guarded = ['id'];
 
-    public function examdates(): HasMany
+    public function examregistrations(): HasMany
     {
-        return $this->hasMany(ExamDate::class);
+        return $this->hasMany(ExamRegistration::class);
     }
 
     public function lectures(): HasMany
@@ -24,5 +24,10 @@ class Departement extends Model
     public function students(): HasMany
     {
         return $this->hasMany(Student::class);
+    }
+
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
     }
 }

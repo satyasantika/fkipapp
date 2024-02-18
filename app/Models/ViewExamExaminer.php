@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ViewExamDate extends Model
+class ViewExamExaminer extends Model
 {
     use HasFactory;
-    protected $table = 'view_exam_dates';
+    protected $table = 'view_exam_examiners';
 }

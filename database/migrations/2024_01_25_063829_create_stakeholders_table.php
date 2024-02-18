@@ -38,7 +38,7 @@ return new class extends Migration
             $table->string('rekening')->nullable();
             $table->string('bank')->nullable();
             $table->string('npwp')->nullable();
-            $table->string('ktp')->nullable();
+            $table->string('nik')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->string('alamat')->nullable();
@@ -51,6 +51,15 @@ return new class extends Migration
             $table->string('nim')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
+            $table->bigInteger('pembimbing1')->nullable();
+            $table->bigInteger('pembimbing2')->nullable();
+            $table->bigInteger('penguji1')->nullable();
+            $table->bigInteger('penguji2')->nullable();
+            $table->bigInteger('penguji3')->nullable();
+            $table->bigInteger('ketuapenguji')->nullable();
+            $table->date('tanggal_proposal')->nullable();
+            $table->date('tanggal_seminar')->nullable();
+            $table->date('tanggal_sidang')->nullable();
             $table->timestamps();
         });
     }

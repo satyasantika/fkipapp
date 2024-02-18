@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\Lecture;
 use App\Models\Student;
-use App\Models\ExamDate;
 use App\Models\ExamType;
 use App\Models\Departement;
+use App\Models\ExamPayment;
+use App\Models\ExamRegistration;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -19,37 +21,46 @@ return new class extends Migration
             $table->id();
             $table->string('name')->nullable();
             $table->string('kode')->nullable();
-            $table->string('singkat')->nullable();
+            $table->string('singkatan')->nullable();
             $table->timestamps();
         });
 
-        Schema::create('exam_dates', function (Blueprint $table) {
+        Schema::create('exam_payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Departement::class);
-            // $table->string('name')->nullable();
-            $table->date('tanggal_ujian')->nullable();
-            $table->string('kelompok_ujian')->nullable(); //berisi tahun-bulan format (YYYYYMM) untuk admin
+            $table->string('name')->nullable();
+            $table->integer('honor')->nullable();
             $table->timestamps();
         });
 
         Schema::create('exam_registrations', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(ExamDate::class);
+            $table->foreignIdFor(Departement::class);
             $table->foreignIdFor(Student::class);
             $table->foreignIdFor(ExamType::class)->nullable();
             $table->integer('ujianke')->nullable();
             $table->text('judul')->nullable();
-            $table->string('ipk')->nullable();
+            $table->double('ipk',3,2)->nullable();
+            $table->date('tanggal_ujian')->nullable();
+            $table->string('kelompok_ujian')->nullable(); //berisi tahun-bulan format (YYYYYMM) untuk admin
             $table->time('waktu_mulai')->nullable();
             $table->time('waktu_akhir')->nullable();
             $table->string('tempat')->nullable();
-            $table->foreignId('dosen1')->nullable();
-            $table->foreignId('dosen2')->nullable();
-            $table->foreignId('dosen3')->nullable();
-            $table->foreignId('dosen4')->nullable();
-            $table->foreignId('dosen5')->nullable();
             $table->timestamps();
         });
+
+        Schema::create('exam_examiners', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(ExamRegistration::class);
+            $table->foreignIdFor(Lecture::class);
+            $table->foreignIdFor(ExamPayment::class);
+            $table->integer('pengujike')->nullable();
+            $table->boolean('ketua')->default(0);
+            $table->integer('pembimbingke')->default(0);
+            $table->integer('honor')->nullable();
+            $table->boolean('aktif')->default(1);
+            $table->timestamps();
+        });
+
     }
 
     /**
@@ -57,8 +68,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('exam_examiners');
         Schema::dropIfExists('exam_registrations');
+        Schema::dropIfExists('exam_payments');
         Schema::dropIfExists('exam_types');
-        Schema::dropIfExists('exam_dates');
     }
 };

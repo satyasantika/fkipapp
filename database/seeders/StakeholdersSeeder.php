@@ -45,7 +45,7 @@ class StakeholdersSeeder extends Seeder
                     'nip'     => $data[5],
                     'tempat_lahir'     => $data[6],
                     'tanggal_lahir'     => $data[7],
-                    'ktp'     => $data[8],
+                    'nik'     => $data[8],
                     'npwp'     => $data[9],
                     'phone'     => $data[10],
                     'email'     => $data[11],
