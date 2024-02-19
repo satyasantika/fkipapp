@@ -22,13 +22,13 @@ class UsersDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            // ->editColumn('updated_at', function($row) {
-            //     return $row->updated_at->format('Y-m-d H:i:s');
-            // })
-            // ->editColumn('created_at', function($row) {
-            //     return $row->created_at->format('Y-m-d H:i:s');
-            // })
-
+            ->addColumn('action', function($row){
+                $action = ' <a href="'.route('users.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
+                return $action;
+            })
+            ->editColumn('departement_id', function($row){
+                return $row->departement_id;
+            })
             ->setRowId('id');
     }
 
@@ -50,14 +50,14 @@ class UsersDataTable extends DataTable
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     //->dom('Bfrtip')
-                    ->orderBy(1)
+                    ->orderBy(2,'ascending')
                     ->selectStyleSingle()
                     ->buttons([
                         Button::make('add'),
-                        Button::make('excel'),
-                        Button::make('csv'),
-                        Button::make('pdf'),
-                        Button::make('print'),
+                        // Button::make('excel'),
+                        // Button::make('csv'),
+                        // Button::make('pdf'),
+                        // Button::make('print'),
                         Button::make('reset'),
                         Button::make('reload')
                     ]);
@@ -69,13 +69,12 @@ class UsersDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            // Column::computed('action')
-            //       ->exportable(false)
-            //       ->printable(false)
-            //       ->width(60)
-            //       ->addClass('text-center'),
-            Column::make('departement_id')->title('Kode'),
+            Column::computed('action')
+                ->exportable(false)
+                ->printable(false)
+                ->width(50),
             Column::make('name'),
+            Column::make('departement_id')->title('jurusan'),
             Column::make('username'),
         ];
     }
