@@ -26,9 +26,6 @@ class UsersDataTable extends DataTable
                 $action = ' <a href="'.route('users.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
                 return $action;
             })
-            ->editColumn('departement_id', function($row){
-                return $row->departement_id;
-            })
             ->setRowId('id');
     }
 
@@ -70,9 +67,10 @@ class UsersDataTable extends DataTable
     {
         return [
             Column::computed('action')
-                ->exportable(false)
-                ->printable(false)
-                ->width(50),
+                    ->exportable(false)
+                    ->printable(false)
+                    ->width(60)
+                    ->addClass('text-center'),
             Column::make('name'),
             Column::make('departement_id')->title('jurusan'),
             Column::make('username'),

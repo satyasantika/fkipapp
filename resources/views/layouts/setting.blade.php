@@ -3,12 +3,12 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col">
+        <div class="col-auto">
             <div class="card">
                 <div class="card-header">
                     {{ ucFirst(request()->segment(1)) }} > {{ ucFirst(request()->segment(2)) }}
                 </div>
-                <div class="card-body">
+                <div class="card-body table-responsive">
                     @if (session('success'))
                         <div class="alert alert-success">
                             {{ session('success') }}

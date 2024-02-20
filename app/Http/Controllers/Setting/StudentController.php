@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Setting;
 
+use App\Models\Lecture;
+use App\Models\Student;
+use App\Models\Departement;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\DataTables\ViewStudentsDataTable;
@@ -13,7 +16,6 @@ class StudentController extends Controller
      */
     public function index(ViewStudentsDataTable $dataTable)
     {
-        // dd($dataTable);
         return $dataTable->render('layouts.setting');
     }
 
@@ -22,7 +24,11 @@ class StudentController extends Controller
      */
     public function create()
     {
-        //
+        $student = new Student();
+        return view('forms.student',array_merge(
+            [ 'student' => $student ],
+            $this->_dataSelection(),
+        ));
     }
 
     /**
@@ -30,7 +36,10 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $name = strtoupper($request->name);
+        $data = $request->all();
+        Student::create($data->all());
+        return to_route('students.index')->with('success','student '.$name.' telah ditambahkan');
     }
 
     /**
@@ -44,24 +53,46 @@ class StudentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Student $student)
     {
-        //
+        return view('forms.student',array_merge(
+            [ 'student' => $student ],
+            $this->_dataSelection(),
+        ));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Student $student)
     {
-        //
+        $name = strtoupper($student->name);
+        $data = $request->all();
+        $student->fill($data)->save();
+
+        return to_route('students.index')->with('success','student '.$name.' telah diperbarui');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Student $student)
     {
-        //
+        $name = strtoupper($student->name);
+        $student->delete();
+        return to_route('students.index')->with('success','mahasiswa '.$name.' telah dihapus');
     }
+
+    private function _dataSelection()
+    {
+        return [
+            // 'roles' =>  Role::all()->pluck('name')->sort(),
+            'departements' =>  Departement::all()->sort(),
+            'lectures' =>  Lecture::select('id','name','departement_id')
+                                    // ->where('departement_id',auth()->user()->departement_id)
+                                    ->orderBy('name')
+                                    ->get(),
+        ];
+    }
+
 }
