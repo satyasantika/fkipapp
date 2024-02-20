@@ -86,7 +86,6 @@ class StudentController extends Controller
     private function _dataSelection()
     {
         return [
-            // 'roles' =>  Role::all()->pluck('name')->sort(),
             'departements' =>  Departement::all()->sort(),
             'lectures' =>  Lecture::select('id','name','departement_id')
                                     // ->where('departement_id',auth()->user()->departement_id)

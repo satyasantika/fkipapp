@@ -22,7 +22,10 @@ class ViewLecturesDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            // ->addColumn('action', 'viewlectures.action')
+            ->addColumn('action', function($row){
+                $action = ' <a href="'.route('lectures.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
+                return $action;
+            })
             ->setRowId('id');
     }
 
@@ -44,14 +47,14 @@ class ViewLecturesDataTable extends DataTable
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     //->dom('Bfrtip')
-                    ->orderBy(1)
+                    ->orderBy(1,'asc')
                     ->selectStyleSingle()
                     ->buttons([
                         Button::make('add'),
-                        Button::make('excel'),
-                        Button::make('csv'),
-                        Button::make('pdf'),
-                        Button::make('print'),
+                        // Button::make('excel'),
+                        // Button::make('csv'),
+                        // Button::make('pdf'),
+                        // Button::make('print'),
                         Button::make('reset'),
                         Button::make('reload')
                     ]);
@@ -63,14 +66,14 @@ class ViewLecturesDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            // Column::computed('action')
-            //       ->exportable(false)
-            //       ->printable(false)
-            //       ->width(60)
-            //       ->addClass('text-center'),
+            Column::computed('action')
+                    ->exportable(false)
+                    ->printable(false)
+                    ->width(60)
+                    ->addClass('text-center'),
+            Column::make('name'),
             Column::make('departement_id')->title('Kode'),
             Column::make('nidn'),
-            Column::make('name'),
         ];
     }
 

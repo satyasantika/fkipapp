@@ -2,15 +2,6 @@
 
 @push('header')
     {{ $student->id ? 'Edit' : 'Tambah' }} Student
-    {{-- @if ($student->id)
-        <form id="delete-form" action="{{ route('students.destroy',$student->id) }}" method="POST">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-outline-danger btn-sm float-end" onclick="return confirm('Yakin akan menghapus {{ $student->name }}?');">
-                {{ __('del') }}
-            </button>
-        </form>
-    @endif --}}
 @endpush
 
 @push('body')
@@ -125,21 +116,21 @@
         {{-- Tanggal Proposal --}}
         <div class="row mb-3">
             <label for="tanggal_proposal" class="col-md-4 col-form-label text-md-end">Tanggal Proposal</label>
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <input type="date" placeholder="tanggal_proposal" value="{{ $student->tanggal_proposal ? $student->tanggal_proposal->format('Y-m-d') : "" }}" name="tanggal_proposal" class="form-control" id="tanggal_proposal">
             </div>
         </div>
         {{-- Tanggal seminar --}}
         <div class="row mb-3">
             <label for="tanggal_seminar" class="col-md-4 col-form-label text-md-end">Tanggal seminar</label>
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <input type="date" placeholder="tanggal_seminar" value="{{ $student->tanggal_seminar ? $student->tanggal_seminar->format('Y-m-d') : "" }}" name="tanggal_seminar" class="form-control" id="tanggal_seminar">
             </div>
         </div>
         {{-- Tanggal sidang --}}
         <div class="row mb-3">
             <label for="tanggal_sidang" class="col-md-4 col-form-label text-md-end">Tanggal sidang</label>
-            <div class="col-md-7">
+            <div class="col-md-6">
                 <input type="date" placeholder="tanggal_sidang" value="{{ $student->tanggal_sidang ? $student->tanggal_sidang->format('Y-m-d') : "" }}" name="tanggal_sidang" class="form-control" id="tanggal_sidang">
             </div>
         </div>
