@@ -29,9 +29,9 @@ class ViewLecturesDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(ViewLecture $model): QueryBuilder
+    public function query(): QueryBuilder
     {
-        return $model->where('departement_id',auth()->user()->departement_id)->newQuery();
+        return ViewLecture::where('departement_id', $this->departement_id);
     }
 
     /**
@@ -48,9 +48,9 @@ class ViewLecturesDataTable extends DataTable
                     ->selectStyleSingle()
                     ->buttons([
                         Button::make('excel'),
-                        Button::make('csv'),
-                        Button::make('pdf'),
-                        Button::make('print'),
+                        // Button::make('csv'),
+                        // Button::make('pdf'),
+                        // Button::make('print'),
                         Button::make('reset'),
                         Button::make('reload')
                     ]);

@@ -11,10 +11,9 @@ class LectureController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(ViewLecturesDataTable $dataTable)
+    public function index(ViewLecturesDataTable $dataTable, $departement_id)
     {
-        // dd($dataTable);
-        return $dataTable->render('layouts.setting');
+        return $dataTable->with('departement_id',$departement_id)->render('layouts.setting');
     }
 
     /**

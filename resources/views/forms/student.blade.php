@@ -57,7 +57,7 @@
         <div class="row mb-3">
             <label for="pembimbing1" class="col-md-4 col-form-label text-md-end">Pembimbing 1</label>
             <div class="col-md-8">
-                <select id="pembimbing1" class="form-control @error('lecture') is-invalid @enderror" name="pembimbing1">
+                <select id="pembimbing1" class="form-control @error('pembimbing1') is-invalid @enderror" name="pembimbing1">
                     <option value="">-- Tentukan --</option>
                     @foreach ($lectures as $lecture)
                     <option value="{{ $lecture->id }}" @selected($student->pembimbing1==$lecture->id)>{{ $lecture->name.' - '.$lecture->departement_id }}</option>
@@ -69,7 +69,7 @@
         <div class="row mb-3">
             <label for="pembimbing2" class="col-md-4 col-form-label text-md-end">Pembimbing 2</label>
             <div class="col-md-8">
-                <select id="pembimbing2" class="form-control @error('lecture') is-invalid @enderror" name="pembimbing2">
+                <select id="pembimbing2" class="form-control @error('pembimbing2') is-invalid @enderror" name="pembimbing2">
                     <option value="">-- Tentukan --</option>
                     @foreach ($lectures as $lecture)
                     <option value="{{ $lecture->id }}" @selected($student->pembimbing2==$lecture->id)>{{ $lecture->name.' - '.$lecture->departement_id }}</option>
@@ -81,7 +81,7 @@
         <div class="row mb-3">
             <label for="penguji1" class="col-md-4 col-form-label text-md-end">penguji 1</label>
             <div class="col-md-8">
-                <select id="penguji1" class="form-control @error('lecture') is-invalid @enderror" name="penguji1">
+                <select id="penguji1" class="form-control @error('penguji1') is-invalid @enderror" name="penguji1">
                     <option value="">-- Tentukan --</option>
                     @foreach ($lectures as $lecture)
                     <option value="{{ $lecture->id }}" @selected($student->penguji1==$lecture->id)>{{ $lecture->name.' - '.$lecture->departement_id }}</option>
@@ -93,7 +93,7 @@
         <div class="row mb-3">
             <label for="penguji2" class="col-md-4 col-form-label text-md-end">penguji 2</label>
             <div class="col-md-8">
-                <select id="penguji2" class="form-control @error('lecture') is-invalid @enderror" name="penguji2">
+                <select id="penguji2" class="form-control @error('penguji2') is-invalid @enderror" name="penguji2">
                     <option value="">-- Tentukan --</option>
                     @foreach ($lectures as $lecture)
                     <option value="{{ $lecture->id }}" @selected($student->penguji2==$lecture->id)>{{ $lecture->name.' - '.$lecture->departement_id }}</option>
@@ -105,10 +105,22 @@
         <div class="row mb-3">
             <label for="penguji3" class="col-md-4 col-form-label text-md-end">penguji 3</label>
             <div class="col-md-8">
-                <select id="penguji3" class="form-control @error('lecture') is-invalid @enderror" name="penguji3">
+                <select id="penguji3" class="form-control @error('penguji3') is-invalid @enderror" name="penguji3">
                     <option value="">-- Tentukan --</option>
                     @foreach ($lectures as $lecture)
                     <option value="{{ $lecture->id }}" @selected($student->penguji3==$lecture->id)>{{ $lecture->name.' - '.$lecture->departement_id }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        {{-- ketua penguji --}}
+        <div class="row mb-3">
+            <label for="ketuapenguji" class="col-md-4 col-form-label text-md-end">ketua penguji</label>
+            <div class="col-md-8">
+                <select id="ketuapenguji" class="form-control @error('ketuapenguji') is-invalid @enderror" name="ketuapenguji">
+                    <option value="">-- Tentukan --</option>
+                    @foreach ($lectures as $lecture)
+                    <option value="{{ $lecture->id }}" @selected($student->ketuapenguji==$lecture->id)>{{ $lecture->name.' - '.$lecture->departement_id }}</option>
                     @endforeach
                 </select>
             </div>

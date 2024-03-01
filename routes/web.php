@@ -30,3 +30,4 @@ Route::resource('departement-students', App\Http\Controllers\Departement\Student
 Route::resource('departement-lectures', App\Http\Controllers\Departement\LectureController::class)->except('show');
 Route::resource('departement-exam-registrations', App\Http\Controllers\Examination\ExamRegistrationController::class)->except('show');
 Route::resource('departement-exam-examiners', App\Http\Controllers\Examination\ExamRegistrationController::class)->except('show');
+Route::get('departement-lectures/{departement_id}', [App\Http\Controllers\Departement\LectureController::class,'index'])->name('departement-lectures.index');

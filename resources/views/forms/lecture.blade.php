@@ -142,7 +142,7 @@
             <label for="phone" class="col-md-4 col-form-label text-md-end">phone</label>
             <div class="col-md-8">
                 <input type="text" value="{{ $lecture->phone }}" name="phone" class="form-control" id="phone">
-                <a href="{{ 'http://wa.me/62' }}{{ $lecture->phone }}" class="text-primary">kirim wa</a>
+                <a target="_blank" href="{{ 'http://wa.me/62' }}{{ $lecture->phone }}" class="text-primary">kirim wa</a>
             </div>
         </div>
         {{-- alamat --}}

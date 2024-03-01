@@ -88,7 +88,6 @@ class StudentController extends Controller
         return [
             'departements' =>  Departement::all()->sort(),
             'lectures' =>  Lecture::select('id','name','departement_id')
-                                    // ->where('departement_id',auth()->user()->departement_id)
                                     ->orderBy('name')
                                     ->get(),
         ];
