@@ -30,7 +30,7 @@
         <div class="row mb-3">
             <label for="departement_id" class="col-md-4 col-form-label text-md-end">Jurusan</label>
             <div class="col-md-8">
-                <select id="departement_id" class="form-control @error('departement') is-invalid @enderror" name="departement_id">
+                <select id="departement_id" class="form-control @error('departement') is-invalid @enderror" name="departement_id" @disabled($student->departement_id==auth()->user()->departement_id)>
                     <option value="">-- Umum --</option>
                     @foreach ($departements as $departement)
                     <option value="{{ $departement->id }}" @selected($student->departement_id==$departement->id)>{{ $departement->id.' - '.$departement->name }}</option>
@@ -50,7 +50,10 @@
             <label for="phone" class="col-md-4 col-form-label text-md-end">phone</label>
             <div class="col-md-8">
                 <input type="text" value="{{ $student->phone }}" name="phone" class="form-control" id="phone">
-                <a href="{{ 'http://wa.me/62' }}{{ $student->phone }}" class="text-primary">kirim wa</a>
+                @if (!$student->phone==null)
+                <a href="{{ 'http://wa.me/62' }}{{ $student->phone }}" target="_blank" class="text-primary">kirim wa</a>
+                @endif
+
             </div>
         </div>
         {{-- pembimbing 1 --}}
@@ -115,7 +118,7 @@
         </div>
         {{-- ketua penguji --}}
         <div class="row mb-3">
-            <label for="ketuapenguji" class="col-md-4 col-form-label text-md-end">ketua penguji</label>
+            <label for="ketuapenguji" class="col-md-4 col-form-label text-md-end bg-warning">ketua penguji</label>
             <div class="col-md-8">
                 <select id="ketuapenguji" class="form-control @error('ketuapenguji') is-invalid @enderror" name="ketuapenguji">
                     <option value="">-- Tentukan --</option>

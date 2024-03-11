@@ -85,11 +85,20 @@ class StudentController extends Controller
 
     private function _dataSelection()
     {
+        if (auth()->user()->hasRole('jurusan')) {
+            $lectures = Lecture::select('id','name','departement_id')
+                                        ->where('departement_id',auth()->user()->departement_id)
+                                        ->orderBy('name')
+                                        ->get();
+        } else {
+            $lectures = Lecture::select('id','name','departement_id')
+                                        ->orderBy('name')
+                                        ->get();
+        }
+
         return [
             'departements' =>  Departement::all()->sort(),
-            'lectures' =>  Lecture::select('id','name','departement_id')
-                                    ->orderBy('name')
-                                    ->get(),
+            'lectures' =>  $lectures,
         ];
     }
 
