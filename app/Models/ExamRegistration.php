@@ -14,19 +14,19 @@ class ExamRegistration extends Model
         'tanggal_ujian' => 'date',
     ];
 
-    public function examiners(): HasMany
-    {
-        return $this->hasMany(ExamExaminer::class);
-    }
-
     public function departement(): BelongsTo
     {
         return $this->belongsTo(Departement::class, 'departement_id');
     }
 
-    public function exam_type(): BelongsTo
+    public function exam_type()
     {
         return $this->belongsTo(ExamType::class, 'exam_type_id');
+    }
+
+    public function lecture(): BelongsTo
+    {
+        return $this->belongsTo(Lecture::class, 'lecture_id');
     }
 
     public function student(): BelongsTo

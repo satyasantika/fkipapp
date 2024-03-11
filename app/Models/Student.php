@@ -13,7 +13,7 @@ class Student extends Model
     protected $casts = [
         'tanggal_proposal' => 'date',
         'tanggal_seminar' => 'date',
-        'tanggal_sidang' => 'date',
+        'tanggal_skripsi' => 'date',
     ];
 
     public function examregistrations(): HasMany

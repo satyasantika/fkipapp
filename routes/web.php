@@ -25,6 +25,6 @@ Route::get('exam/registrations/{student_id}/create', [App\Http\Controllers\ExamR
 Route::resource('users', App\Http\Controllers\UserController::class)->except('show');
 Route::resource('students', App\Http\Controllers\StudentController::class)->except('show');
 Route::resource('lectures', App\Http\Controllers\LectureController::class)->except('show');
-Route::resource('exam/registrations', App\Http\Controllers\ExamRegistrationController::class);
+Route::resource('exam/registrations', App\Http\Controllers\ExamRegistrationController::class)->except('create');
 Route::resource('departement-exam-registrations', App\Http\Controllers\Examination\ExamRegistrationController::class)->except('show');
 Route::resource('departement-exam-examiners', App\Http\Controllers\Examination\ExamRegistrationController::class)->except('show');

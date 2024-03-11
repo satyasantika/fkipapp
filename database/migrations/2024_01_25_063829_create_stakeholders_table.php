@@ -59,7 +59,7 @@ return new class extends Migration
             $table->unsignedBigInteger('ketuapenguji_id')->nullable();
             $table->date('tanggal_proposal')->nullable();
             $table->date('tanggal_seminar')->nullable();
-            $table->date('tanggal_sidang')->nullable();
+            $table->date('tanggal_skripsi')->nullable();
             $table->timestamps();
         });
     }
