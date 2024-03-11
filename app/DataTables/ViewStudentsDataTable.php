@@ -34,7 +34,11 @@ class ViewStudentsDataTable extends DataTable
      */
     public function query(ViewStudent $model): QueryBuilder
     {
-        return $model->newQuery();
+        if (auth()->user()->hasRole('jurusan')) {
+            return $model->where('departement_id',auth()->user()->departement_id)->newQuery();
+        } else {
+            return $model->newQuery();
+        }
     }
 
     /**
@@ -50,7 +54,7 @@ class ViewStudentsDataTable extends DataTable
                     ->orderBy(1)
                     ->selectStyleSingle()
                     ->buttons([
-                        Button::make('add'),
+                        auth()->user()->hasRole('admin') ? Button::make('add') :'',
                         // Button::make('excel'),
                         // Button::make('csv'),
                         // Button::make('pdf'),

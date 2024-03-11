@@ -34,7 +34,12 @@ class ViewLecturesDataTable extends DataTable
      */
     public function query(ViewLecture $model): QueryBuilder
     {
-        return $model->newQuery();
+        if (auth()->user()->hasRole('jurusan')) {
+            return $model->where('departement_id',auth()->user()->departement_id)->newQuery();
+        } else {
+            return $model->newQuery();
+        }
+
     }
 
     /**
@@ -50,7 +55,7 @@ class ViewLecturesDataTable extends DataTable
                     ->orderBy(1,'asc')
                     ->selectStyleSingle()
                     ->buttons([
-                        Button::make('add'),
+                        auth()->user()->hasRole('admin') ? Button::make('add') :'',
                         // Button::make('excel'),
                         // Button::make('csv'),
                         // Button::make('pdf'),
