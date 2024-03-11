@@ -42,7 +42,7 @@
                 <select id="departement_id" class="form-control @error('departement') is-invalid @enderror" name="departement_id">
                     <option value="">-- Umum --</option>
                     @foreach ($departements as $departement)
-                    <option value="{{ $departement->id }}" @selected($user->departement_id==$departement->id)>{{ $departement->id.' - '.$departement->name }}</option>
+                    <option value="{{ $departement->id }}" @selected($user->departement_id==$departement->id)>{{ $departement->id.' - '.$departement->nama }}</option>
                     @endforeach
                 </select>
             </div>
