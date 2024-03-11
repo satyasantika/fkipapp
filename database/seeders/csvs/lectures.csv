@@ -1,4 +1,4 @@
-departement_id,name,gelar_depan,gelar_belakang,nidn,nip,tempat_lahir,tanggal_lahir,ktp,npwp,phone,email,alamat,golongan,kualifikasi,jafung,rekening
+departement_id,nama,gelar_depan,gelar_belakang,nidn,nip,tempat_lahir,tanggal_lahir,ktp,npwp,phone,email,alamat,golongan,pendidikan,jabatan_akademik,rekening
 2103,Mumu,H.,"Drs., M.Pd.",0002085902,195908021985031002,TASIKMALAYA,1959-08-02,,252420914425000,,mumu@unsil.ac.id,Kp. Mugarsari,3d,S2,Lektor,1310012964476
 2103,Lilis Karwati,Dr.,"Dra., M.Pd.",0403106706,09310122103930091,GARUT,1967-10-03,3207024310670003,94.326.913.4.442.000,085222260501,liliskarwati@unsil.ac.id,Jln.Raya Nasional III. Dusun Pengkolan No.405. RT.023/RW.007 Kelurahan Sindangkasih Kecamatan Sindangkasih.,3d,S3,Lektor Kepala,
 2103,Wiwin Herwina,Dr.,"S.Pd., M.Pd.",0023056903,,TASIKMALAYA,1969-05-23,3278026305690001,24.426.546.8.425.000,085223506611,wiwinherwina@unsil.ac.id,Leuwihalang No. 107 RT/RW 003/004 Kelurahan Sukamanah Kec. Cipedes,3c,S3,Lektor Kepala,
@@ -40,7 +40,7 @@ departement_id,name,gelar_depan,gelar_belakang,nidn,nip,tempat_lahir,tanggal_lah
 2122,Yuyus Saputra,,"S.Pd., M.Pd.",0404078207,,TASIKMALAYA,1982-07-04,3206200407820001,34.901.941.4-425.000,,kil056@unsil.ac.id,Perum Aksajaya Blok E No. 02 RT/RW 004/009 Kel. Sambongjaya Kec. Mangkubumi,3c,S2,Lektor,1310013122637
 2122,Agis Andriani,Dr.,"S.Pd., M.Hum.",0411088302,,CIAMIS,1983-08-11,3278095108830001,71.471.274.2-425.000,081313696478,agisandriani@unsil.ac.id,Jl. Bantarsari RT/RW 001/002 Kel. Bantarsari Kec. Bangusari,3c,S2,Lektor,1310006679452
 2122,Ratu Sarah Pujasari,,"S.Pd., M.Pd.",0012039501,,Tasikmalaya,1985-03-12,3278095203850001,71.493.771.1-425.000,085323032338,,Jalan Bantar No. 90 001/008 Bantarsari Bungursari,3c,S2,Lektor,1770000417797
-2122,Junjun Muhamad Ramdani,,M.Pd.,0014068502,,Tasikmalaya,1985-06-14,3214111406850003,88.270.343.2-409.000,,,Dusun Paratag 010/005 Bojong Barat Bojong,3c,S2,Lektor,1310013117637
+2122,Junjun Muhamad Ramdani,,"S.Pd., M.Pd., Ph.D.",0014068502,,Tasikmalaya,1985-06-14,3214111406850003,88.270.343.2-409.000,,,Dusun Paratag 010/005 Bojong Barat Bojong,3c,S2,Lektor,1310013117637
 2122,Fera Sulastri,,"S.Pd, M.Pd.",0031128502,,Panumbangan,1985-12-31,3207077112850001,73.088.901.1-442.000,081289490368,ferasulastri@unsil.ac.id,Dusun Cijamban RT/RW 004/002 Kel. Panumbangan Kec. Panumbanagan,3c,S2,Lektor,1310013117660
 2122,Arini Nurul Hidayati,,"S.Pd., M.Pd.",0406048801,19880406 201504 2 005,Tasikmalaya,1988-04-06,3206284604880001,71.448.154.7-425.000,,,Kp. Arjasari RT/RW 006/002 Kel. Arjasari Kec. Leuwisari,3b,S2,Lektor,9000009948119
 2122,Fuad Abdullah,,M.Pd.,0028038901,,Tasikmalaya,1989-03-28,3278062803890006,73.095.164.1-425.000,,fuad.abdullah182@gmail.com,Kp. Siluman 003/002 Setiaratu Cibeureum,3c,S2,Lektor,1770000493046
@@ -78,7 +78,7 @@ departement_id,name,gelar_depan,gelar_belakang,nidn,nip,tempat_lahir,tanggal_lah
 2153,Endang Surahman,Dr.,"Drs., M.Pd.",0029046201,196204291989031001,TASIKMALAYA,1962-04-29,3278062904620009,77.299.009.9-425.000,081322588100,e.surahman@unsil.ac.id,JL. Khoer Afandi 145 Kp. Elos 002/003 Kota Baru Cibeureum,4b,S3,Lektor Kepala,1310013121019
 2153,Agus Sumantri,Dr.,M.Pd.,0026066307,19630626261984031008,Cilacap,1963-06-26,3301162606630001,07.944.290.1-442.000,082219209371,gus.suman3@gmail.com,Dusun Ciawitali RT 02 RW 09 Desa Panulisan Timur Kecamatan Dayeuhluhur Kabupaten Cialacap,4d,S3,Asisten Ahli,
 2153,Nana,Dr.,"S.Pd., M.Pd.",0005067911,197906052005011015,Ciamis,1979-06-05,3207010506790003,777826603442000,082133440942,nana@unsil.ac.id,Jl. SILIWANGI RT02 RW O3 MALEBER CIAMIS,3d,S3,Lektor,
-2153,Irwan Muhammad Ridwan,,M.Pd.,0014088503,,Sodonghilir,1985-06-14,3206121406850003,54.583.309.7-425.000,081321818956,irwanmr@unsil.ac.id,Kp. Ciakar Desa Leuwidulang Kec. Sodonghilir,3b,S3,Asisten Ahli,1770006386913
+2153,Irwan Muhammad Ridwan,Dr.,M.Pd.,0014088503,,Sodonghilir,1985-06-14,3206121406850003,54.583.309.7-425.000,081321818956,irwanmr@unsil.ac.id,Kp. Ciakar Desa Leuwidulang Kec. Sodonghilir,3b,S3,Asisten Ahli,1770006386913
 2153,Rahmat Rizal,Dr.,"S.Pd., M.Pd.",0421018701,,Jamanis,1987-01-21,320635201870001,846371128425000,085218588810,rahmatrizal@unsil.ac.id,Sekbrong RT 01 RW 07 Desa Condong Kecamatan Jamanis,3c,S3,Lektor,
 2153,Eko Sujarwanto,,"S.Pd., M.Pd.",0723098901,198909232019031008,Nganjuk,1989-09-23,3517022309890003,,083846204456,eko.sujarwanto@unsil.ac.id,,3b,S2,Lektor,
 2153,Irfan Ansori,,M.Pd.,0015089003,,,1990-08-15,3205051508900002,751880014443000,,,Kp. Umbui Tengah Desa Jayawaras Kecamatan Tarogong Kidul,3b,S2,Asisten Ahli,1320021158713
@@ -96,7 +96,7 @@ departement_id,name,gelar_depan,gelar_belakang,nidn,nip,tempat_lahir,tanggal_lah
 2154,Popo Musthofa Kamil,,"S.Pd., M.Pd.",0006098701,,TASIKMALAYA,1987-09-06,3278100609870002,71.525.939.6-425.000,085224636353,,Kp. Depok RT/RW 003/005 Kel. Sukamenak Kec. Purbaratu,3c,S2,Lektor,1310013121449
 2154,Dea Diella,,"S.Pd., M.Pd.",0008128703,198712082015042005,TASIKMALAYA,1987-12-08,3278014812870006,709131536425000,081320402253,deadiella@unsil.ac.id,CEMPAKAWARNA NO. 12A,3b,S2,Lektor,9000034670878
 2154,Dita Agustian,Dr.,"S.Pd., M.Pd.",0407088803,198808072019031012,Tasikmalaya,1988-08-07,3206010708880004,706029535428000,085223830734,dita.agustian@unsil.ac.id,Komplek Puri Sumelap Indah Blok C No 20,3c,S3,Lektor,
-2154,Liah Badriah,,"S.Pd., M.Pd.",0013088802,,RAJAPOLAH,1988-08-13,3206345308880009,71.564.611.3-425.000,081322526493,liahbadriah@unsil.ac.id,Gunung Tujuh RT.02 RT.08 Kelurahan Sukarindik kecamatan Bungursari Tasikmalaya Jawa Barat,3c,S2,Lektor,1310013121225
+2154,Liah Badriah,Dr.,"S.Pd., M.Pd.",0013088802,,RAJAPOLAH,1988-08-13,3206345308880009,71.564.611.3-425.000,081322526493,liahbadriah@unsil.ac.id,Gunung Tujuh RT.02 RT.08 Kelurahan Sukarindik kecamatan Bungursari Tasikmalaya Jawa Barat,3c,S2,Lektor,1310013121225
 2154,Diki Muhamad Chaidir,,"S.Pd., M.Pd.",0022128802,,TANGERANG,1988-12-22,3278062212880008,72.986.525.3-425.000,082115101710,dikimc@unsil.ac.id,Perum Baitul Marhamah I Blok B.9 RT/RW 001/014 Kel. Sambongjaya Kec. Mangkubumi,3b,S2,Lektor,1770000419074
 2154,Ryan Ardiansyah,,"S.Pd., M.Pd.",0008018901,198901082015041001,SUBANG,1989-01-08,3213040801890005,723029054439000,08997979633,ryanardiansyah@unsil.ac.id,perum kertasari jl. kertawinangun I Blok IV RT 05/12. Ciamis,3b,S2,Lektor,9000037976637
 2154,Egi Nuryadin,,"S.Pd., M.Si.",0019038901,,TASIKMALAYA,1989-03-19,3206151903890002,71.532.429.9-425.000,085221835608,egi.nuryadin@unsil.ac.id,PERUM VILLA PERDANIA BLOK A.21 RT/RW 001/012 KEL.SETIAMULYA KEC. TAMANSARI,3c,S2,Lektor,1310013121175
@@ -105,7 +105,7 @@ departement_id,name,gelar_depan,gelar_belakang,nidn,nip,tempat_lahir,tanggal_lah
 2154,Rita Fitriani,,"S.Pd., M.Pd.",0028118901,,TASIKMALAYA,1989-11-28,3206276811890001,72.995.973.4-425.000,,tatairawan12@gmail.com,Jalan Cikalang Girang Gg. Sukasukur I RT/RW 004/004 Kel. Kahuripan Kec. Tawang,3c,S2,Lektor,1310013121514
 2154,Vita Meylani,,"S.Pd., M.Sc.",0027059001,,CIMERAK,1990-05-27,3278026705900003,71.452.885.8-425.000,,,Nagarakasih Kaler RT/RW 002/002 Kel. Kersanagara Kec. Cibeureum,3d,S2,Lektor,1310013120946
 2154,Samuel Agus Triyanto,,"S.Pd., M.Pd.",0011089103,199108112019031015,Karanganyar,1991-08-11,3313141108910001,82.080.885.5-528.000,082147180470,samuel.agus@unsil.ac.id,"Tegalan RT 01/RW 06, Lalung, Karanganyar",3b,S2,Lektor,
-2154,Dani Ramdani,,"S.Pd., M.Pd.",0028048902,,TASIKMALAYA,2013-04-28,3206052804890001,71.532.647.6-425.000,082127911113,daniramdani@unsil.ac.id,Perum Bumi Citra Saguling N0. C-12 Kawalu,3c,S3,Lektor,1310013121092
+2154,Dani Ramdani,Dr.,"S.Pd., M.Pd.",0028048902,,TASIKMALAYA,2013-04-28,3206052804890001,71.532.647.6-425.000,082127911113,daniramdani@unsil.ac.id,Perum Bumi Citra Saguling N0. C-12 Kawalu,3c,S3,Lektor,1310013121092
 2165,Heti Suherti,,"Dra., M.M.",0019035901,195903191985032001,Garut,1959-03-19,,772990016425000,08121479969,hetisuherti@unsil.ac.id,Perum Laswi Residence Blok D.4,4b,S2,Lektor Kepala,1310013118239
 2165,Yoni Hermawan,Dr.,"Drs., M.Pd.",0414026201,196202142021211001,TASIKMALAYA,1962-02-14,,772982195425000,08122483217,yonihermawan@unsil.ac.id,Jl. RE. Martadinata Gg. Sayuran I No. 18,4b,S3,Lektor Kepala,1770000414356
 2165,Ade Rustiana,Dr.,"Drs., M.Si.",0002016803,196801021992031002,Garut,1968-01-02,,,,,,4c,S3,Lektor Kepala,

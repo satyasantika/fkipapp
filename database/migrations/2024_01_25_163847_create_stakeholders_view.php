@@ -12,17 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         // view dosen
-        $query = "SELECT lectures.*,departements.name AS prodi FROM lectures JOIN departements ON departements.id=lectures.departement_id";
+        $query = "SELECT lectures.*,departements.nama AS prodi FROM lectures JOIN departements ON departements.id=lectures.departement_id";
         Schema::createOrReplaceView('view_lectures', $query);
         // view mahasiswa
         $query = "SELECT students.*,
-                        departements.name AS prodi,
-                        (SELECT lectures.name FROM lectures WHERE lectures.id=students.pembimbing1) AS pembimbing_1,
-                        (SELECT lectures.name FROM lectures WHERE lectures.id=students.pembimbing2) AS pembimbing_2,
-                        (SELECT lectures.name FROM lectures WHERE lectures.id=students.penguji1) AS penguji_1,
-                        (SELECT lectures.name FROM lectures WHERE lectures.id=students.penguji2) AS penguji_2,
-                        (SELECT lectures.name FROM lectures WHERE lectures.id=students.penguji3) AS penguji_3,
-                        (SELECT lectures.name FROM lectures WHERE lectures.id=students.ketuapenguji) AS ketua
+                        departements.nama AS prodi,
+                        (SELECT lectures.nama FROM lectures WHERE lectures.id=students.pembimbing1_id) AS pembimbing_1,
+                        (SELECT lectures.nama FROM lectures WHERE lectures.id=students.pembimbing2_id) AS pembimbing_2,
+                        (SELECT lectures.nama FROM lectures WHERE lectures.id=students.penguji1_id) AS penguji_1,
+                        (SELECT lectures.nama FROM lectures WHERE lectures.id=students.penguji2_id) AS penguji_2,
+                        (SELECT lectures.nama FROM lectures WHERE lectures.id=students.penguji3_id) AS penguji_3,
+                        (SELECT lectures.nama FROM lectures WHERE lectures.id=students.ketuapenguji_id) AS ketua
                 FROM students
                 JOIN departements ON departements.id=students.departement_id";
         Schema::createOrReplaceView('view_students', $query);

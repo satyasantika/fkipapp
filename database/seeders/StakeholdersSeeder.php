@@ -22,7 +22,7 @@ class StakeholdersSeeder extends Seeder
             if (!$transRow) {
                 Departement::create([
                     'id'  => $data[0],
-                    'name'      => $data[1],
+                    'nama'      => $data[1],
                     'mapel'     => $data[2],
                     'singkatan'     => $data[3],
                 ]);
@@ -38,7 +38,7 @@ class StakeholdersSeeder extends Seeder
             if (!$transRow) {
                 Lecture::create([
                     'departement_id'  => $data[0],
-                    'name'      => $data[1],
+                    'nama'      => $data[1],
                     'gelar_depan'     => $data[2],
                     'gelar_belakang'     => $data[3],
                     'nidn'     => $data[4],
@@ -51,8 +51,8 @@ class StakeholdersSeeder extends Seeder
                     'email'     => $data[11],
                     'alamat'     => $data[12],
                     'golongan'     => $data[13],
-                    'kualifikasi'     => $data[14],
-                    'jafung'     => $data[15],
+                    'pendidikan'     => $data[14],
+                    'jabatan_akademik'     => $data[15],
                     'rekening'     => $data[16],
                 ]);
             }
@@ -68,7 +68,7 @@ class StakeholdersSeeder extends Seeder
                 Student::create([
                     'departement_id'  => $data[0],
                     'nim'      => $data[1],
-                    'name'      => $data[2],
+                    'nama'      => $data[2],
                     'email'     => $data[3],
                     'phone'     => $data[4],
                 ]);

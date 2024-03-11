@@ -36,7 +36,7 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        $name = strtoupper($request->name);
+        $name = strtoupper($request->nama);
         $data = $request->all();
         Student::create($data->all());
         return to_route('students.index')->with('success','student '.$name.' telah ditambahkan');
@@ -66,7 +66,7 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
-        $name = strtoupper($student->name);
+        $name = strtoupper($student->nama);
         $data = $request->all();
         $student->fill($data)->save();
 
@@ -86,13 +86,13 @@ class StudentController extends Controller
     private function _dataSelection()
     {
         if (auth()->user()->hasRole('jurusan')) {
-            $lectures = Lecture::select('id','name','departement_id')
+            $lectures = Lecture::select('id','nama','departement_id')
                                         ->where('departement_id',auth()->user()->departement_id)
-                                        ->orderBy('name')
+                                        ->orderBy('nama')
                                         ->get();
         } else {
-            $lectures = Lecture::select('id','name','departement_id')
-                                        ->orderBy('name')
+            $lectures = Lecture::select('id','nama','departement_id')
+                                        ->orderBy('nama')
                                         ->get();
         }
 

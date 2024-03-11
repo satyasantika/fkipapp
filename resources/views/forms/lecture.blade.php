@@ -19,7 +19,7 @@
                 <select id="departement_id" class="form-control @error('departement') is-invalid @enderror" name="departement_id">
                     <option value="">-- Umum --</option>
                     @foreach ($departements as $departement)
-                    <option value="{{ $departement->id }}" @selected($lecture->departement_id==$departement->id)>{{ $departement->id.' - '.$departement->name }}</option>
+                    <option value="{{ $departement->id }}" @selected($lecture->departement_id==$departement->id)>{{ $departement->id.' - '.$departement->nama }}</option>
                     @endforeach
                 </select>
             </div>
@@ -31,11 +31,11 @@
                 <input type="text" value="{{ $lecture->gelar_depan }}" name="gelar_depan" class="form-control" id="gelar_depan">
             </div>
         </div>
-        {{-- name --}}
+        {{-- nama --}}
         <div class="row mb-3">
-            <label for="name" class="col-md-4 col-form-label text-md-end">name</label>
+            <label for="nama" class="col-md-4 col-form-label text-md-end">nama</label>
             <div class="col-md-8">
-                <input type="text" value="{{ $lecture->name }}" name="name" class="form-control" id="name">
+                <input type="text" value="{{ $lecture->nama }}" name="nama" class="form-control" id="nama">
             </div>
         </div>
         {{-- gelar_belakang --}}
@@ -59,14 +59,14 @@
                 <input type="text" value="{{ $lecture->nip }}" name="nip" class="form-control" id="nip">
             </div>
         </div>
-        {{-- Jafung --}}
+        {{-- jabatan_akademik --}}
         <div class="row mb-3">
-            <label for="jafung" class="col-md-4 col-form-label text-md-end">Jafung</label>
+            <label for="jabatan_akademik" class="col-md-4 col-form-label text-md-end">jabatan_akademik</label>
             <div class="col-md-8">
-                <select id="jafung" class="form-control @error('jafung') is-invalid @enderror" name="jafung">
+                <select id="jabatan_akademik" class="form-control @error('jabatan_akademik') is-invalid @enderror" name="jabatan_akademik">
                     <option value=""></option>
-                    @foreach ($jafungs as $jafung)
-                    <option value="{{ $jafung }}" @selected($lecture->jafung==$jafung)>{{ $jafung }}</option>
+                    @foreach ($jabatan_akademiks as $jabatan_akademik)
+                    <option value="{{ $jabatan_akademik }}" @selected($lecture->jabatan_akademik==$jabatan_akademik)>{{ $jabatan_akademik }}</option>
                     @endforeach
                 </select>
             </div>
@@ -83,14 +83,14 @@
                 </select>
             </div>
         </div>
-        {{-- kualifikasi --}}
+        {{-- pendidikan --}}
         <div class="row mb-3">
-            <label for="kualifikasi" class="col-md-4 col-form-label text-md-end">kualifikasi</label>
+            <label for="pendidikan" class="col-md-4 col-form-label text-md-end">pendidikan</label>
             <div class="col-md-8">
-                <select id="kualifikasi" class="form-control @error('kualifikasi') is-invalid @enderror" name="kualifikasi">
+                <select id="pendidikan" class="form-control @error('pendidikan') is-invalid @enderror" name="pendidikan">
                     <option value=""></option>
-                    @foreach ($kualifikasis as $kualifikasi)
-                    <option value="{{ $kualifikasi }}" @selected($lecture->kualifikasi==$kualifikasi)>{{ $kualifikasi }}</option>
+                    @foreach ($pendidikans as $pendidikan)
+                    <option value="{{ $pendidikan }}" @selected($lecture->pendidikan==$pendidikan)>{{ $pendidikan }}</option>
                     @endforeach
                 </select>
             </div>

@@ -66,7 +66,7 @@ class LectureController extends Controller
      */
     public function update(Request $request, Lecture $lecture)
     {
-        $name = strtoupper($lecture->name);
+        $name = strtoupper($lecture->nama);
         $data = $request->all();
         $lecture->fill($data)->save();
 
@@ -78,7 +78,7 @@ class LectureController extends Controller
      */
     public function destroy(Lecture $lecture)
     {
-        $name = strtoupper($lecture->name);
+        $name = strtoupper($lecture->nama);
         $lecture->delete();
         return to_route('lectures.index')->with('success','mahasiswa '.$name.' telah dihapus');
     }
@@ -87,9 +87,9 @@ class LectureController extends Controller
     {
         return [
             'departements' =>  Departement::all()->sort(),
-            'jafungs' =>  ['Asisten Ahli','Lektor','Lektor Kepala','Guru Besar'],
+            'jabatan_akademiks' =>  ['Asisten Ahli','Lektor','Lektor Kepala','Guru Besar'],
             'golongans' =>  ['3b','3c','3d','4a','4b','4c','4d','4e'],
-            'kualifikasis' =>  ['S2','S3'],
+            'pendidikans' =>  ['S2','S3'],
         ];
     }
 

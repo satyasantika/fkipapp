@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('departements', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable();
+            $table->string('nama')->nullable();
             $table->string('mapel')->nullable();
             $table->string('singkatan')->nullable();
             $table->timestamps();
@@ -22,17 +22,17 @@ return new class extends Migration
         Schema::create('lectures', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Departement::class);
-            $table->string('name')->nullable();
+            $table->string('nama')->nullable();
             $table->string('gelar_depan')->nullable();
             $table->string('gelar_belakang')->nullable();
             $table->string('nidn')->nullable();
             $table->string('nip')->nullable();
-            $table->string('jafung')->nullable();
-            $table->date('tmt_jafung')->nullable();
+            $table->string('jabatan_akademik')->nullable();
+            $table->date('tmt_jabatan_akademik')->nullable();
             $table->string('golongan')->nullable();
             $table->date('tmt_golongan')->nullable();
-            $table->string('kualifikasi')->nullable();
-            $table->date('tmt_kualifikasi')->nullable();
+            $table->string('pendidikan')->nullable();
+            $table->date('tmt_pendidikan')->nullable();
             $table->string('tempat_lahir')->nullable();
             $table->date('tanggal_lahir')->nullable();
             $table->string('rekening')->nullable();
@@ -47,16 +47,16 @@ return new class extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Departement::class);
-            $table->string('name')->nullable();
+            $table->string('nama')->nullable();
             $table->string('nim')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            $table->bigInteger('pembimbing1')->nullable();
-            $table->bigInteger('pembimbing2')->nullable();
-            $table->bigInteger('penguji1')->nullable();
-            $table->bigInteger('penguji2')->nullable();
-            $table->bigInteger('penguji3')->nullable();
-            $table->bigInteger('ketuapenguji')->nullable();
+            $table->unsignedBigInteger('pembimbing1_id')->nullable();
+            $table->unsignedBigInteger('pembimbing2_id')->nullable();
+            $table->unsignedBigInteger('penguji1_id')->nullable();
+            $table->unsignedBigInteger('penguji2_id')->nullable();
+            $table->unsignedBigInteger('penguji3_id')->nullable();
+            $table->unsignedBigInteger('ketuapenguji_id')->nullable();
             $table->date('tanggal_proposal')->nullable();
             $table->date('tanggal_seminar')->nullable();
             $table->date('tanggal_sidang')->nullable();

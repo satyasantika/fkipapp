@@ -31,7 +31,13 @@ class ViewExamRegistrationsDataTable extends DataTable
      */
     public function query(ViewExamRegistration $model): QueryBuilder
     {
-        return $model->newQuery();
+        if (auth()->user()->hasRole('jurusan')) {
+            return $model->where('departement_id',auth()->user()->departement_id)
+                        ->orWhere('student_id',$this->student_id)
+                        ->newQuery();
+        } else {
+            return $model->newQuery();
+        }
     }
 
     /**
@@ -47,7 +53,7 @@ class ViewExamRegistrationsDataTable extends DataTable
                     ->orderBy(1)
                     ->selectStyleSingle()
                     ->buttons([
-                        Button::make('add'),
+                        auth()->user()->hasRole('jurusan') ? Button::make('add') :'',
                         Button::make('excel'),
                         // Button::make('csv'),
                         // Button::make('pdf'),

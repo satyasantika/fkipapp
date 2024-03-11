@@ -1,9 +1,10 @@
-nama,honor
-"penguji proposal",50000
-"penguji seminar hasil penelitian",20000
-"penguji skripsi - Guru Besar",850000
-"penguji skripsi - Doktor/Lektor Kepala",800000
-"penguji skripsi - Doktor/Lektor",700000
-"penguji skripsi - Magister/Lektor Kepala",700000
-"penguji skripsi - Magister/Lektor",600000
-"penguji skripsi - Magister/Asisten Ahli",550000
+nama,jabatan_akademik,pendidikan,honor
+"penguji proposal",,,50000
+"penguji seminar hasil penelitian",,,20000
+"penguji skripsi",,,100000
+"pembimbing skripsi - Guru Besar","Guru Besar",S3,750000
+"pembimbing skripsi - Doktor/Lektor Kepala","Lektor Kepala",S3,700000
+"pembimbing skripsi - Doktor/Lektor",Lektor,S3,600000
+"pembimbing skripsi - Magister/Lektor Kepala","Lektor Kepala",S2,600000
+"pembimbing skripsi - Magister/Lektor",Lektor,S2,500000
+"pembimbing skripsi - Magister/Asisten Ahli","Asisten Ahli",S2,450000

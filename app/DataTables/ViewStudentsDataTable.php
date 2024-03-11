@@ -24,6 +24,7 @@ class ViewStudentsDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('action', function($row){
                 $action = ' <a href="'.route('students.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
+                $action .= ' <a href="'.route('registrations.show',$row->id).'" class="btn btn-success btn-sm action">U</a> ';
                 return $action;
             })
             ->setRowId('id');
@@ -77,7 +78,7 @@ class ViewStudentsDataTable extends DataTable
                     ->addClass('text-center'),
             Column::make('departement_id')->title('Kode'),
             Column::make('nim'),
-            Column::make('name'),
+            Column::make('nama'),
         ];
     }
 

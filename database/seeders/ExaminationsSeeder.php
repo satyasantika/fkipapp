@@ -20,9 +20,9 @@ class ExaminationsSeeder extends Seeder
         while (($data = fgetcsv($csvData, 555, ',')) !== false) {
             if (!$transRow) {
                 ExamType::create([
-                    'name'      => $data[0],
-                    'kode'      => $data[1],
-                    'singkatan' => $data[2],
+                    'nama_ujian'      => $data[0],
+                    'kode_ujian'      => $data[1],
+                    'singkat_ujian' => $data[2],
                 ]);
             }
             $transRow = false;
@@ -35,8 +35,10 @@ class ExaminationsSeeder extends Seeder
         while (($data = fgetcsv($csvData, 555, ',')) !== false) {
             if (!$transRow) {
                 ExamPayment::create([
-                    'name'      => $data[0],
-                    'honor'      => $data[1],
+                    'nama'      => $data[0],
+                    'jabatan_akademik'      => $data[1],
+                    'pendidikan'      => $data[2],
+                    'honor'      => $data[3],
                 ]);
             }
             $transRow = false;

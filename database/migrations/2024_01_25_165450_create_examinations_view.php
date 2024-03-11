@@ -13,10 +13,10 @@ return new class extends Migration
     {
         // view registrasi ujian
         $query = "SELECT exam_registrations.*,
-                        exam_types.kode AS kode_ujian,
-                        exam_types.singkatan AS ujian,
-                        departements.name AS prodi,
-                        students.name AS mahasiswa,
+                        exam_types.kode_ujian AS kode_ujian,
+                        exam_types.singkat_ujian AS ujian,
+                        departements.nama AS prodi,
+                        students.nama AS mahasiswa,
                         students.nim AS nim
                 FROM exam_registrations
                     JOIN exam_types ON exam_types.id=exam_registrations.exam_type_id
@@ -26,31 +26,16 @@ return new class extends Migration
         Schema::createOrReplaceView('view_exam_registrations', $query);
 
         // view penguji
-        $query = "SELECT exam_examiners.*,
-                        exam_types.kode AS kode_ujian,
-                        exam_types.singkatan AS ujian,
-                        exam_registrations.departement_id,
-                        exam_registrations.tanggal_ujian,
-                        departements.name AS prodi,
-                        lectures.name AS dosen,
-                        students.name AS mahasiswa,
-                        students.nim AS nim,
-                        exam_payments.name AS pembayaran,
-                        lectures.rekening AS rekening,
+        $query = "SELECT exam_payment_reports.*,
+                        lectures.nama AS dosen,
                         lectures.bank AS bank,
-                        lectures.npwp AS npwp,
                         lectures.nik AS nik,
                         lectures.email AS email,
                         lectures.phone AS phone
-                FROM exam_examiners
-                    JOIN exam_registrations ON exam_registrations.id=exam_examiners.exam_registration_id
-                    JOIN exam_payments ON exam_payments.id=exam_examiners.exam_payment_id
-                    JOIN lectures ON lectures.id=exam_examiners.lecture_id
-                    JOIN students ON students.id=exam_registrations.student_id
-                    JOIN exam_types ON exam_types.id=exam_registrations.exam_type_id
-                    JOIN departements ON departements.id=exam_registrations.departement_id
+                FROM exam_payment_reports
+                    JOIN lectures ON lectures.id=exam_payment_reports.lecture_id
                 ";
-        Schema::createOrReplaceView('view_exam_examiners', $query);
+        Schema::createOrReplaceView('view_exam_payment_reports', $query);
     }
 
     /**
@@ -58,7 +43,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropViewIfExists('view_exam_examiners');
+        Schema::dropViewIfExists('view_exam_payment_reports');
         Schema::dropViewIfExists('view_exam_registrations');
     }
 };
