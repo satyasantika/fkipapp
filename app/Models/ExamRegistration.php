@@ -12,6 +12,11 @@ class ExamRegistration extends Model
 
     protected $casts = [
         'tanggal_ujian' => 'date',
+        'penguji1_dibayar' => 'bool',
+        'penguji2_dibayar' => 'bool',
+        'penguji3_dibayar' => 'bool',
+        'pembimbing1_dibayar' => 'bool',
+        'pembimbing2_dibayar' => 'bool',
     ];
 
     public function departement(): BelongsTo

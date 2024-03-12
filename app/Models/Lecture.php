@@ -11,6 +11,9 @@ class Lecture extends Model
     protected $guarded = ['id'];
     protected $casts = [
         'tanggal_lahir' => 'date',
+        'tmt_jabatan_akademik' => 'date',
+        'tmt_golongan' => 'date',
+        'tmt_pendidikan' => 'date',
     ];
 
     public function examiners(): HasMany

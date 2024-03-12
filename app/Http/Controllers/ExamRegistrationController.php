@@ -89,10 +89,16 @@ class ExamRegistrationController extends Controller
      */
     public function update(Request $request, ExamRegistration $registration)
     {
+        // dd($request);
         $student= Student::find($registration->student_id);
         $ujian = $registration->exam_type->nama_ujian;
         $name = strtoupper($student->nama);
         $data = $request->all();
+        $data['pembimbing1_dibayar'] = $request->pembimbing1_dibayar ? 1 : 0;
+        $data['pembimbing2_dibayar'] = $request->pembimbing2_dibayar ? 1 : 0;
+        $data['penguji1_dibayar'] = $request->penguji1_dibayar ? 1 : 0;
+        $data['penguji2_dibayar'] = $request->penguji2_dibayar ? 1 : 0;
+        $data['penguji3_dibayar'] = $request->penguji3_dibayar ? 1 : 0;
         $registration->fill($data)->save();
 
         $student->update([

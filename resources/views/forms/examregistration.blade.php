@@ -103,64 +103,94 @@
             </div>
         </div>
     @if ($examregistration->id)
+        <div class="row mb-3">
+            <div class="col">
+                <span class="text-danger">Pastikan Pembimbing dan Penguji diceklis jika akan dibayar</span>
+            </div>
+        </div>
         {{-- pembimbing 1 --}}
         <div class="row mb-3">
             <label for="pembimbing1_id" class="col-md-4 col-form-label text-md-end">Pembimbing 1</label>
             <div class="col-md-8">
-                <select id="pembimbing1_id" class="form-control @error('pembimbing1_id') is-invalid @enderror" name="pembimbing1_id">
-                    <option value="">-- Tentukan --</option>
-                    @foreach ($lectures as $lecture)
-                    <option value="{{ $lecture->id }}" @selected($student->pembimbing1_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
-                    @endforeach
-                </select>
+                <div class="input-group">
+                    <div class="input-group-text">
+                        <input id="pembimbing1_dibayar" name="pembimbing1_dibayar" class="form-check-input mt-0" type="checkbox" @checked($examregistration->pembimbing1_dibayar)>
+                    </div>
+                    <select id="pembimbing1_id" class="form-control @error('pembimbing1_id') is-invalid @enderror" name="pembimbing1_id">
+                        <option value="">-- Tentukan --</option>
+                        @foreach ($lectures as $lecture)
+                        <option value="{{ $lecture->id }}" @selected($student->pembimbing1_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </div>
         {{-- pembimbing 2 --}}
         <div class="row mb-3">
             <label for="pembimbing2_id" class="col-md-4 col-form-label text-md-end">Pembimbing 2</label>
             <div class="col-md-8">
-                <select id="pembimbing2_id" class="form-control @error('pembimbing2_id') is-invalid @enderror" name="pembimbing2_id">
-                    <option value="">-- Tentukan --</option>
-                    @foreach ($lectures as $lecture)
-                    <option value="{{ $lecture->id }}" @selected($student->pembimbing2_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
-                    @endforeach
-                </select>
+                <div class="input-group">
+                    <div class="input-group-text">
+                        <input id="pembimbing2_dibayar" name="pembimbing2_dibayar" class="form-check-input mt-0" type="checkbox" @checked($examregistration->pembimbing2_dibayar)>
+                    </div>
+                    <select id="pembimbing2_id" class="form-control @error('pembimbing2_id') is-invalid @enderror" name="pembimbing2_id">
+                        <option value="">-- Tentukan --</option>
+                        @foreach ($lectures as $lecture)
+                        <option value="{{ $lecture->id }}" @selected($student->pembimbing2_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </div>
         {{-- penguji 1 --}}
         <div class="row mb-3">
             <label for="penguji1_id" class="col-md-4 col-form-label text-md-end">penguji 1</label>
             <div class="col-md-8">
-                <select id="penguji1_id" class="form-control @error('penguji1_id') is-invalid @enderror" name="penguji1_id">
-                    <option value="">-- Tentukan --</option>
-                    @foreach ($lectures as $lecture)
-                    <option value="{{ $lecture->id }}" @selected($student->penguji1_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
-                    @endforeach
-                </select>
+                <div class="input-group">
+                    <div class="input-group-text">
+                        <input id="penguji1_dibayar" name="penguji1_dibayar" class="form-check-input mt-0" type="checkbox" @checked($examregistration->penguji1_dibayar)>
+                    </div>
+                    <select id="penguji1_id" class="form-control @error('penguji1_id') is-invalid @enderror" name="penguji1_id">
+                        <option value="">-- Tentukan --</option>
+                        @foreach ($lectures as $lecture)
+                        <option value="{{ $lecture->id }}" @selected($student->penguji1_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </div>
         {{-- penguji 2 --}}
         <div class="row mb-3">
             <label for="penguji2_id" class="col-md-4 col-form-label text-md-end">penguji 2</label>
             <div class="col-md-8">
-                <select id="penguji2_id" class="form-control @error('penguji2_id') is-invalid @enderror" name="penguji2_id">
-                    <option value="">-- Tentukan --</option>
-                    @foreach ($lectures as $lecture)
-                    <option value="{{ $lecture->id }}" @selected($student->penguji2_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
-                    @endforeach
-                </select>
+                <div class="input-group">
+                    <div class="input-group-text">
+                        <input id="penguji2_dibayar" name="penguji2_dibayar" class="form-check-input mt-0" type="checkbox" @checked($examregistration->penguji2_dibayar)>
+                    </div>
+                    <select id="penguji2_id" class="form-control @error('penguji2_id') is-invalid @enderror" name="penguji2_id">
+                        <option value="">-- Tentukan --</option>
+                        @foreach ($lectures as $lecture)
+                        <option value="{{ $lecture->id }}" @selected($student->penguji2_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </div>
         {{-- penguji 3 --}}
         <div class="row mb-3">
             <label for="penguji3_id" class="col-md-4 col-form-label text-md-end">penguji 3</label>
             <div class="col-md-8">
-                <select id="penguji3_id" class="form-control @error('penguji3_id') is-invalid @enderror" name="penguji3_id">
-                    <option value="">-- Tentukan --</option>
-                    @foreach ($lectures as $lecture)
-                    <option value="{{ $lecture->id }}" @selected($student->penguji3_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
-                    @endforeach
-                </select>
+                <div class="input-group">
+                    <div class="input-group-text">
+                        <input id="penguji3_dibayar" name="penguji3_dibayar" class="form-check-input mt-0" type="checkbox" @checked($examregistration->penguji3_dibayar)>
+                    </div>
+                    <select id="penguji3_id" class="form-control @error('penguji3_id') is-invalid @enderror" name="penguji3_id">
+                        <option value="">-- Tentukan --</option>
+                        @foreach ($lectures as $lecture)
+                        <option value="{{ $lecture->id }}" @selected($student->penguji3_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </div>
         {{-- ketua penguji --}}
