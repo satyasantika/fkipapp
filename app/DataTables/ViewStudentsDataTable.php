@@ -24,7 +24,9 @@ class ViewStudentsDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('action', function($row){
                 $action = ' <a href="'.route('students.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
-                $action .= ' <a href="'.route('registrations.show',$row->id).'" class="btn btn-success btn-sm action">U</a> ';
+                if (auth()->user()->hasRole('jurusan')) {
+                    $action .= ' <a href="'.route('registrations.show',$row->id).'" class="btn btn-success btn-sm action">U</a> ';
+                }
                 return $action;
             })
             ->setRowId('id');

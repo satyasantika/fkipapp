@@ -56,6 +56,8 @@
 
             </div>
         </div>
+
+    @role('jurusan')
         {{-- pembimbing 1 --}}
         <div class="row mb-3">
             <label for="pembimbing1_id" class="col-md-4 col-form-label text-md-end">Pembimbing 1</label>
@@ -149,6 +151,7 @@
                 <input type="date" placeholder="tanggal_skripsi" value="{{ $student->tanggal_skripsi ? $student->tanggal_skripsi->format('Y-m-d') : "" }}" name="tanggal_skripsi" class="form-control" id="tanggal_skripsi">
             </div>
         </div>
+    @endrole
 
         {{-- submit Button --}}
         <div class="row mb-0">
