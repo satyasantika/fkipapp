@@ -58,6 +58,7 @@ return new class extends Migration
             $table->boolean('pembimbing1_dibayar')->default(1);
             $table->boolean('pembimbing2_dibayar')->default(1);
             $table->date('tanggal_dilaporkan')->nullable();
+            $table->boolean('dilaporkan')->default(0);
             $table->timestamps();
         });
 

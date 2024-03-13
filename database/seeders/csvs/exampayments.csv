@@ -7,4 +7,5 @@ nama,jabatan_akademik,pendidikan,honor
 "pembimbing skripsi - Doktor/Lektor",Lektor,S3,600000
 "pembimbing skripsi - Magister/Lektor Kepala","Lektor Kepala",S2,600000
 "pembimbing skripsi - Magister/Lektor",Lektor,S2,500000
+"pembimbing skripsi - Doktor/Asisten Ahli",Asisten Ahli,S3,500000
 "pembimbing skripsi - Magister/Asisten Ahli","Asisten Ahli",S2,450000

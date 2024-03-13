@@ -17,6 +17,7 @@ class ExamRegistration extends Model
         'penguji3_dibayar' => 'bool',
         'pembimbing1_dibayar' => 'bool',
         'pembimbing2_dibayar' => 'bool',
+        'dilaporkan' => 'bool',
     ];
 
     public function departement(): BelongsTo
@@ -29,12 +30,32 @@ class ExamRegistration extends Model
         return $this->belongsTo(ExamType::class, 'exam_type_id');
     }
 
-    public function lecture(): BelongsTo
+    public function penguji1()
     {
-        return $this->belongsTo(Lecture::class, 'lecture_id');
+        return $this->belongsTo(Lecture::class, 'penguji1_id');
     }
 
-    public function student(): BelongsTo
+    public function penguji2()
+    {
+        return $this->belongsTo(Lecture::class, 'penguji2_id');
+    }
+
+    public function penguji3()
+    {
+        return $this->belongsTo(Lecture::class, 'penguji3_id');
+    }
+
+    public function pembimbing1()
+    {
+        return $this->belongsTo(Lecture::class, 'pembimbing1_id');
+    }
+
+    public function pembimbing2()
+    {
+        return $this->belongsTo(Lecture::class, 'pembimbing2_id');
+    }
+
+    public function student()
     {
         return $this->belongsTo(Student::class, 'student_id');
     }

@@ -36,12 +36,13 @@ class ExamRegistrationController extends Controller
         $student = Student::find($request->student_id);
         $name = strtoupper($student->name);
         $ujian = ExamType::find($request->exam_type_id)->nama_ujian;
-        $data = $request->all();
-        ExamRegistration::create([
+
+        ExamRegistration::updateOrCreate([
             'departement_id'=>$request->departement_id,
             'student_id'=>$request->student_id,
             'exam_type_id'=>$request->exam_type_id,
             'ujian_ke'=>$request->ujian_ke,
+        ],[
             'tanggal_ujian'=>$request->tanggal_ujian,
             'waktu_mulai'=>$request->waktu_mulai,
             'waktu_akhir'=>$request->waktu_akhir,
@@ -59,7 +60,7 @@ class ExamRegistrationController extends Controller
         $student->update([
             $this->_examType($request->exam_type_id)=>$request->tanggal_ujian,
         ]);
-        return to_route('registrations.show',$student->id)->with('success','data '.$ujian.' untuk '.$name.' telah ditambahkan');
+        return to_route('registrations.show',$student->id)->with('success','data '.$ujian.' untuk mahasiswa '.$name.' telah ditambahkan');
     }
 
     /**
@@ -94,11 +95,11 @@ class ExamRegistrationController extends Controller
         $ujian = $registration->exam_type->nama_ujian;
         $name = strtoupper($student->nama);
         $data = $request->all();
-        $data['pembimbing1_dibayar'] = $request->pembimbing1_dibayar ? 1 : 0;
-        $data['pembimbing2_dibayar'] = $request->pembimbing2_dibayar ? 1 : 0;
         $data['penguji1_dibayar'] = $request->penguji1_dibayar ? 1 : 0;
         $data['penguji2_dibayar'] = $request->penguji2_dibayar ? 1 : 0;
         $data['penguji3_dibayar'] = $request->penguji3_dibayar ? 1 : 0;
+        $data['pembimbing1_dibayar'] = $request->pembimbing1_dibayar ? 1 : 0;
+        $data['pembimbing2_dibayar'] = $request->pembimbing2_dibayar ? 1 : 0;
         $registration->fill($data)->save();
 
         $student->update([
@@ -111,7 +112,7 @@ class ExamRegistrationController extends Controller
             $this->_examType($registration->exam_type_id)=>$registration->tanggal_ujian,
         ]);
 
-        return to_route('registrations.show',$student->id)->with('success','data '.$ujian.' untuk '.$name.' telah diperbarui');
+        return to_route('registrations.show',$student->id)->with('success','data '.$ujian.' untuk mahasiswa '.$name.' telah diperbarui');
     }
 
     /**
