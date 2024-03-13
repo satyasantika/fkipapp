@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('nama')->nullable();
             $table->string('gelar_depan')->nullable();
             $table->string('gelar_belakang')->nullable();
+            $table->boolean('pns')->nullable();
             $table->string('nidn')->nullable();
             $table->string('nip')->nullable();
             $table->string('jabatan_akademik')->nullable();

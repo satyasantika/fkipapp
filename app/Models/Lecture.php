@@ -14,6 +14,7 @@ class Lecture extends Model
         'tmt_jabatan_akademik' => 'date',
         'tmt_golongan' => 'date',
         'tmt_pendidikan' => 'date',
+        'pns' => 'bool',
     ];
 
     public function examiners(): HasMany

@@ -68,6 +68,7 @@ class LectureController extends Controller
     {
         $name = strtoupper($lecture->nama);
         $data = $request->all();
+        $data['pns'] = $request->pns ? 1 : 0;
         $lecture->fill($data)->save();
 
         return to_route('lectures.index')->with('success','lecture '.$name.' telah diperbarui');

@@ -45,6 +45,20 @@
                 <input type="text" value="{{ $lecture->gelar_belakang }}" name="gelar_belakang" class="form-control" id="gelar_belakang">
             </div>
         </div>
+        {{-- status pns --}}
+        <div class="row mb-3">
+            <label for="pns" class="col-md-4 col-form-label text-md-end">Status</label>
+            <div class="col-md-8">
+                <div class="input-group">
+                    <div class="input-group-text">
+                        <input id="pns" name="pns" class="form-check-input mt-0" type="checkbox" @checked($lecture->pns)>
+                    </div>
+                    <div class="input-group-text">
+                        PNS
+                    </div>
+                </div>
+            </div>
+        </div>
         {{-- nidn --}}
         <div class="row mb-3">
         <label for="nidn" class="col-md-4 col-form-label text-md-end">nidn</label>
