@@ -35,7 +35,7 @@ class ViewExamRegistrationsDataTable extends DataTable
     public function query(ViewExamRegistration $model): QueryBuilder
     {
         if (auth()->user()->hasRole('jurusan')) {
-            return $model->where('student_id',$this->student_id)
+            return $model->where('departement_id',auth()->user()->departement_id)
                         ->newQuery();
         } else {
             return $model->newQuery();
@@ -55,7 +55,7 @@ class ViewExamRegistrationsDataTable extends DataTable
                     ->orderBy(2)
                     ->selectStyleSingle()
                     ->buttons([
-                        auth()->user()->hasRole('jurusan') ? Button::make('add') :'',
+                        // auth()->user()->hasRole('jurusan') ? Button::make('add') :'',
                         Button::make('excel'),
                         // Button::make('csv'),
                         // Button::make('pdf'),

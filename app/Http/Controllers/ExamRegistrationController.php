@@ -8,6 +8,7 @@ use App\Models\ExamType;
 use Illuminate\Http\Request;
 use App\Models\ExamRegistration;
 use App\Http\Controllers\Controller;
+use App\Models\ViewExamRegistration;
 use App\DataTables\ViewExamRegistrationsDataTable;
 
 class ExamRegistrationController extends Controller
@@ -60,7 +61,7 @@ class ExamRegistrationController extends Controller
         $student->update([
             $this->_examType($request->exam_type_id)=>$request->tanggal_ujian,
         ]);
-        return to_route('registrations.show',$student->id)->with('success','data '.$ujian.' untuk mahasiswa '.$name.' telah ditambahkan');
+        return to_route('registrations.show.student',$student->id)->with('success','data '.$ujian.' untuk mahasiswa '.$name.' telah ditambahkan');
     }
 
     /**
@@ -90,7 +91,6 @@ class ExamRegistrationController extends Controller
      */
     public function update(Request $request, ExamRegistration $registration)
     {
-        // dd($request);
         $student= Student::find($registration->student_id);
         $ujian = $registration->exam_type->nama_ujian;
         $name = strtoupper($student->nama);
@@ -141,6 +141,12 @@ class ExamRegistrationController extends Controller
             ],
             $this->_dataSelection(),
         ));
+    }
+
+    public function showByStudent($student_id)
+    {
+        $examregistrations = ViewExamRegistration::where('student_id',$student_id)->orderBy('tanggal_ujian')->get();
+        return view('reports.examregistration',compact('examregistrations','student_id'));
     }
 
     private function _dataSelection()

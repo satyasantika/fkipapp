@@ -212,7 +212,7 @@
         <div class="row mb-0">
             <div class="col-md-8 offset-md-4">
                 <button type="submit" class="btn btn-primary btn-sm">Save</button>
-                <a href="{{ route('registrations.show',['registration'=>$student->id]) }}" class="btn btn-outline-secondary btn-sm">Close</a>
+                <a href="{{ route('registrations.show.student',['student_id'=>$student->id]) }}" class="btn btn-outline-secondary btn-sm">Close</a>
             </div>
         </div>
     </div>
