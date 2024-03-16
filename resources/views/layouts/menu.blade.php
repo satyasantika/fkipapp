@@ -9,6 +9,7 @@
 <a class="dropdown-item" href="{{ route('students.index') }}">{{ __('Mahasiswa') }}</a>
 <a class="dropdown-item" href="{{ route('lectures.index') }}">{{ __('Dosen') }}</a>
 <a class="dropdown-item" href="{{ route('registrations.index') }}">{{ __('Reg Ujian') }}</a>
+<a class="dropdown-item" href="{{ route('reports.by.date') }}">{{ __('Rekap Ujian') }}</a>
 @endrole
 
 @role('keuangan')
