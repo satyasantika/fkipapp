@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ExamPayment;
 use Illuminate\Http\Request;
 use App\Models\ExamRegistration;
+use App\Models\ViewExamRegistration;
 use App\Models\ExamPaymentReport;
 use App\DataTables\ViewExamPaymentReportsDataTable;
 
@@ -13,9 +14,15 @@ class ExamPaymentReportController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(ViewExamPaymentReportsDataTable $dataTable)
+    public function index()
     {
-        return $dataTable->render('layouts.setting');
+        $lists = ExamPaymentReport::select('kode_laporan')->distinct()
+                                    // ->where('lecture_id',0)
+                                            // ->orderBy('kode_laporan')
+                                            // ->groupBy('kode_laporan')
+                                            ->get()->sort();
+        // dd($list);
+        return view('reports.periode',compact('lists'));
     }
 
     /**
@@ -33,14 +40,49 @@ class ExamPaymentReportController extends Controller
     {
         $examregistration = ExamRegistration::find($request->examregistration_id);
         $name = strtoupper($examregistration->student->nama);
-        // dd($examregistration);
+        $kode_laporan = substr($examregistration->tanggal_ujian,0,7);
+        $exam_type_id = $examregistration->exam_type_id;
+
+        $examregistration->update([
+            'dilaporkan'=>1,
+        ]);
 
         foreach (['pembimbing1','pembimbing2','penguji1','penguji2','penguji3'] as $penguji) {
-            $id_penguji = $penguji.'_id';
+            $urutan_penguji = $penguji.'_id';
+            $cek_penguji_dibayar = $penguji.'_dibayar';
+            $banyak_menguji = 'banyak_'.$penguji;
+            $id_penguji = $examregistration->$urutan_penguji;
+            $cek_penguji = $examregistration->$cek_penguji_dibayar;
+            $menguji = $this->_getCountOfExaminer($exam_type_id,$kode_laporan,$cek_penguji_dibayar,$urutan_penguji,$id_penguji);
+
+            $data_tambahan = [];
+            // if ($cek_penguji) {
+                if ($exam_type_id == 3) {
+                    if ($penguji == 'pembimbing1') {
+                        $data_tambahan['banyak_membimbing1']=$menguji;
+                    }
+                    if ($penguji == 'pembimbing2') {
+                        $data_tambahan['banyak_membimbing2']=$menguji;
+                    }
+                    $data_tambahan['banyak_menguji_skripsi']=$menguji;
+                }
+                // if ($penguji == 'penguji1' || $penguji == 'penguji2' || $penguji == 'penguji3') {
+                    if ($exam_type_id == 1) {
+                        $data_tambahan['banyak_menguji_proposal']=$menguji;
+                        // dd($menguji);
+                    } else {
+                        $data_tambahan['banyak_menguji_seminar']=$menguji;
+                    }
+                // }
+            // } else {
+            //     continue;
+            // }
+
+
             ExamPaymentReport::updateOrCreate([
-                'kode_laporan'=>substr($examregistration->tanggal_ujian,0,7),
-                'lecture_id'=>$examregistration->$id_penguji,
-            ],[
+                'kode_laporan'=>$kode_laporan,
+                'lecture_id'=>$id_penguji,
+            ],array_merge([
                 'status'=>$examregistration->$penguji->pns ? 1 : 0,
                 'golongan'=>substr($examregistration->$penguji->golongan,0,1),
                 'npwp'=>$examregistration->$penguji->npwp,
@@ -51,64 +93,15 @@ class ExamPaymentReportController extends Controller
                 'honor_penguji_skripsi'=>ExamPayment::find(3)->honor,
                 'honor_penguji_proposal'=>ExamPayment::find(1)->honor,
                 'honor_penguji_seminar'=>ExamPayment::find(2)->honor,
-            ]);
+                // 'banyak_membimbing1'=>$this->_getCountOfGuide('pembimbing1_id',$kode_laporan,$id_penguji),
+                // 'banyak_membimbing2'=>$this->_getCountOfGuide('pembimbing2_id',$kode_laporan,$id_penguji),
+                // 'banyak_menguji_skripsi'=>$this->_getCountOfExamByType(3,$kode_laporan,$id_penguji),
+                // 'banyak_menguji_proposal'=>$this->_getCountOfExamByType(1,$kode_laporan,$id_penguji),
+                // 'banyak_menguji_seminar'=>$this->_getCountOfExamByType(2,$kode_laporan,$id_penguji),
+            ],$data_tambahan));
+
         }
-        $examregistration->update([
-            'dilaporkan'=>1,
-        ]);
 
-        // sempro
-        // if ($examregistration->exam_type_id == 1) {
-        //     if ($examregistration->pembimbing1_dibayar) {
-        //     }
-        // }
-        // if ($examregistration->pembimbing1_dibayar) {
-        //     ExamRegistration::where('pembimbing1_id',$examregistration->pembimbing1_id)->count();
-        //     if ($examregistration->exam_type_id == 3) {
-        //         ExamPaymentReport::updateOrCreate([
-        //             'kode_laporan'=>substr($examregistration->tanggal_ujian,0,7),
-        //             'lecture_id'=>$penguji,
-        //         ],[
-        //             'banyak_membimbing1'=>$exampaymentreport->banyak_membimbing1 + ($examregistration->pembimbing1_dibayar ? 1 : 0),
-        //         ]);
-        //     } else {
-        //         continue;
-        //     }
-        // } else {
-        //     # code...
-        // }
-        // semhas
-        // sidang
-
-
-        // foreach (['pembimbing1','pembimbing2','penguji1','penguji2','penguji3'] as $penguji) {
-
-        //     if ($examregistration->$penguji.'_dibayar') {
-        //         ExamRegistration::where($penguji.'_id',$examregistration->$penguji.'_id')->count();
-        //         if ($examregistration->exam_type_id == 3) {
-        //             ExamPaymentReport::updateOrCreate([
-        //                 'kode_laporan'=>substr($examregistration->tanggal_ujian,0,7),
-        //                 'lecture_id'=>$penguji,
-        //             ],[
-        //                 'banyak_membimbing1'=>$exampaymentreport->banyak_membimbing1 + ($examregistration->pembimbing1_dibayar ? 1 : 0),
-        //             ]);
-        //         } else {
-        //             continue;
-        //         }
-        //     } else {
-        //         # code...
-        //     }
-
-
-        //     $exampaymentreport = ExamPaymentReport::where([
-        //         'lecture_id'=>$penguji,
-        //         'kode_laporan'=>substr($examregistration->tanggal_ujian,0,7),
-        //         ])->first();
-        // }
-
-        // $lecture->update([
-        //     $this->_examType($request->exam_type_id)=>$request->tanggal_ujian,
-        // ]);
         return back()->with('success','data laporan para penguji untuk mahasiswa '.$name.' telah ditambahkan');
     }
 
@@ -142,5 +135,47 @@ class ExamPaymentReportController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function reportByDate(ViewExamPaymentReportsDataTable $dataTable, $date)
+    {
+        return $dataTable->with('date',$date)->render('layouts.setting');
+    }
+
+        // banyaknya pembimbing1/pembimbing2 pada ujian skripsi
+    private function _getCountOfExaminer($exam_type_id,$kode_laporan,$guide_cek,$guide_order,$guide_id)
+    {
+        return ViewExamRegistration::where('exam_type_id',$exam_type_id)
+                                    ->where('kode_laporan',$kode_laporan)
+                                    ->where('dilaporkan',1)
+                                    ->where($guide_cek,1)
+                                    ->where($guide_order,$guide_id)
+                                    ->count();
+    }
+
+    // banyaknya pembimbing1/pembimbing2 pada ujian skripsi
+    private function _getCountOfGuide($guide_order,$kode_laporan,$guide_id)
+    {
+        return ViewExamRegistration::where('exam_type_id',3)
+                                    ->where('dilaporkan',1)
+                                    ->where('kode_laporan',$kode_laporan)
+                                    ->where($guide_order,$guide_id)
+                                    ->count();
+    }
+
+    // banyaknya penguji pada ujian proposal/seminar/skripsi
+    private function _getCountOfExamByType($exam_type_id,$kode_laporan,$examiner_id)
+    {
+        return ViewExamRegistration::where('exam_type_id',$exam_type_id)
+                                    ->where('dilaporkan',0)
+                                    ->where('kode_laporan',$kode_laporan)
+                                    ->where(function ($query,$examiner){
+                                        $query->where('pembimbing1_id',$examiner_id)
+                                        ->orWhere('pembimbing2_id',$examiner_id)
+                                        ->orWhere('penguji1_id',$examiner_id)
+                                        ->orWhere('penguji2_id',$examiner_id)
+                                        ->orWhere('penguji3_id',$examiner_id);
+                                    })
+                                    ->count();
     }
 }

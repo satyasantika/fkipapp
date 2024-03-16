@@ -9,4 +9,5 @@ class ViewExamRegistration extends Model
 {
     use HasFactory;
     protected $table = 'view_exam_registrations';
+
 }

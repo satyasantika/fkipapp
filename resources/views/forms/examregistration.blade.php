@@ -2,7 +2,7 @@
 
 @push('header')
     {{ $examregistration->id ? 'Edit' : 'Tambah' }} Ujian untuk {{ $student->nama }}
-    @if ($examregistration->id)
+    @if ($examregistration->id &&  !$examregistration->dilaporkan)
         <form id="delete-form" action="{{ route('registrations.destroy',$examregistration->id) }}" method="POST">
             @csrf
             @method('DELETE')
@@ -49,9 +49,9 @@
         </div>
         {{-- Tanggal Ujian --}}
         <div class="row mb-3">
-            <label for="tanggal_ujian" class="col-md-4 col-form-label text-md-end">Set</label>
+            <label for="tanggal_ujian" class="col-md-4 col-form-label text-md-end">Tanggal Ujian</label>
             <div class="col-md-8">
-                <input type="date" placeholder="tanggal_ujian" value="{{ $examregistration->tanggal_ujian ? $examregistration->tanggal_ujian->format('Y-m-d') : '' }}" name="tanggal_ujian" class="form-control" id="tanggal_ujian">
+                <input type="date" placeholder="tanggal_ujian" value="{{ $examregistration->tanggal_ujian ? $examregistration->tanggal_ujian->format('Y-m-d') : '' }}" name="tanggal_ujian" class="form-control" id="tanggal_ujian" @disabled($examregistration->dilaporkan)>
             </div>
         </div>
         {{-- Exam Time Start --}}
@@ -119,7 +119,7 @@
                     <select id="pembimbing1_id" class="form-control @error('pembimbing1_id') is-invalid @enderror" name="pembimbing1_id" @disabled($examregistration->dilaporkan)>
                         <option value="">-- Tentukan --</option>
                         @foreach ($lectures as $lecture)
-                        <option value="{{ $lecture->id }}" @selected($student->pembimbing1_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
+                        <option value="{{ $lecture->id }}" @selected($examregistration->pembimbing1_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -136,7 +136,7 @@
                     <select id="pembimbing2_id" class="form-control @error('pembimbing2_id') is-invalid @enderror" name="pembimbing2_id" @disabled($examregistration->dilaporkan)>
                         <option value="">-- Tentukan --</option>
                         @foreach ($lectures as $lecture)
-                        <option value="{{ $lecture->id }}" @selected($student->pembimbing2_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
+                        <option value="{{ $lecture->id }}" @selected($examregistration->pembimbing2_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -153,7 +153,7 @@
                     <select id="penguji1_id" class="form-control @error('penguji1_id') is-invalid @enderror" name="penguji1_id" @disabled($examregistration->dilaporkan)>
                         <option value="">-- Tentukan --</option>
                         @foreach ($lectures as $lecture)
-                        <option value="{{ $lecture->id }}" @selected($student->penguji1_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
+                        <option value="{{ $lecture->id }}" @selected($examregistration->penguji1_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -170,7 +170,7 @@
                     <select id="penguji2_id" class="form-control @error('penguji2_id') is-invalid @enderror" name="penguji2_id" @disabled($examregistration->dilaporkan)>
                         <option value="">-- Tentukan --</option>
                         @foreach ($lectures as $lecture)
-                        <option value="{{ $lecture->id }}" @selected($student->penguji2_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
+                        <option value="{{ $lecture->id }}" @selected($examregistration->penguji2_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -187,7 +187,7 @@
                     <select id="penguji3_id" class="form-control @error('penguji3_id') is-invalid @enderror" name="penguji3_id" @disabled($examregistration->dilaporkan)>
                         <option value="">-- Tentukan --</option>
                         @foreach ($lectures as $lecture)
-                        <option value="{{ $lecture->id }}" @selected($student->penguji3_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
+                        <option value="{{ $lecture->id }}" @selected($examregistration->penguji3_id==$lecture->id)>{{ $lecture->nama.' - '.$lecture->departement_id }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -212,7 +212,7 @@
         <div class="row mb-0">
             <div class="col-md-8 offset-md-4">
                 <button type="submit" class="btn btn-primary btn-sm">Save</button>
-                <a href="{{ route('registrations.index') }}" class="btn btn-outline-secondary btn-sm">Close</a>
+                <a href="{{ route('registrations.show',['registration'=>$student->id]) }}" class="btn btn-outline-secondary btn-sm">Close</a>
             </div>
         </div>
     </div>

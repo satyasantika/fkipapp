@@ -52,7 +52,7 @@ class ViewExamRegistrationsDataTable extends DataTable
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     //->dom('Bfrtip')
-                    ->orderBy(1)
+                    ->orderBy(2)
                     ->selectStyleSingle()
                     ->buttons([
                         auth()->user()->hasRole('jurusan') ? Button::make('add') :'',
@@ -81,6 +81,11 @@ class ViewExamRegistrationsDataTable extends DataTable
             Column::make('ujian'),
             Column::make('mahasiswa'),
             Column::make('nim'),
+            Column::make('pembimbing1_nama')->title('Pemb.1'),
+            Column::make('pembimbing2_nama')->title('Pemb.2'),
+            Column::make('penguji1_nama')->title('Peng.1'),
+            Column::make('penguji2_nama')->title('Peng.2'),
+            Column::make('penguji3_nama')->title('Peng.3'),
         ];
     }
 

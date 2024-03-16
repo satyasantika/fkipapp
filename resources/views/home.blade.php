@@ -14,7 +14,28 @@
                         </div>
                     @endif
 
-                    {{ __('You are logged in!') }}
+                    {{ __('Selamat Datang di Aplikasi Laporan Ujian FKIP Universitas Siliwangi!') }}<br>
+                    <p>silakan pilih menu berikut</p><br>
+                @role('admin')
+                <a class="btn btn-primary" href="{{ route('users.index') }}">{{ __('User') }}</a>
+                <a class="btn btn-primary" href="{{ route('students.index') }}">{{ __('Mahasiswa') }}</a>
+                <a class="btn btn-primary" href="{{ route('lectures.index') }}">{{ __('Dosen') }}</a>
+                {{-- <a class="btn btn-primary" href="{{ route('registrations.index') }}">{{ __('Reg Ujian') }}</a> --}}
+                @endrole
+
+                @role('jurusan')
+                <a class="btn btn-primary" href="{{ route('students.index') }}">{{ __('Mahasiswa') }}</a>
+                <a class="btn btn-primary" href="{{ route('lectures.index') }}">{{ __('Dosen') }}</a>
+                <a class="btn btn-primary" href="{{ route('registrations.index') }}">{{ __('Reg Ujian') }}</a>
+                @endrole
+
+                @role('keuangan')
+                {{-- <a class="btn btn-primary" href="{{ route('users.index') }}">{{ __('User') }}</a> --}}
+                @endrole
+
+                @role('dekanat')
+                {{-- <a class="btn btn-primary" href="{{ route('users.index') }}">{{ __('User') }}</a> --}}
+                @endrole
                 </div>
             </div>
         </div>

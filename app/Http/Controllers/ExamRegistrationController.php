@@ -112,7 +112,7 @@ class ExamRegistrationController extends Controller
             $this->_examType($registration->exam_type_id)=>$registration->tanggal_ujian,
         ]);
 
-        return to_route('registrations.show',$student->id)->with('success','data '.$ujian.' untuk mahasiswa '.$name.' telah diperbarui');
+        return to_route('registrations.edit',$registration)->with('success','data '.$ujian.' untuk mahasiswa '.$name.' telah diperbarui');
     }
 
     /**

@@ -31,7 +31,7 @@ class ViewExamPaymentReportsDataTable extends DataTable
      */
     public function query(ViewExamPaymentReport $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->where('kode_laporan',$this->date)->newQuery();
     }
 
     /**
@@ -79,7 +79,7 @@ class ViewExamPaymentReportsDataTable extends DataTable
             Column::make('honor_pembimbing'),
             Column::make('honor_penguji_skripsi'),
             Column::make('honor_penguji_proposal'),
-            Column::make('honor_penguji_seinar'),
+            Column::make('honor_penguji_seminar'),
             Column::make('banyak_membimbing1'),
             Column::make('banyak_membimbing2'),
             Column::make('banyak_menguji_skripsi'),
