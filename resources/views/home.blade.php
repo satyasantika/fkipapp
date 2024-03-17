@@ -18,7 +18,7 @@
                     <p>silakan pilih menu berikut</p>
                     @includeWhen(auth()->user()->hasRole('admin'),'dashboards.admin')
                     @includeWhen(auth()->user()->hasRole('jurusan'),'dashboards.departement')
-                    {{-- @includeWhen(auth()->user()->role('keuangan'),'dashboards.keuangan') --}}
+                    @includeWhen(auth()->user()->hasRole('keuangan'),'dashboards.financial')
                     {{-- @includeWhen(auth()->user()->role('dekanat'),'dashboards.dekanat') --}}
                 </div>
             </div>
