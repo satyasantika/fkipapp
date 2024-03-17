@@ -6,7 +6,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
-                    {{ __('Rekap Penyelenggaraan Ujian pada periode ').$periode }}
+                    {{ __('Rekap Penyelenggaraan Ujian pada bulan ').Carbon\Carbon::createFromFormat('Y-m',$periode)->isoFormat('MMMM Y') }}
                     <a href="{{ route('reports.by.departement') }}" class="btn btn-sm btn-primary float-end">kembali</a>
                 </div>
 

@@ -12,7 +12,8 @@
                     <table class="table table-striped table-hover">
                         <thead class="table-dark">
                             <tr>
-                                <th>periode laporan</th>
+                                <th></th>
+                                <th>Bulan laporan</th>
                                 @hasrole('jurusan')
                                 <th>Banyak Ujian</th>
                                 <th>Penguji</th>
@@ -25,8 +26,10 @@
                             @forelse ($lists as $list)
                                 <tr>
                                     <td>
-                                        {{ $list->kode_laporan }}
                                         <a href="{{ route('reports.by.periode',$list->kode_laporan) }}" class="btn btn-sm btn-outline-primary">view</a>
+                                    </td>
+                                    <td>
+                                        {{ Carbon\Carbon::createFromFormat('Y-m',$list->kode_laporan)->isoFormat('MMMM Y') }}
                                     </td>
                                     @hasrole('jurusan')
                                     <td>
