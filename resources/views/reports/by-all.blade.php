@@ -24,19 +24,22 @@
                         <tbody>
                             @forelse ($lists as $list)
                                 <tr>
-                                    <td>{{ $list->kode_laporan }}</td>
+                                    <td>
+                                        {{ $list->kode_laporan }}
+                                        <a href="{{ route('reports.by.periode',$list->kode_laporan) }}" class="btn btn-sm btn-outline-primary">view</a>
+                                    </td>
                                     @hasrole('jurusan')
                                     <td>
                                         {{ \App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->count() }}
-                                        <a href="{{ route('reports.by.periode',$list->kode_laporan) }}" class="btn btn-sm btn-outline-primary">detail</a>
                                     </td>
                                     <td>
                                         @php
-                                            $pembimbing1 = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('pembimbing1_id')->pluck('pembimbing1_id');
-                                            $pembimbing2 = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('pembimbing2_id')->pluck('pembimbing2_id');
-                                            $penguji1 = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('penguji1_id')->pluck('penguji1_id');
-                                            $penguji2 = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('penguji2_id')->pluck('penguji2_id');
-                                            $penguji3 = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('penguji3_id')->pluck('penguji3_id');
+                                            $penguji = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->where('departement_id',auth()->user()->departement_id);
+                                            $pembimbing1 = $penguji->whereNotNull('pembimbing1_id')->pluck('pembimbing1_id');
+                                            $pembimbing2 = $penguji->whereNotNull('pembimbing2_id')->pluck('pembimbing2_id');
+                                            $penguji1 = $penguji->whereNotNull('penguji1_id')->pluck('penguji1_id');
+                                            $penguji2 = $penguji->whereNotNull('penguji2_id')->pluck('penguji2_id');
+                                            $penguji3 = $penguji->whereNotNull('penguji3_id')->pluck('penguji3_id');
                                             $collection = collect($pembimbing1)->concat($pembimbing2)->concat($penguji1)->concat($penguji2)->concat($penguji3);
                                         @endphp
                                         {{ $collection->unique()->values()->count() }}
