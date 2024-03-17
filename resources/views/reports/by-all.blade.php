@@ -30,11 +30,13 @@
                                     </td>
                                     @hasrole('jurusan')
                                     <td>
-                                        {{ \App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->count() }}
+                                        @php
+                                            $penguji = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->where('departement_id',auth()->user()->departement_id);
+                                        @endphp
+                                        {{ $penguji->count() }}
                                     </td>
                                     <td>
                                         @php
-                                            $penguji = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->where('departement_id',auth()->user()->departement_id);
                                             $pembimbing1 = $penguji->whereNotNull('pembimbing1_id')->pluck('pembimbing1_id');
                                             $pembimbing2 = $penguji->whereNotNull('pembimbing2_id')->pluck('pembimbing2_id');
                                             $penguji1 = $penguji->whereNotNull('penguji1_id')->pluck('penguji1_id');
