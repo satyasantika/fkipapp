@@ -26,6 +26,12 @@ class ViewLecturesDataTable extends DataTable
                 $action = ' <a href="'.route('lectures.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
                 return $action;
             })
+            ->editColumn('pns', function($row){
+                return $row->pns ? 'PNS' : 'Non PNS';
+            })
+            ->editColumn('pns', function($row){
+                return $row->pns ? 'PNS' : 'Non PNS';
+            })
             ->setRowId('id');
     }
 
@@ -78,7 +84,12 @@ class ViewLecturesDataTable extends DataTable
                     ->addClass('text-center'),
             Column::make('nama'),
             Column::make('departement_id')->title('Kode'),
-            Column::make('nidn'),
+            Column::make('pns')->title('status'),
+            Column::make('golongan'),
+            Column::make('jabatan_akademik')->title('JF'),
+            Column::make('pendidikan'),
+            Column::make('npwp'),
+            Column::make('rekening'),
         ];
     }
 
