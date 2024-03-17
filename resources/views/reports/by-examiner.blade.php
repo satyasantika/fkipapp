@@ -6,11 +6,14 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    {{ __('Rekap Penguji pada tanggal ').$date }}
+                    {{ __('Rekap Penguji pada hari ').Carbon\Carbon::createFromFormat('Y-m-d',$date)->isoFormat('dddd, LL') }}
                     <a href="{{ route('reports.by.periode',substr($date,0,7)) }}" class="btn btn-sm btn-primary float-end">kembali</a>
                 </div>
 
                 <div class="card-body">
+                    <h4 class="text-end">
+                        TOTAL: {{ $examiners->count() }} Penguji
+                    </h4>
                     <div class="accordion" id="accordionExaminer">
                         @forelse ($examiners as $examiner)
                         @php
