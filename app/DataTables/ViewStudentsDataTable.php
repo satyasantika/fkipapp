@@ -29,6 +29,21 @@ class ViewStudentsDataTable extends DataTable
                 }
                 return $action;
             })
+            ->editColumn('pembimbing_1',function($row){
+                return is_null($row->pembimbing_1) ? '' : $row->pembimbing_1 ;
+            })
+            ->editColumn('pembimbing_2',function($row){
+                return is_null($row->pembimbing_2) ? '' : $row->pembimbing_2 ;
+            })
+            ->editColumn('penguji_1',function($row){
+                return is_null($row->penguji_1) ? '' : $row->penguji_1 ;
+            })
+            ->editColumn('penguji_2',function($row){
+                return is_null($row->penguji_2) ? '' : $row->penguji_2 ;
+            })
+            ->editColumn('penguji_3',function($row){
+                return is_null($row->penguji_3) ? '' : $row->penguji_3 ;
+            })
             ->setRowId('id');
     }
 
@@ -81,6 +96,14 @@ class ViewStudentsDataTable extends DataTable
             Column::make('departement_id')->title('Kode'),
             Column::make('nim'),
             Column::make('nama'),
+            Column::make('pembimbing_1'),
+            Column::make('pembimbing_2'),
+            Column::make('penguji_1'),
+            Column::make('penguji_2'),
+            Column::make('penguji_3'),
+            Column::make('tanggal_proposal'),
+            Column::make('tanggal_seminar'),
+            Column::make('tanggal_skripsi'),
         ];
     }
 
