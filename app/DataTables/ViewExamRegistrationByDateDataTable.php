@@ -29,6 +29,21 @@ class ViewExamRegistrationByDateDataTable extends DataTable
             ->addColumn('waktu', function($row){
                 return $row->waktu_mulai.' - '.$row->waktu_akhir;
             })
+            ->editColumn('pembimbing1_nama',function($row){
+                return is_null($row->pembimbing1_nama) ? '' : $row->pembimbing1_nama ;
+            })
+            ->editColumn('pembimbing2_nama',function($row){
+                return is_null($row->pembimbing2_nama) ? '' : $row->pembimbing2_nama ;
+            })
+            ->editColumn('penguji1_nama',function($row){
+                return is_null($row->penguji1_nama) ? '' : $row->penguji1_nama ;
+            })
+            ->editColumn('penguji2_nama',function($row){
+                return is_null($row->penguji2_nama) ? '' : $row->penguji2_nama ;
+            })
+            ->editColumn('penguji3_nama',function($row){
+                return is_null($row->penguji3_nama) ? '' : $row->penguji3_nama ;
+            })
             ->setRowId('id');
     }
 
