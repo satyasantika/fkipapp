@@ -16,8 +16,8 @@ class ExamPaymentReportController extends Controller
      */
     public function index()
     {
-        $lists = ExamPaymentReport::select('kode_laporan')->distinct()->get()->sort();
-        return view('reports.periode',compact('lists'));
+        $lists = ExamPaymentReport::select('kode_laporan')->distinct()->get()->sortDesc();
+        return view('reports.paymentresume',compact('lists'));
     }
 
     /**
@@ -89,9 +89,9 @@ class ExamPaymentReportController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(ViewExamPaymentReportsDataTable $dataTable, $exampaymentreport)
     {
-        //
+        return $dataTable->with('kode_laporan',$exampaymentreport)->render('layouts.setting');
     }
 
     /**
@@ -118,9 +118,9 @@ class ExamPaymentReportController extends Controller
         //
     }
 
-    public function reportByDate(ViewExamPaymentReportsDataTable $dataTable, $date)
+    public function reportByDate(ViewExamPaymentReportsDataTable $dataTable, $kode_laporan)
     {
-        return $dataTable->with('date',$date)->render('layouts.setting');
+        return $dataTable->with('kode_laporan',$kode_laporan)->render('reports.exampaymentreport',compact('kode_laporan'));
     }
 
     // banyaknya membimbing/menguji pada ujian skripsi/proposal/seminar

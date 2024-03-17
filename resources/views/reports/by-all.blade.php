@@ -14,12 +14,8 @@
                             <tr>
                                 <th></th>
                                 <th>Bulan laporan</th>
-                                @hasrole('jurusan')
                                 <th>Banyak Ujian</th>
                                 <th>Penguji</th>
-                                @else
-                                <th>total dibayar</th>
-                                @endhasrole
                             </tr>
                         </thead>
                         <tbody>
@@ -31,7 +27,6 @@
                                     <td>
                                         {{ Carbon\Carbon::createFromFormat('Y-m',$list->kode_laporan)->isoFormat('MMMM Y') }}
                                     </td>
-                                    @hasrole('jurusan')
                                     <td>
                                         @php
                                             $penguji = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->where('departement_id',auth()->user()->departement_id);
@@ -48,11 +43,7 @@
                                             $collection = collect($pembimbing1)->concat($pembimbing2)->concat($penguji1)->concat($penguji2)->concat($penguji3);
                                         @endphp
                                         {{ $collection->unique()->values()->count() }}
-                                        {{-- <a href="{{ route('reports.date',$list->kode_laporan) }}" class="btn btn-sm btn-outline-primary">detail</a> --}}
                                     </td>
-                                    @else
-                                    <td></td>
-                                    @endhasrole
                                 </tr>
                             @empty
                                 <tr>

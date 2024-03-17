@@ -31,7 +31,7 @@ class ViewExamPaymentReportsDataTable extends DataTable
      */
     public function query(ViewExamPaymentReport $model): QueryBuilder
     {
-        return $model->where('kode_laporan',$this->date)->newQuery();
+        return $model->where('kode_laporan',$this->kode_laporan)->newQuery();
     }
 
     /**
@@ -44,12 +44,12 @@ class ViewExamPaymentReportsDataTable extends DataTable
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     //->dom('Bfrtip')
-                    ->orderBy(1)
+                    ->orderBy(2,3)
                     ->selectStyleSingle()
                     ->buttons([
                         Button::make('excel'),
-                        Button::make('csv'),
-                        Button::make('pdf'),
+                        // Button::make('csv'),
+                        // Button::make('pdf'),
                         Button::make('print'),
                         Button::make('reset'),
                         Button::make('reload')
@@ -69,6 +69,7 @@ class ViewExamPaymentReportsDataTable extends DataTable
             //       ->addClass('text-center'),
             // Column::make('id'),
             Column::make('kode_laporan'),
+            Column::make('departemen_id'),
             Column::make('dosen'),
             Column::make('status'),
             Column::make('golongan'),
@@ -85,8 +86,13 @@ class ViewExamPaymentReportsDataTable extends DataTable
             Column::make('banyak_menguji_skripsi'),
             Column::make('banyak_menguji_proposal'),
             Column::make('banyak_menguji_seminar'),
-            Column::make('created_at'),
-            Column::make('updated_at'),
+            Column::make('jumlah_honor_pembimbing'),
+            Column::make('jumlah_honor_penguji_skripsi'),
+            Column::make('jumlah_honor_penguji_proposal'),
+            Column::make('jumlah_honor_penguji_seminar'),
+            Column::make('total_honor'),
+            Column::make('potong_pajak')->title('PAJAK'),
+            Column::make('honor_dibayar')->title('JUMLAH'),
         ];
     }
 
