@@ -22,7 +22,10 @@ class ViewExamPaymentReportsDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('action', 'viewexampaymentreports.action')
+            ->addColumn('action', function($row){
+                $action = ' <a href="'.route('paymentreports.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
+                return $action;
+            })
             ->setRowId('id');
     }
 
@@ -62,11 +65,11 @@ class ViewExamPaymentReportsDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            // Column::computed('action')
-            //       ->exportable(false)
-            //       ->printable(false)
-            //       ->width(60)
-            //       ->addClass('text-center'),
+            Column::computed('action')
+                  ->exportable(false)
+                  ->printable(false)
+                  ->width(60)
+                  ->addClass('text-center'),
             // Column::make('id'),
             Column::make('kode_laporan'),
             Column::make('departemen_id'),

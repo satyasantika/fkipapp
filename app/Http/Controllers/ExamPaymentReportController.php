@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\ExamPayment;
 use Illuminate\Http\Request;
 use App\Models\ExamRegistration;
-use App\Models\ViewExamRegistration;
 use App\Models\ExamPaymentReport;
+use App\Models\ViewExamRegistration;
+use App\Models\ViewExamPaymentReport;
 use App\DataTables\ViewExamPaymentReportsDataTable;
 
 class ExamPaymentReportController extends Controller
@@ -89,33 +90,46 @@ class ExamPaymentReportController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ViewExamPaymentReportsDataTable $dataTable, $exampaymentreport)
+    public function show(string $id)
     {
-        return $dataTable->with('kode_laporan',$exampaymentreport)->render('layouts.setting');
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(ViewExamPaymentReport $paymentreport)
     {
-        //
+        return view('forms.exampaymentreport',array_merge(
+            [
+                'paymentreport' => $paymentreport,
+            ],
+            $this->_dataSelection(),
+        ));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, ExamPaymentReport $paymentreport)
     {
-        //
+        $data = $request->all();
+        $data['status'] = $request->pns ? 1 : 0;
+        $data['honor_pembimbing'] =  ExamPayment::where('jabatan_akademik',$request->jabatan_akademik)->where('pendidikan',$request->pendidikan)->first()->honor;
+        $paymentreport->fill($data)->save();
+
+        return to_route('reports.date',$paymentreport->kode_laporan)->with('success','data penguji '.$paymentreport->dosen.' telah diperbarui');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(ExamPaymentReport $paymentreport)
     {
-        //
+        $name = strtoupper($paymentreport->dosen);
+        $kode_laporan = $paymentreport->kode_laporan;
+        $paymentreport->delete();
+        return to_route('reports.date',$kode_laporan)->with('warning','data penguji '.$name.' telah dihapus');
     }
 
     public function reportByDate(ViewExamPaymentReportsDataTable $dataTable, $kode_laporan)
@@ -133,4 +147,14 @@ class ExamPaymentReportController extends Controller
                                     ->where($guide_order,$guide_id)
                                     ->count();
     }
+
+    private function _dataSelection()
+    {
+        return [
+            'jabatan_akademiks' =>  ['Asisten Ahli','Lektor','Lektor Kepala','Guru Besar'],
+            'golongans' =>  ['3','4'],
+            'pendidikans' =>  ['S2','S3'],
+        ];
+    }
+
 }
