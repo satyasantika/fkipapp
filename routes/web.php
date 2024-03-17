@@ -27,7 +27,7 @@ Route::get('exam/reports/departement', [App\Http\Controllers\ReportController::c
 Route::get('exam/reports/periode/{periode}', [App\Http\Controllers\ReportController::class,'showExamReportByPeriode'])->name('reports.by.periode');
 Route::get('exam/reports/date/{date}', [App\Http\Controllers\ReportController::class,'showExamReportByDate'])->name('reports.by.date');
 Route::get('exam/reports/examiner/{date}', [App\Http\Controllers\ReportController::class,'showExamReportByExaminer'])->name('reports.by.examiner');
-Route::get('exam/reports/{date}', [App\Http\Controllers\ExamPaymentReportController::class,'reportByDate'])->name('reports.date');
+Route::get('exam/reports/{pns}/{kode_laporan}', [App\Http\Controllers\ExamPaymentReportController::class,'reportByDate'])->name('reports.date');
 Route::resource('users', App\Http\Controllers\UserController::class)->except('show');
 Route::resource('students', App\Http\Controllers\StudentController::class)->except('show');
 Route::resource('lectures', App\Http\Controllers\LectureController::class)->except('show');

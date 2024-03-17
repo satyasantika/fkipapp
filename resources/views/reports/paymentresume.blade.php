@@ -14,25 +14,32 @@
                             <tr>
                                 <th></th>
                                 <th>Bulan laporan</th>
-                                <th>total dibayar</th>
+                                <th>total PNS dibayar</th>
+                                <th>total nonPNS dibayar</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($lists as $list)
                                 <tr>
                                     <td>
-                                        <a href="{{ route('reports.date',$list->kode_laporan) }}" class="btn btn-sm btn-outline-primary">view</a>
                                     </td>
                                     <td>
                                         {{ Carbon\Carbon::createFromFormat('Y-m',$list->kode_laporan)->isoFormat('MMMM Y') }}
                                     </td>
                                     @php
-                                        $dibayar = App\Models\ViewExamPaymentReport::where('kode_laporan',$list->kode_laporan)->sum('honor_dibayar');
-                                        // dd((int)$dibayar);
-                                    @endphp
+                                        $bayar_pns = App\Models\ViewExamPaymentReport::where('kode_laporan',$list->kode_laporan)->where('status',1)->sum('honor_dibayar');
+                                        $bayar_nonpns = App\Models\ViewExamPaymentReport::where('kode_laporan',$list->kode_laporan)->where('status',0)->sum('honor_dibayar');
+                                        // dd((int)$bayar_pns);
+                                        @endphp
                                     <td>
-                                        {{ Laraindo\RupiahFormat::currency($dibayar) }}<br>
-                                        <i>{{ Laraindo\RupiahFormat::terbilang($dibayar) }}</i>
+                                        {{ Laraindo\RupiahFormat::currency($bayar_pns) }}
+                                        <a href="{{ route('reports.date',['kode_laporan'=>$list->kode_laporan,'pns'=>1]) }}" class="btn btn-sm btn-outline-primary">detail</a><br>
+                                        <i>{{ Laraindo\RupiahFormat::terbilang($bayar_pns) }}</i>
+                                    </td>
+                                    <td>
+                                        {{ Laraindo\RupiahFormat::currency($bayar_nonpns) }}
+                                        <a href="{{ route('reports.date',['kode_laporan'=>$list->kode_laporan,'pns'=>0]) }}" class="btn btn-sm btn-outline-primary">detail</a><br>
+                                        <i>{{ Laraindo\RupiahFormat::terbilang($bayar_nonpns) }}</i>
                                     </td>
                                 </tr>
                             @empty

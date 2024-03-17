@@ -132,9 +132,12 @@ class ExamPaymentReportController extends Controller
         return to_route('reports.date',$kode_laporan)->with('warning','data penguji '.$name.' telah dihapus');
     }
 
-    public function reportByDate(ViewExamPaymentReportsDataTable $dataTable, $kode_laporan)
+    public function reportByDate(ViewExamPaymentReportsDataTable $dataTable, $pns, $kode_laporan)
     {
-        return $dataTable->with('kode_laporan',$kode_laporan)->render('reports.exampaymentreport',compact('kode_laporan'));
+        return $dataTable->with([
+            'pns'=>$pns,
+            'kode_laporan'=>$kode_laporan,
+            ])->render('reports.exampaymentreport',compact('kode_laporan'));
     }
 
     // banyaknya membimbing/menguji pada ujian skripsi/proposal/seminar

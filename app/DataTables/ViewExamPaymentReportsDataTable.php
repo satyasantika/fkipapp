@@ -26,6 +26,12 @@ class ViewExamPaymentReportsDataTable extends DataTable
                 $action = ' <a href="'.route('paymentreports.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
                 return $action;
             })
+            ->editColumn('status',function($row){
+                return $row->status==1 ? 'PNS' : 'NON PNS' ;
+            })
+            ->editColumn('golongan',function($row){
+                return $row->golongan==4 ? 'IV' : 'III' ;
+            })
             ->setRowId('id');
     }
 
@@ -34,7 +40,7 @@ class ViewExamPaymentReportsDataTable extends DataTable
      */
     public function query(ViewExamPaymentReport $model): QueryBuilder
     {
-        return $model->where('kode_laporan',$this->kode_laporan)->newQuery();
+        return $model->where('kode_laporan',$this->kode_laporan)->where('status',$this->pns)->newQuery();
     }
 
     /**
