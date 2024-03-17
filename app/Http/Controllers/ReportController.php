@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Lecture;
 use Illuminate\Http\Request;
 use App\Models\ViewExamRegistration;
 use App\DataTables\ViewExamRegistrationByDateDataTable;
@@ -37,6 +38,8 @@ class ReportController extends Controller
         $penguji2 = $penguji->whereNotNull('penguji2_id')->pluck('penguji2_id');
         $penguji3 = $penguji->whereNotNull('penguji3_id')->pluck('penguji3_id');
         $examiner_ids = collect($pembimbing1)->concat($pembimbing2)->concat($penguji1)->concat($penguji2)->concat($penguji3)->unique()->values()->all();
-        return view('reports.by-examiner',compact('date','examiner_ids'));
+
+        $examiners = Lecture::select('id','nama')->whereIn('id',$examiner_ids)->orderBy('nama')->get();
+        return view('reports.by-examiner',compact('date','examiners'));
     }
 }

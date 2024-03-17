@@ -12,23 +12,25 @@
 
                 <div class="card-body">
                     <div class="accordion" id="accordionExaminer">
-                        @forelse ($examiner_ids as $examiner_id)
+                        @forelse ($examiners as $examiner)
                         @php
                             $examregistrations = App\Models\ViewExamRegistration::where('tanggal_ujian',$date)
-                                                ->where('pembimbing1_id',$examiner_id)
-                                                ->orWhere('pembimbing2_id',$examiner_id)
-                                                ->orWhere('penguji1_id',$examiner_id)
-                                                ->orWhere('penguji2_id',$examiner_id)
-                                                ->orWhere('penguji3_id',$examiner_id)
+                                                ->where(function($query) use ($examiner){
+                                                    $query->where('pembimbing1_id',$examiner->id)
+                                                        ->orWhere('pembimbing2_id',$examiner->id)
+                                                        ->orWhere('penguji1_id',$examiner->id)
+                                                        ->orWhere('penguji2_id',$examiner->id)
+                                                        ->orWhere('penguji3_id',$examiner->id);
+                                                })
                                                 ->get();
                         @endphp
                         <div class="accordion-item">
-                            <h2 class="accordion-header" id="heading{{ $examiner_id }}">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $examiner_id }}" aria-expanded="true" aria-controls="collapse{{ $examiner_id }}">
-                                {{ \App\Models\Lecture::find($examiner_id)->nama }} &nbsp; <span class="badge bg-primary"> {{ $examregistrations->count() }}</span>
+                            <h2 class="accordion-header" id="heading{{ $examiner->id }}">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ $examiner->id }}" aria-expanded="true" aria-controls="collapse{{ $examiner->id }}">
+                                {{ \App\Models\Lecture::find($examiner->id)->nama }} &nbsp; <span class="badge bg-primary"> {{ $examregistrations->count() }}</span>
                             </button>
                             </h2>
-                            <div id="collapse{{ $examiner_id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ $examiner_id }}" data-bs-parent="#accordionExaminer">
+                            <div id="collapse{{ $examiner->id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ $examiner->id }}" data-bs-parent="#accordionExaminer">
                             <div class="accordion-body">
                                 <table class="table table-striped table-hover">
                                     <thead class="table-dark">
