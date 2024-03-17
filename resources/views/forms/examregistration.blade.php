@@ -21,6 +21,13 @@
         @method('PUT')
     @endif
     <div class="card-body">
+        @if ($examregistration->dilaporkan)
+        <div class="alert alert-info">
+            <h3>Ujian ini sudah dilaporkan</h3>
+            Anda tidak dapat mengedit tanggal ujian dan susunan para penguji
+        </div>
+        @endif
+
         <input type="hidden" name="departement_id" value="{{ $student->departement_id }}">
         <input type="hidden" name="student_id" value="{{ $student->id }}">
         {{-- jenis ujian --}}

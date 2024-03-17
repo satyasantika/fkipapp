@@ -30,7 +30,7 @@
                         </thead>
                         <tbody>
                             @forelse ($examregistrations as $examregistration)
-                                <tr class="table-success">
+                                <tr class="table-{{ $examregistration->dilaporkan ? 'success' : '' }}">
                                     <td><a href="{{ route('registrations.edit',$examregistration->id) }}" class="btn btn-sm btn-primary">view</a></td>
                                     <td>{{ $examregistration->tanggal_ujian }}</td>
                                     <td>{{ $examregistration->ujian }}</td>
