@@ -32,14 +32,15 @@
                                     </td>
                                     <td>
                                         @php
-                                            $penguji = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('pembimbing1_id')->count()
-                                                        +App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('pembimbing2_id')->count()
-                                                        +App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('penguji1_id')->count()
-                                                        +App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('penguji2_id')->count()
-                                                        +App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('penguji3_id')->count();
+                                            $pembimbing1 = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('pembimbing1_id')->pluck('pembimbing1_id');
+                                            $pembimbing2 = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('pembimbing2_id')->pluck('pembimbing2_id');
+                                            $penguji1 = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('penguji1_id')->pluck('penguji1_id');
+                                            $penguji2 = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('penguji2_id')->pluck('penguji2_id');
+                                            $penguji3 = App\Models\ViewExamRegistration::where('kode_laporan',$list->kode_laporan)->whereNotNull('penguji3_id')->pluck('penguji3_id');
+                                            $collection = collect($pembimbing1)->concat($pembimbing2)->concat($penguji1)->concat($penguji2)->concat($penguji3);
                                         @endphp
-                                        {{ $penguji }}
-                                        <a href="{{ route('reports.date',$list->kode_laporan) }}" class="btn btn-sm btn-outline-primary">detail</a>
+                                        {{ $collection->unique()->values()->count() }}
+                                        {{-- <a href="{{ route('reports.date',$list->kode_laporan) }}" class="btn btn-sm btn-outline-primary">detail</a> --}}
                                     </td>
                                     @else
                                     <td></td>

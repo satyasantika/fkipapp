@@ -26,6 +26,9 @@ class ViewExamRegistrationByDateDataTable extends DataTable
                 $action = ' <a href="'.route('registrations.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
                 return $action;
             })
+            ->addColumn('waktu', function($row){
+                return $row->waktu_mulai.' - '.$row->waktu_akhir;
+            })
             ->setRowId('id');
     }
 
@@ -53,6 +56,7 @@ class ViewExamRegistrationByDateDataTable extends DataTable
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     //->dom('Bfrtip')
+                    ->orderBy(1)
                     ->orderBy(2)
                     ->selectStyleSingle()
                     ->buttons([
@@ -77,11 +81,12 @@ class ViewExamRegistrationByDateDataTable extends DataTable
                     ->printable(false)
                     ->width(60)
                     ->addClass('text-center'),
-            Column::make('departement_id')->title('Kode'),
-            Column::make('tanggal_ujian'),
-            Column::make('ujian'),
-            Column::make('mahasiswa'),
+                    // Column::make('departement_id')->title('Kode'),
+            Column::make('ruangan'),
+            Column::make('waktu'),
             Column::make('nim'),
+            Column::make('mahasiswa'),
+            Column::make('ujian'),
             Column::make('pembimbing1_nama')->title('Pemb.1'),
             Column::make('pembimbing2_nama')->title('Pemb.2'),
             Column::make('penguji1_nama')->title('Peng.1'),

@@ -24,4 +24,15 @@ class ReportController extends Controller
     {
         return $dataTable->with('date',$date)->render('reports.by-date',compact('date'));
     }
+
+    public function showExamReportByExaminer($date)
+    {
+        $pembimbing1 = ViewExamRegistration::where('tanggal_ujian',$date)->whereNotNull('pembimbing1_id')->pluck('pembimbing1_id');
+        $pembimbing2 = ViewExamRegistration::where('tanggal_ujian',$date)->whereNotNull('pembimbing2_id')->pluck('pembimbing2_id');
+        $penguji1 = ViewExamRegistration::where('tanggal_ujian',$date)->whereNotNull('penguji1_id')->pluck('penguji1_id');
+        $penguji2 = ViewExamRegistration::where('tanggal_ujian',$date)->whereNotNull('penguji2_id')->pluck('penguji2_id');
+        $penguji3 = ViewExamRegistration::where('tanggal_ujian',$date)->whereNotNull('penguji3_id')->pluck('penguji3_id');
+        $examiner_ids = collect($pembimbing1)->concat($pembimbing2)->concat($penguji1)->concat($penguji2)->concat($penguji3)->unique()->values()->all();
+        return view('reports.by-examiner',compact('date','examiner_ids'));
+    }
 }
