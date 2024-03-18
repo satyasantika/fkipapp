@@ -99,4 +99,14 @@
     </div>
 </form>
 <hr>
+@if (!$paymentreport->dilaporkan)
+<form id="retract-form" action="{{ route('paymentreports.update',$paymentreport->id) }}" method="post">
+    @csrf
+    <input type="hidden" name="dilaporkan" value="1">
+    <button type="submit" class="btn btn-success btn-sm float-end" onclick="return confirm('batalkan laporan?');">
+        {{ __('cabut laporan') }}
+    </button>
+</form>
+@endif
+
 @endpush
