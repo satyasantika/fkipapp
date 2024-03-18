@@ -51,13 +51,17 @@
                                             <tr>
                                                 <td>
                                                     {{ Carbon\Carbon::createFromFormat('Y-m-d',$list2->tanggal_ujian)->isoFormat('dddd, LL') }}
-                                                    @if (App\Models\ViewExamRegistration::where('departement_id',auth()->user()->departement_id)->where('kode_laporan',$list->kode_laporan)->where('tanggal_ujian',$list2->tanggal_ujian)->where('dilaporkan',0)->exists())
+                                                    @if (App\Models\ViewExamRegistration::where([
+                                                        'departement_id'=>auth()->user()->departement_id,
+                                                        'tanggal_ujian'=>$list2->tanggal_ujian,
+                                                        'dilaporkan'=>0
+                                                        ])->exists())
                                                     <br><span class="badge bg-danger">ada yang belum dilaporkan</span>
                                                     @endif
 
                                                 </td>
                                                 <td>
-                                                    {{ \App\Models\ViewExamRegistration::where('tanggal_ujian',$list2->tanggal_ujian)->count() }}
+                                                    {{ \App\Models\ViewExamRegistration::where('tanggal_ujian',$list2->tanggal_ujian)->where('departement_id',auth()->user()->departement_id)->count() }}
                                                     <a href="{{ route('reports.by.date',$list2->tanggal_ujian) }}" class="btn btn-sm btn-outline-primary">detail ujian</a>
                                                 </td>
                                                 <td>
