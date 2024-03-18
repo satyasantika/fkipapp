@@ -79,7 +79,7 @@
         <div class="row mb-0">
             <div class="col-md-8 offset-md-4">
                 <button type="submit" class="btn btn-primary btn-sm">Save</button>
-                <a href="{{ route('reports.date',$paymentreport->kode_laporan) }}" class="btn btn-outline-secondary btn-sm">Close</a>
+                <a href="{{ route('reports.date',['pns'=>$paymentreport->status,'kode_laporan'=>$paymentreport->kode_laporan]) }}" class="btn btn-outline-secondary btn-sm">Close</a>
             </div>
         </div>
     </div>
