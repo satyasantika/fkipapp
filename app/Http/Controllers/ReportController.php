@@ -11,8 +11,8 @@ class ReportController extends Controller
 {
     public function showExamReport()
     {
-        $lists = ViewExamRegistration::where('departement_id',auth()->user()->departement_id)->select('kode_laporan')->distinct()->get()->sortDesc();
-        return view('reports.by-all',compact('lists'));
+        // $lists = ViewExamRegistration::where('departement_id',auth()->user()->departement_id)->select('kode_laporan')->distinct()->get()->sortDesc();
+        return view('reports.exam-resume');
     }
 
     public function showExamReportByPeriode($periode)
