@@ -103,7 +103,7 @@ class ViewExamRegistrationByDateDataTable extends DataTable
                     ->addClass('text-center'),
                     // Column::make('departement_id')->title('Kode'),
             Column::make('dilaporkan')->title('lapor?'),
-            Column::make('tanggal_ujian'),
+            // Column::make('tanggal_ujian'),
             Column::make('ruangan'),
             Column::make('waktu_mulai')->title('waktu'),
             Column::make('ujian'),
