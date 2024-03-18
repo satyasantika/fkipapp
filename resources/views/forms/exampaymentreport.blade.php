@@ -33,7 +33,7 @@
                         <input id="pns" name="pns" class="form-check-input mt-0" type="checkbox" @checked($paymentreport->pns)>
                     </div>
                     <div class="input-group-text">
-                        PNS
+                        ASN
                     </div>
                 </div>
             </div>

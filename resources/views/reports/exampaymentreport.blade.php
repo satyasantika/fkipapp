@@ -6,7 +6,7 @@
         <div class="col-auto">
             <div class="card">
                 <div class="card-header">
-                    Rekap Laporan Bulan {{ Carbon\Carbon::createFromFormat('Y-m',$kode_laporan)->isoFormat('MMMM Y') }}
+                    Rekap Laporan Bulan {{ Carbon\Carbon::createFromFormat('Y-m',$kode_laporan)->isoFormat('MMMM Y') }} ({{ request()->segment(3) == 1 ? 'ASN' : 'non ASN' }})
                     <a href="{{ route('paymentreports.index') }}" class="btn btn-sm btn-primary float-end">kembali</a>
                 </div>
                 <div class="card-body table-responsive">

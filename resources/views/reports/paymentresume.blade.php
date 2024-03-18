@@ -14,8 +14,8 @@
                             <tr>
                                 <th></th>
                                 <th>Bulan laporan</th>
-                                <th>total PNS dibayar</th>
-                                <th>total nonPNS dibayar</th>
+                                <th>total ASN dibayar</th>
+                                <th>total nonASN dibayar</th>
                             </tr>
                         </thead>
                         <tbody>
