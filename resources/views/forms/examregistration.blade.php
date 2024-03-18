@@ -234,10 +234,10 @@
     </button>
 </form>
 @endif
-@if (!$paymentreport->dilaporkan)
+@if (!$examregistration->dilaporkan)
 <form id="retract-form" action="{{ route('registrations.update',$examregistration->id) }}" method="post">
     @csrf
-    <input type="hidden" name="dilaporkan" value="1">
+    <input type="hidden" name="dilaporkan" value="0">
     <button type="submit" class="btn btn-danger btn-sm float-end" onclick="return confirm('batalkan laporan?');">
         {{ __('cabut laporan') }}
     </button>
