@@ -26,6 +26,12 @@ class ViewExamRegistrationsDataTable extends DataTable
                 $action = ' <a href="'.route('registrations.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
                 return $action;
             })
+            ->editColumn('waktu_mulai',function($row){
+                return is_null($row->waktu_mulai) ? '' : (substr($row->waktu_mulai,0,5).' - '.substr($row->waktu_akhir,0,5)) ;
+            })
+            ->editColumn('dilaporkan',function($row){
+                return $row->dilaporkan ? 'sudah' : 'belum' ;
+            })
             ->editColumn('pembimbing1_nama',function($row){
                 return is_null($row->pembimbing1_nama) ? '' : $row->pembimbing1_nama ;
             })
@@ -68,6 +74,8 @@ class ViewExamRegistrationsDataTable extends DataTable
                     ->minifiedAjax()
                     //->dom('Bfrtip')
                     ->orderBy(2)
+                    ->orderBy(3)
+                    ->orderBy(4)
                     ->selectStyleSingle()
                     ->buttons([
                         // auth()->user()->hasRole('jurusan') ? Button::make('add') :'',
@@ -91,11 +99,14 @@ class ViewExamRegistrationsDataTable extends DataTable
                     ->printable(false)
                     ->width(60)
                     ->addClass('text-center'),
-            Column::make('departement_id')->title('Kode'),
+                    // Column::make('departement_id')->title('Kode'),
+            Column::make('dilaporkan')->title('lapor?'),
             Column::make('tanggal_ujian'),
+            Column::make('ruangan'),
+            Column::make('waktu_mulai')->title('waktu'),
             Column::make('ujian'),
-            Column::make('mahasiswa'),
             Column::make('nim'),
+            Column::make('mahasiswa'),
             Column::make('pembimbing1_nama')->title('Pemb.1'),
             Column::make('pembimbing2_nama')->title('Pemb.2'),
             Column::make('penguji1_nama')->title('Peng.1'),
