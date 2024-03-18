@@ -74,6 +74,7 @@ class ViewExamRegistrationByDateDataTable extends DataTable
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     //->dom('Bfrtip')
+                    ->orderBy(1,'Desc')
                     ->orderBy(2)
                     ->orderBy(3)
                     ->orderBy(4)
