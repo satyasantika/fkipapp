@@ -225,22 +225,30 @@
     </div>
 </form>
 <hr>
-@if (!$examregistration->dilaporkan)
-<form id="report-form" action="{{ route('paymentreports.store') }}" method="post">
-    @csrf
-    <input type="hidden" name="examregistration_id" value="{{ $examregistration->id }}">
-    <button type="submit" class="btn btn-success btn-sm float-end" onclick="return confirm('data {{ $examregistration->exam_type->nama_ujian }} {{ $student->nama }} akan dilaporkan ke atasan');" @disabled($examregistration->dilaporkan)>
-        {{ __('laporkan ujian') }}
-    </button>
-</form>
-@endif
-@if (!$examregistration->dilaporkan)
-<form id="retract-form" action="{{ route('registrations.update',$examregistration->id) }}" method="post">
-    @csrf
-    <input type="hidden" name="dilaporkan" value="0">
-    <button type="submit" class="btn btn-danger btn-sm float-end" onclick="return confirm('batalkan laporan?');">
-        {{ __('cabut laporan') }}
-    </button>
-</form>
+@if ($examregistration->id)
+    @if (!$examregistration->dilaporkan)
+    <form id="report-form" action="{{ route('paymentreports.store') }}" method="post">
+        @csrf
+        <input type="hidden" name="examregistration_id" value="{{ $examregistration->id }}">
+        <button type="submit" class="btn btn-success btn-sm float-end" onclick="return confirm('data {{ $examregistration->exam_type->nama_ujian }} {{ $student->nama }} akan dilaporkan ke atasan');" @disabled($examregistration->dilaporkan)>
+            {{ __('laporkan ujian') }}
+        </button>
+    </form>
+    @endif
+    @if ($examregistration->dilaporkan)
+    <form id="retract-form" action="{{ route('registrations.update',$examregistration->id) }}" method="post">
+        @csrf
+        @method('PUT')
+        <input type="hidden" name="dilaporkan" value="0">
+        <input type="hidden" name="pembimbing1_dibayar" value="{{ $examregistration->pembimbing1_dibayar }}">
+        <input type="hidden" name="pembimbing2_dibayar" value="{{ $examregistration->pembimbing2_dibayar }}">
+        <input type="hidden" name="penguji1_dibayar" value="{{ $examregistration->penguji1_dibayar }}">
+        <input type="hidden" name="penguji2_dibayar" value="{{ $examregistration->penguji2_dibayar }}">
+        <input type="hidden" name="penguji3_dibayar" value="{{ $examregistration->penguji3_dibayar }}">
+        <button type="submit" class="btn btn-danger btn-sm float-end" onclick="return confirm('batalkan laporan?');">
+            {{ __('cabut laporan') }}
+        </button>
+    </form>
+    @endif
 @endif
 @endpush
