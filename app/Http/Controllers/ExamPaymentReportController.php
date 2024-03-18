@@ -118,7 +118,12 @@ class ExamPaymentReportController extends Controller
         $data['honor_pembimbing'] =  ExamPayment::where('jabatan_akademik',$request->jabatan_akademik)->where('pendidikan',$request->pendidikan)->first()->honor;
         $paymentreport->fill($data)->save();
 
-        return to_route('reports.date',$paymentreport->kode_laporan)->with('success','data penguji '.$paymentreport->dosen.' telah diperbarui');
+        $pass = [
+            'pns' => $paymentreport->status,
+            'kode_laporan' => $paymentreport->kode_laporan,
+        ];
+
+        return to_route('reports.date',$pass)->with('success','data penguji '.$paymentreport->dosen.' telah diperbarui');
     }
 
     /**
@@ -127,9 +132,12 @@ class ExamPaymentReportController extends Controller
     public function destroy(ExamPaymentReport $paymentreport)
     {
         $name = strtoupper($paymentreport->dosen);
-        $kode_laporan = $paymentreport->kode_laporan;
+        $pass = [
+            'pns' => $paymentreport->status,
+            'kode_laporan' => $paymentreport->kode_laporan,
+        ];
         $paymentreport->delete();
-        return to_route('reports.date',$kode_laporan)->with('warning','data penguji '.$name.' telah dihapus');
+        return to_route('reports.date',$pass)->with('warning','data penguji '.$name.' telah dihapus');
     }
 
     public function reportByDate(ViewExamPaymentReportsDataTable $dataTable, $pns, $kode_laporan)

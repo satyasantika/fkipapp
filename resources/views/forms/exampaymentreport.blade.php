@@ -74,6 +74,20 @@
                 </select>
             </div>
         </div>
+        {{-- npwp --}}
+        <div class="row mb-3">
+        <label for="npwp" class="col-md-4 col-form-label text-md-end">npwp</label>
+            <div class="col-md-8">
+                <input type="text" value="{{ $paymentreport->npwp }}" name="npwp" class="form-control" id="npwp">
+            </div>
+        </div>
+        {{-- rekening --}}
+        <div class="row mb-3">
+        <label for="rekening" class="col-md-4 col-form-label text-md-end">rekening</label>
+            <div class="col-md-8">
+                <input type="text" value="{{ $paymentreport->rekening }}" name="rekening" class="form-control" id="rekening">
+            </div>
+        </div>
 
         {{-- submit Button --}}
         <div class="row mb-0">
