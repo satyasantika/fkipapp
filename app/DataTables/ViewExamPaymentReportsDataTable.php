@@ -75,7 +75,7 @@ class ViewExamPaymentReportsDataTable extends DataTable
             Column::make('departemen_id'),
             Column::make('dosen'),
             Column::make('status_nama')->title('status'),
-            Column::make('golongan_nama')->title('golongan'),
+            Column::make('golongan_nama')->title('gol'),
             Column::make('npwp'),
             Column::make('rekening'),
             Column::make('jabatan_akademik'),
