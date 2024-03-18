@@ -27,10 +27,7 @@ class ViewLecturesDataTable extends DataTable
                 return $action;
             })
             ->editColumn('pns', function($row){
-                return $row->pns ? 'PNS' : 'Non PNS';
-            })
-            ->editColumn('pns', function($row){
-                return $row->pns ? 'PNS' : 'Non PNS';
+                return $row->pns ? 'ASN' : 'Non ASN';
             })
             ->setRowId('id');
     }
