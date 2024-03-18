@@ -33,7 +33,7 @@ return new class extends Migration
 
         // view laporan ujian
         $query = "SELECT exam_payment_reports.*,
-                        CONCAT(lectures.gelar_depan,' ',lectures.nama,', ',lectures.gelar_belakang) AS dosen,
+                        TRIM(CONCAT(IF(ISNULL(lectures.gelar_depan),'',CONCAT(lectures.gelar_depan,' ')),lectures.nama,', ',lectures.gelar_belakang)) AS dosen,
                         lectures.departement_id AS departemen_id,
                         CASE WHEN exam_payment_reports.status=1 THEN 'ASN' ELSE 'NON ASN' END AS status_nama,
                         CASE WHEN exam_payment_reports.golongan=3 THEN 'III'

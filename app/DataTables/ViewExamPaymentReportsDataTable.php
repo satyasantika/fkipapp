@@ -26,12 +26,6 @@ class ViewExamPaymentReportsDataTable extends DataTable
                 $action = ' <a href="'.route('paymentreports.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
                 return $action;
             })
-            ->editColumn('status',function($row){
-                return $row->status==1 ? 'PNS' : 'NON PNS' ;
-            })
-            ->editColumn('golongan',function($row){
-                return $row->golongan==4 ? 'IV' : 'III' ;
-            })
             ->setRowId('id');
     }
 
@@ -80,8 +74,8 @@ class ViewExamPaymentReportsDataTable extends DataTable
             Column::make('kode_laporan'),
             Column::make('departemen_id'),
             Column::make('dosen'),
-            Column::make('status'),
-            Column::make('golongan'),
+            Column::make('status_nama')->title('status'),
+            Column::make('golongan_nama')->title('golongan'),
             Column::make('npwp'),
             Column::make('rekening'),
             Column::make('jabatan_akademik'),
