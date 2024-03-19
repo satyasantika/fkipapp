@@ -48,23 +48,30 @@ class ExamPaymentReportController extends Controller
             $cek_penguji_dibayar = $penguji.'_dibayar';
             $banyak_menguji = 'banyak_'.$penguji;
             $id_penguji = $examregistration->$urutan_penguji;
-            $cek_penguji = $examregistration->$cek_penguji_dibayar;
-            $menguji = $this->_getCountOfExaminer($exam_type_id,$kode_laporan,$cek_penguji_dibayar,$urutan_penguji,$id_penguji);
+
+            $pembimbing1 = $this->_getCountOfExaminer($exam_type_id,$kode_laporan,'pembimbing1_dibayar','pembimbing1_id',$id_penguji);
+            $pembimbing2 = $this->_getCountOfExaminer($exam_type_id,$kode_laporan,'pembimbing2_dibayar','pembimbing2_id',$id_penguji);
+            $penguji1 = $this->_getCountOfExaminer($exam_type_id,$kode_laporan,'penguji1_dibayar','penguji1_id',$id_penguji);
+            $penguji2 = $this->_getCountOfExaminer($exam_type_id,$kode_laporan,'penguji2_dibayar','penguji2_id',$id_penguji);
+            $penguji3 = $this->_getCountOfExaminer($exam_type_id,$kode_laporan,'penguji3_dibayar','penguji3_id',$id_penguji);
+
+            $semua = $pembimbing1 + $pembimbing2 + $penguji1 + $penguji2 + $penguji3;
 
             $data_tambahan = [];
             if ($exam_type_id == 3) {
                 if ($penguji == 'pembimbing1') {
-                    $data_tambahan['banyak_membimbing1']=$menguji;
+                    $data_tambahan['banyak_membimbing1'] = $pembimbing1;
                 }
                 if ($penguji == 'pembimbing2') {
-                    $data_tambahan['banyak_membimbing2']=$menguji;
+                    $data_tambahan['banyak_membimbing2'] = $pembimbing2;
                 }
-                $data_tambahan['banyak_menguji_skripsi']=$menguji;
+
+                $data_tambahan['banyak_menguji_skripsi'] = $semua;
+
             } elseif ($exam_type_id == 1) {
-                $data_tambahan['banyak_menguji_proposal']=$menguji;
-                // dd($menguji);
+                $data_tambahan['banyak_menguji_proposal'] = $semua;
             } else {
-                $data_tambahan['banyak_menguji_seminar']=$menguji;
+                $data_tambahan['banyak_menguji_seminar'] = $semua;
             }
 
             ExamPaymentReport::updateOrCreate([
