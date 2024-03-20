@@ -24,21 +24,21 @@
                     <table class="table table-hover table-responsive table-sm">
                         <thead class="table-dark">
                             <tr>
-                                <th>tanggal ujian</th>
-                                <th>jurusan ujian</th>
                                 <th></th>
+                                <th>tanggal ujian</th>
+                                <th>peserta</th>
+                                <th>jurusan</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($dates as $date)
                             @php
                                 $departement = App\Models\ViewExamRegistration::where('tanggal_ujian',$date)->pluck('departement_id');
+                                $peserta = App\Models\ViewExamRegistration::where('tanggal_ujian',$date)->count();
                                 $departement_id = collect($departement)->unique()->sort()->values()->all();
                                 $tanggal = Carbon\Carbon::createFromFormat('Y-m-d',$date)->isoFormat('dddd, LL');
                             @endphp
                                 <tr>
-                                    <td>{{ $tanggal }}</td>
-                                    <td>@foreach ($departement_id as $id) {{ App\Models\Departement::find($id)->mapel }}, @endforeach</span></td>
                                     <td>
                                         <form id="refresh-{{ $date }}" action="{{ route('reports.mass',$date) }}" method="POST">
                                             @csrf
@@ -46,6 +46,13 @@
                                                 {{ __('fresh') }}
                                             </button>
                                         </form>
+                                    </td>
+                                    <td>{{ $tanggal }}</td>
+                                    <td class="text-center">{{ $peserta }}</td>
+                                    <td>@foreach ($departement_id as $id)
+                                        {{ App\Models\Departement::find($id)->mapel }}
+                                        <span class="badge bg-dark">{{ App\Models\ViewExamRegistration::where('departement_id',$id)->where('tanggal_ujian',$date)->count() }}</span>&nbsp;|
+                                        @endforeach
                                     </td>
                                 </tr>
                             @endforeach
