@@ -16,6 +16,7 @@
                                 <th>Bulan laporan</th>
                                 <th>total ASN dibayar</th>
                                 <th>total nonASN dibayar</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -25,7 +26,7 @@
                                     </td>
                                     <td>
                                         {{ Carbon\Carbon::createFromFormat('Y-m',$list->kode_laporan)->isoFormat('MMMM Y') }}
-                                        <a href="{{ route('reports.periode',$list->kode_laporan) }}" class="btn btn-sm btn-outline-primary">penguij</a><br>
+                                        <a href="{{ route('reports.fresh.periode',$list->kode_laporan) }}" class="btn btn-sm btn-outline-primary">refresh</a>
                                     </td>
                                     @php
                                         $bayar_pns = App\Models\ViewExamPaymentReport::where('kode_laporan',$list->kode_laporan)->where('status',1)->sum('honor_dibayar');
@@ -41,6 +42,9 @@
                                         {{ Laraindo\RupiahFormat::currency($bayar_nonpns) }}
                                         <a href="{{ route('reports.date',['kode_laporan'=>$list->kode_laporan,'pns'=>0]) }}" class="btn btn-sm btn-outline-primary">detail</a><br>
                                         <i>{{ Laraindo\RupiahFormat::terbilang($bayar_nonpns) }}</i>
+                                    </td>
+                                    <td>
+                                        {{-- <a href="{{ route('reports.mass',$list->kode_laporan) }}" class="btn btn-sm btn-outline-primary">hitung</a><br> --}}
                                     </td>
                                 </tr>
                             @empty
