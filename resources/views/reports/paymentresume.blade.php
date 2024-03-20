@@ -25,6 +25,7 @@
                                     </td>
                                     <td>
                                         {{ Carbon\Carbon::createFromFormat('Y-m',$list->kode_laporan)->isoFormat('MMMM Y') }}
+                                        <a href="{{ route('reports.periode',$list->kode_laporan) }}" class="btn btn-sm btn-outline-primary">penguij</a><br>
                                     </td>
                                     @php
                                         $bayar_pns = App\Models\ViewExamPaymentReport::where('kode_laporan',$list->kode_laporan)->where('status',1)->sum('honor_dibayar');

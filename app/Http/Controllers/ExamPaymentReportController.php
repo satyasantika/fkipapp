@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Lecture;
 use App\Models\ExamPayment;
 use Illuminate\Http\Request;
 use App\Models\ExamRegistration;
@@ -153,6 +154,18 @@ class ExamPaymentReportController extends Controller
             'pns'=>$pns,
             'kode_laporan'=>$kode_laporan,
             ])->render('reports.exampaymentreport',compact('kode_laporan'));
+    }
+
+    public function reportByPeriode($kode_laporan)
+    {
+        $pembimbing1 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('pembimbing1_id');
+        $pembimbing2 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('pembimbing2_id');
+        $penguji1 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('penguji1_id');
+        $penguji2 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('penguji2_id');
+        $penguji3 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('penguji3_id');
+        $penguji = collect($pembimbing1)->concat($pembimbing2)->concat($penguji1)->concat($penguji2)->concat($penguji3)->unique()->values()->all();
+        $examiners = Lecture::whereIn('id',$penguji)->orderBy('nama')->get();
+        return view('reports.exam-by-periode',compact('kode_laporan','examiners'));
     }
 
     // banyaknya membimbing/menguji pada ujian skripsi/proposal/seminar
