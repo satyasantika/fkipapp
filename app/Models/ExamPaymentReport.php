@@ -14,4 +14,9 @@ class ExamPaymentReport extends Model
     {
         return $this->belongsTo(Lecture::class, 'lecture_id');
     }
+
+    public function reportdate(): BelongsTo
+    {
+        return $this->belongsTo(ReportDate::class, 'report_date_id');
+    }
 }

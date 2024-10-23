@@ -59,4 +59,8 @@ class ExamRegistration extends Model
     {
         return $this->belongsTo(Student::class, 'student_id');
     }
+    public function reportdate(): BelongsTo
+    {
+        return $this->belongsTo(ReportDate::class, 'report_date_id');
+    }
 }

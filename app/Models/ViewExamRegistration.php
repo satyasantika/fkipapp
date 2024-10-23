@@ -10,4 +10,9 @@ class ViewExamRegistration extends Model
     use HasFactory;
     protected $table = 'view_exam_registrations';
 
+    public function reportdate(): BelongsTo
+    {
+        return $this->belongsTo(ReportDate::class, 'report_date_id');
+    }
+
 }
