@@ -49,7 +49,7 @@ class ViewExamNotReportedDataTable extends DataTable
                 return is_null($row->penguji3_nama) ? '' : $row->penguji3_nama ;
             })
             ->editColumn('created_at', function($row) {
-                return $row->updated_at->format('Y-m-d');
+                return $row->created_at->format('Y-m-d');
             })
             ->editColumn('updated_at', function($row) {
                 return $row->updated_at->format('Y-m-d');
