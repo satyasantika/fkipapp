@@ -84,9 +84,9 @@ class ViewReportDatesDataTable extends DataTable
                   ->width(100)
                   ->addClass('text-center'),
             // Column::make('id'),
-            // Column::make('tanggal'),
+            Column::make('tanggal')->width(100),
             Column::make('deskripsi'),
-            Column::make('dibayar'),
+            Column::make('dibayar')->width(100),
         ];
     }
 
