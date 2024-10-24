@@ -30,8 +30,12 @@ class ViewReportDatesDataTable extends DataTable
                 return $action;
             })
             ->editColumn('dibayar',function($row){
-                $action = RupiahFormat::currency($row->dibayar);
-                $action = $action.' ('.RupiahFormat::terbilang($row->dibayar).')';
+                if (!is_null($row->dibayar)) {
+                    $action = RupiahFormat::currency($row->dibayar);
+                    $action = $action.' ('.RupiahFormat::terbilang($row->dibayar).')';
+                } else {
+                    $action = NULL;
+                }
                 return $action;
             })
             ->setRowId('id');
@@ -80,7 +84,7 @@ class ViewReportDatesDataTable extends DataTable
                   ->width(100)
                   ->addClass('text-center'),
             // Column::make('id'),
-            Column::make('tanggal'),
+            // Column::make('tanggal'),
             Column::make('deskripsi'),
             Column::make('dibayar'),
         ];
