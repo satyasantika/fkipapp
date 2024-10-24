@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\Lecture;
+use App\Models\ReportDate;
 use App\Models\ExamPayment;
 use Illuminate\Http\Request;
 use App\Models\ExamRegistration;
@@ -96,12 +97,12 @@ class ExamPaymentReportController extends Controller
         return to_route('reports.date',$pass)->with('warning','data penguji '.$name.' telah dihapus');
     }
 
-    public function reportByDate(ViewExamPaymentReportsDataTable $dataTable, $pns, $kode_laporan)
+    public function reportBySection(ViewExamPaymentReportsDataTable $dataTable, $pns, $report_date_id)
     {
         return $dataTable->with([
             'pns'=>$pns,
-            'kode_laporan'=>$kode_laporan,
-            ])->render('reports.exampaymentreport',compact('kode_laporan'));
+            'report_date_id'=>$report_date_id,
+            ])->render('reports.exampaymentreport',compact('report_date_id'));
     }
 
     public function reportExaminerByPeriode($kode_laporan)
@@ -130,7 +131,7 @@ class ExamPaymentReportController extends Controller
 
     public function reportFreshByPeriode($periode)
     {
-        $tanggal = ViewExamRegistration::where('kode_laporan',$periode)->pluck('tanggal_ujian');
+        $tanggal = ViewExamRegistration::where('report_date_id',$periode)->pluck('tanggal_ujian');
         $dates = collect($tanggal)->unique()->sort()->values()->all();
         $total = collect($tanggal)->unique()->count();
         return view('reports.fresh-by-date',compact('periode','dates','total'));
@@ -145,14 +146,15 @@ class ExamPaymentReportController extends Controller
         foreach ($examregistrations as $examregistration) {
             $this->_reportStore($examregistration);
         }
-        return to_route('reports.fresh.periode',substr($date,0,7))->with('success','data ujian tanggal '.$tanggal.' telah disegarkan');
+
+        return redirect()->back()->with('success','data ujian tanggal '.$tanggal.' telah disegarkan');
     }
 
     // banyaknya membimbing/menguji pada ujian skripsi/proposal/seminar
-    private function _getCountOfExaminer($exam_type_id,$kode_laporan,$guide_cek,$guide_order,$guide_id)
+    private function _getCountOfExaminer($exam_type_id,$report_date_id,$guide_cek,$guide_order,$guide_id)
     {
         return ViewExamRegistration::where('exam_type_id',$exam_type_id)
-                                    ->where('kode_laporan',$kode_laporan)
+                                    ->where('report_date_id',$report_date_id)
                                     ->where('dilaporkan',1)
                                     ->where($guide_cek,1)
                                     ->where($guide_order,$guide_id)
@@ -171,7 +173,7 @@ class ExamPaymentReportController extends Controller
     public function _reportStore($examregistration_id)
     {
         $examregistration = ExamRegistration::find($examregistration_id);
-        $kode_laporan = substr($examregistration->tanggal_ujian,0,7);
+        $report_date_id = $examregistration->report_date_id;
         $exam_type_id = $examregistration->exam_type_id;
 
         $examregistration->update([
@@ -184,11 +186,11 @@ class ExamPaymentReportController extends Controller
             $banyak_menguji = 'banyak_'.$penguji;
             $id_penguji = $examregistration->$urutan_penguji;
 
-            $pembimbing1 = $this->_getCountOfExaminer($exam_type_id,$kode_laporan,'pembimbing1_dibayar','pembimbing1_id',$id_penguji);
-            $pembimbing2 = $this->_getCountOfExaminer($exam_type_id,$kode_laporan,'pembimbing2_dibayar','pembimbing2_id',$id_penguji);
-            $penguji1 = $this->_getCountOfExaminer($exam_type_id,$kode_laporan,'penguji1_dibayar','penguji1_id',$id_penguji);
-            $penguji2 = $this->_getCountOfExaminer($exam_type_id,$kode_laporan,'penguji2_dibayar','penguji2_id',$id_penguji);
-            $penguji3 = $this->_getCountOfExaminer($exam_type_id,$kode_laporan,'penguji3_dibayar','penguji3_id',$id_penguji);
+            $pembimbing1 = $this->_getCountOfExaminer($exam_type_id,$report_date_id,'pembimbing1_dibayar','pembimbing1_id',$id_penguji);
+            $pembimbing2 = $this->_getCountOfExaminer($exam_type_id,$report_date_id,'pembimbing2_dibayar','pembimbing2_id',$id_penguji);
+            $penguji1 = $this->_getCountOfExaminer($exam_type_id,$report_date_id,'penguji1_dibayar','penguji1_id',$id_penguji);
+            $penguji2 = $this->_getCountOfExaminer($exam_type_id,$report_date_id,'penguji2_dibayar','penguji2_id',$id_penguji);
+            $penguji3 = $this->_getCountOfExaminer($exam_type_id,$report_date_id,'penguji3_dibayar','penguji3_id',$id_penguji);
 
             $semua = $pembimbing1 + $pembimbing2 + $penguji1 + $penguji2 + $penguji3;
 
@@ -210,7 +212,7 @@ class ExamPaymentReportController extends Controller
             }
 
             ExamPaymentReport::updateOrCreate([
-                'kode_laporan'=>$kode_laporan,
+                'report_date_id'=>$report_date_id,
                 'lecture_id'=>$id_penguji,
             ],array_merge([
                 'status'=>$examregistration->$penguji->pns ? 1 : 0,
@@ -223,6 +225,15 @@ class ExamPaymentReportController extends Controller
                 'honor_penguji_skripsi'=>ExamPayment::find(3)->honor,
                 'honor_penguji_proposal'=>ExamPayment::find(1)->honor,
                 'honor_penguji_seminar'=>ExamPayment::find(2)->honor,
+            ],$data_tambahan));
+
+            ReportDate::updateOrCreate([
+                'id'=>$report_date_id,
+            ],array_merge([
+                'dibayar'=>ExamPayment::where('jabatan_akademik',$examregistration->$penguji->jabatan_akademik)->where('pendidikan',$examregistration->$penguji->pendidikan)->first()->honor
+                                        +ExamPayment::find(3)->honor,
+                                        +ExamPayment::find(1)->honor,
+                                        +ExamPayment::find(2)->honor,
             ],$data_tambahan));
         }
     }

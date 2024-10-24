@@ -23,6 +23,9 @@ return new class extends Migration
             $table->dropColumn('tanggal_dilaporkan');
             $table->foreignIdFor(ReportDate::class)->after('dilaporkan')->nullable();
         });
+        Schema::table('exam_payment_reports', function (Blueprint $table) {
+            $table->foreignIdFor(ReportDate::class)->after('dilaporkan')->nullable();
+        });
     }
 
     /**
@@ -35,6 +38,11 @@ return new class extends Migration
                 'report_date_id',
             ]);
             $table->date('tanggal_dilaporkan')->nullable();
+        });
+        Schema::table('exam_payment_reports', function (Blueprint $table) {
+            $table->dropColumn([
+                'report_date_id',
+            ]);
         });
         Schema::dropIfExists('report_dates');
     }

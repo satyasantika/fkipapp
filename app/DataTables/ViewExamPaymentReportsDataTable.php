@@ -34,7 +34,7 @@ class ViewExamPaymentReportsDataTable extends DataTable
      */
     public function query(ViewExamPaymentReport $model): QueryBuilder
     {
-        return $model->where('kode_laporan',$this->kode_laporan)->where('status',$this->pns)->newQuery();
+        return $model->where('report_date_id',$this->report_date_id)->where('status',$this->pns)->newQuery();
     }
 
     /**
@@ -71,7 +71,7 @@ class ViewExamPaymentReportsDataTable extends DataTable
                   ->width(60)
                   ->addClass('text-center'),
             // Column::make('id'),
-            Column::make('kode_laporan'),
+            Column::make('tanggal_laporan'),
             Column::make('departemen_id'),
             Column::make('dosen'),
             Column::make('status_nama')->title('status'),

@@ -6,8 +6,8 @@
         <div class="col-auto">
             <div class="card">
                 <div class="card-header">
-                    Rekap Laporan Bulan {{ Carbon\Carbon::createFromFormat('Y-m',$kode_laporan)->isoFormat('MMMM Y') }} ({{ request()->segment(3) == 1 ? 'ASN' : 'non ASN' }})
-                    <a href="{{ route('paymentreports.index') }}" class="btn btn-sm btn-primary float-end">kembali</a>
+                    Rekap Laporan Bulan {{ App\Models\ReportDate::find($report_date_id)->tanggal }} untuk Kelompok ({{ request()->segment(3) == 1 ? 'ASN' : 'non ASN' }})
+                    <a href="{{ route('reports.fresh.periode',$report_date_id) }}" class="btn btn-sm btn-primary float-end">kembali</a>
                 </div>
                 <div class="card-body table-responsive">
                     @if (session('success'))

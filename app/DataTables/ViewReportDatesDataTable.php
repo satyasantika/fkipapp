@@ -3,14 +3,15 @@
 namespace App\DataTables;
 
 use App\Models\ReportDate;
-use Illuminate\Database\Eloquent\Builder as QueryBuilder;
-use Yajra\DataTables\EloquentDataTable;
-use Yajra\DataTables\Html\Builder as HtmlBuilder;
+use Laraindo\RupiahFormat;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
+use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
+use Yajra\DataTables\Html\Builder as HtmlBuilder;
+use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 
 class ViewReportDatesDataTable extends DataTable
 {
@@ -25,6 +26,12 @@ class ViewReportDatesDataTable extends DataTable
             ->addColumn('action', function($row){
                 $action = ' <a href="'.route('reportdates.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
                 $action = $action.' <a href="'.route('reportdates.reportedlist',$row->id).'" class="btn btn-outline-success btn-sm action">L</a> ';
+                $action = $action.' <a href="'.route('reports.fresh.periode',$row->id).'" class="btn btn-outline-dark btn-sm action">R</a> ';
+                return $action;
+            })
+            ->editColumn('dibayar',function($row){
+                $action = RupiahFormat::currency($row->dibayar);
+                $action = $action.' ('.RupiahFormat::terbilang($row->dibayar).')';
                 return $action;
             })
             ->setRowId('id');
@@ -70,7 +77,7 @@ class ViewReportDatesDataTable extends DataTable
             Column::computed('action')
                   ->exportable(false)
                   ->printable(false)
-                  ->width(60)
+                  ->width(100)
                   ->addClass('text-center'),
             // Column::make('id'),
             Column::make('tanggal'),

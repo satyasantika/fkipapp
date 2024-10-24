@@ -6,13 +6,17 @@
         <div class="col-auto">
             <div class="card">
                 <div class="card-header">
-                    {{ __('Rekap Ujian pada bulan ').Carbon\Carbon::createFromFormat('Y-m',$periode)->isoFormat('MMMM Y') }}
-                    <a href="{{ route('paymentreports.index') }}" class="btn btn-sm btn-primary float-end">kembali</a>
+                    {{ __('Rekap Ujian pada sesi penarikan ').$periode }}
+                    <a href="{{ route('reportdates.index') }}" class="btn btn-sm btn-primary float-end">kembali</a>
                 </div>
 
                 <div class="card-body">
                     <h4>
                         TOTAL: {{ $total }} Ujian
+                        <div class="float-end">
+                            <a href="{{ route('reports.section',['pns'=>1,'report_date_id'=>$periode]) }}" class="btn btn-sm btn-outline-success">list ASN</a>
+                            <a href="{{ route('reports.section',['pns'=>0,'report_date_id'=>$periode]) }}" class="btn btn-sm btn-outline-success">list NON ASN</a>
+                        </div>
                     </h4>
                     <hr>
                     @if (session('success'))
