@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\ReportDate;
 use Illuminate\Http\Request;
+use App\Models\ExamRegistration;
 use App\DataTables\ViewReportDatesDataTable;
+use App\DataTables\ViewExamReportedDataTable;
+use App\DataTables\ViewExamNotReportedDataTable;
 
 class ReportDateController extends Controller
 {
@@ -78,8 +81,33 @@ class ReportDateController extends Controller
         return to_route('reportdates.index')->with('warning','penarikan laporan tanggal '.$tanggal.' telah dihapus');
     }
 
-    public function list(string $id)
+    public function reportedList(ViewExamReportedDataTable $dataTable, $report_date_id)
     {
-        //
+        $tanggal = ReportDate::find($report_date_id)->tanggal;
+        return $dataTable->with('report_date_id',$report_date_id)->render('reports.reportdatelist',compact('tanggal','report_date_id'));
     }
+
+    public function notReportedList(ViewExamNotReportedDataTable $dataTable, $report_date_id)
+    {
+        $tanggal = ReportDate::find($report_date_id)->tanggal;
+        return $dataTable->with('report_date_id',$report_date_id)->render('reports.notreportdatelist',compact('tanggal','report_date_id'));
+    }
+
+        /**
+     * Update the specified resource in storage.
+     */
+    public function setReportDate(Request $request, ExamRegistration $examregistration)
+    {
+        if ($request->date_report_id==NULL) {
+            $pesan = 'dicabut dari';
+        } else {
+            $pesan = 'ditambahkan pada';
+        }
+
+        $data = $request->all();
+        $examregistration->fill($data)->save();
+
+        return redirect()->back()->with('warning','data ujian telah '.$pesan.' sesi penarikan laporan');
+    }
+
 }

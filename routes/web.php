@@ -32,7 +32,9 @@ Route::get('exam/reports/{pns}/{kode_laporan}', [App\Http\Controllers\ExamPaymen
 Route::get('reports/periode-fresh/{periode}', [App\Http\Controllers\ExamPaymentReportController::class,'reportFreshByPeriode'])->name('reports.fresh.periode');
 // Route::get('reports/date-fresh/{date}', [App\Http\Controllers\ExamPaymentReportController::class,'reportFreshByDate'])->name('reports.fresh.date');
 Route::post('exam/massreports/{date}', [App\Http\Controllers\ExamPaymentReportController::class,'massReportByDate'])->name('reports.mass');
-Route::get('exam/reportdates/list/{id}', [App\Http\Controllers\ReportDateController::class,'list'])->name('reportdates.list');
+Route::get('exam/reportdates/reported-list/{report_date_id}', [App\Http\Controllers\ReportDateController::class,'reportedList'])->name('reportdates.reportedlist');
+Route::put('exam/reportdates/set-report-date/{examregistration}', [App\Http\Controllers\ReportDateController::class,'setReportDate'])->name('reportdates.setreportdate');
+Route::get('exam/reportdates/not-reported-list/{report_date_id}', [App\Http\Controllers\ReportDateController::class,'notReportedList'])->name('reportdates.notreportedlist');
 Route::resource('users', App\Http\Controllers\UserController::class)->except('show');
 Route::resource('students', App\Http\Controllers\StudentController::class)->except('show');
 Route::resource('lectures', App\Http\Controllers\LectureController::class)->except('show');

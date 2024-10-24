@@ -24,7 +24,7 @@ class ViewReportDatesDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('action', function($row){
                 $action = ' <a href="'.route('reportdates.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
-                $action = $action.' <a href="'.route('reportdates.list',$row->id).'" class="btn btn-outline-success btn-sm action">L</a> ';
+                $action = $action.' <a href="'.route('reportdates.reportedlist',$row->id).'" class="btn btn-outline-success btn-sm action">L</a> ';
                 return $action;
             })
             ->setRowId('id');
