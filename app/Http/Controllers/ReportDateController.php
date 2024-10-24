@@ -98,16 +98,20 @@ class ReportDateController extends Controller
      */
     public function setReportDate(Request $request, ExamRegistration $examregistration)
     {
-        if ($request->date_report_id==NULL) {
-            $pesan = 'dicabut dari';
-        } else {
-            $pesan = 'ditambahkan pada';
-        }
+        // TO FIX
+        // if ((int)$request->date_report_id>0) {
+        //     $pesan = 'ditambahkan pada';
+        //     $alert = 'success';
+        // } else {
+        //     $pesan = 'dicabut dari';
+        //     $alert = 'warning';
+        // }
 
         $data = $request->all();
         $examregistration->fill($data)->save();
 
-        return redirect()->back()->with('warning','data ujian telah '.$pesan.' sesi penarikan laporan');
+        // return redirect()->back()->with($alert,'data ujian telah '.$pesan.' sesi penarikan laporan');
+        return redirect()->back();
     }
 
 }

@@ -27,7 +27,7 @@ class ViewExamNotReportedDataTable extends DataTable
                 $action = $action.'<input type="hidden" name="_token" value='.csrf_token().'>';
                 $action = $action.'<input type="hidden" name="_method" value="PUT">';
                 $action = $action.'<input type="hidden" name="report_date_id" value='.$this->report_date_id.'>';
-                $action = $action.'<button type="submit" class="btn btn-success btn-sm">UP</button> </form> ';
+                $action = $action.'<button type="submit" class="btn btn-success btn-sm">+</button> </form> ';
                 return $action;
             })
             ->editColumn('dilaporkan',function($row){
