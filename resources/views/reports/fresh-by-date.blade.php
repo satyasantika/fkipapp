@@ -55,7 +55,7 @@
                                     <td class="text-center">{{ $peserta }}</td>
                                     <td>@foreach ($departement_id as $id)
                                         {{ App\Models\Departement::find($id)->mapel }}
-                                        <span class="badge bg-dark">{{ App\Models\ViewExamRegistration::where('departement_id',$id)->where('report_date_id',$periode)->count() }}</span>&nbsp;|
+                                        <span class="badge bg-dark">{{ App\Models\ViewExamRegistration::where('departement_id',$id)->where('report_date_id',$periode)->where('tanggal_ujian',$date)->count() }}</span>&nbsp;|
                                         @endforeach
                                     </td>
                                 </tr>
