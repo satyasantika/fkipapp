@@ -30,7 +30,7 @@
                             <tr>
                                 <th></th>
                                 <th>tanggal ujian</th>
-                                <th>peserta</th>
+                                <th class="text-center">peserta</th>
                                 <th>jurusan</th>
                             </tr>
                         </thead>
