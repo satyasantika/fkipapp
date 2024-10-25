@@ -20,7 +20,7 @@ class ExamPaymentReportController extends Controller
      */
     public function index()
     {
-        $lists = ExamPaymentReport::select('kode_laporan')->distinct()->get()->sortDesc();
+        $lists = ExamPaymentReport::select('report_date_id')->distinct()->get()->sortDesc();
         return view('reports.paymentresume',compact('lists'));
     }
 
@@ -77,10 +77,10 @@ class ExamPaymentReportController extends Controller
 
         $pass = [
             'pns' => $paymentreport->status,
-            'kode_laporan' => $paymentreport->kode_laporan,
+            'report_date_id' => $paymentreport->report_date_id,
         ];
 
-        return to_route('reports.date',$pass)->with('success','data penguji '.$paymentreport->dosen.' telah diperbarui');
+        return to_route('reports.section',$pass)->with('success','data penguji '.$paymentreport->dosen.' telah diperbarui');
     }
 
     /**
@@ -91,10 +91,10 @@ class ExamPaymentReportController extends Controller
         $name = strtoupper($paymentreport->dosen);
         $pass = [
             'pns' => $paymentreport->status,
-            'kode_laporan' => $paymentreport->kode_laporan,
+            'report_date_id' => $paymentreport->report_date_id,
         ];
         $paymentreport->delete();
-        return to_route('reports.date',$pass)->with('warning','data penguji '.$name.' telah dihapus');
+        return to_route('reports.section',$pass)->with('warning','data penguji '.$name.' telah dihapus');
     }
 
     public function reportBySection(ViewExamPaymentReportsDataTable $dataTable, $pns, $report_date_id)
@@ -105,28 +105,28 @@ class ExamPaymentReportController extends Controller
             ])->render('reports.exampaymentreport',compact('report_date_id'));
     }
 
-    public function reportExaminerByPeriode($kode_laporan)
+    public function reportExaminerByPeriode($report_date_id)
     {
-        $pembimbing1 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('pembimbing1_id');
-        $pembimbing2 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('pembimbing2_id');
-        $penguji1 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('penguji1_id');
-        $penguji2 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('penguji2_id');
-        $penguji3 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('penguji3_id');
+        $pembimbing1 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('pembimbing1_id');
+        $pembimbing2 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('pembimbing2_id');
+        $penguji1 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji1_id');
+        $penguji2 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji2_id');
+        $penguji3 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji3_id');
         $penguji = collect($pembimbing1)->concat($pembimbing2)->concat($penguji1)->concat($penguji2)->concat($penguji3)->unique()->values()->all();
         $examiners = Lecture::whereIn('id',$penguji)->orderBy('nama')->get();
-        return view('reports.exam-by-periode',compact('kode_laporan','examiners'));
+        return view('reports.exam-by-periode',compact('report_date_id','examiners'));
     }
 
     public function reportExaminerByDate($date)
     {
-        $pembimbing1 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('pembimbing1_id');
-        $pembimbing2 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('pembimbing2_id');
-        $penguji1 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('penguji1_id');
-        $penguji2 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('penguji2_id');
-        $penguji3 = ViewExamRegistration::where('kode_laporan',$kode_laporan)->pluck('penguji3_id');
+        $pembimbing1 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('pembimbing1_id');
+        $pembimbing2 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('pembimbing2_id');
+        $penguji1 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji1_id');
+        $penguji2 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji2_id');
+        $penguji3 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji3_id');
         $penguji = collect($pembimbing1)->concat($pembimbing2)->concat($penguji1)->concat($penguji2)->concat($penguji3)->unique()->values()->all();
         $examiners = Lecture::whereIn('id',$penguji)->orderBy('nama')->get();
-        return view('reports.exam-by-periode',compact('kode_laporan','examiners'));
+        return view('reports.exam-by-periode',compact('report_date_id','examiners'));
     }
 
     public function reportFreshByPeriode($periode)
@@ -138,10 +138,10 @@ class ExamPaymentReportController extends Controller
     }
 
     // report massal
-    public function massReportByDate($date)
+    public function massReportByDate($periode,$date)
     {
         $tanggal = Carbon::createFromFormat('Y-m-d',$date)->isoFormat('dddd, LL');
-        $examregistrations = ViewExamRegistration::where('tanggal_ujian',$date)->pluck('id');
+        $examregistrations = ViewExamRegistration::where('tanggal_ujian',$date)->where('report_date_id',$periode)->pluck('id');
         // dd($examregistrations);
         foreach ($examregistrations as $examregistration) {
             $this->_reportStore($examregistration);

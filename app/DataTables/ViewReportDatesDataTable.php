@@ -86,7 +86,7 @@ class ViewReportDatesDataTable extends DataTable
             // Column::make('id'),
             Column::make('tanggal')->width(100),
             Column::make('deskripsi'),
-            Column::make('dibayar')->width(100),
+            Column::make('dibayar')
         ];
     }
 

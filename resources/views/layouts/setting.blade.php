@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-auto">
+        <div class="col">
             <div class="card">
                 <div class="card-header">
                     {{ ucFirst(request()->segment(1)) }} > {{ ucFirst(request()->segment(2)) }} > {{ ucFirst(request()->segment(3)) }}
