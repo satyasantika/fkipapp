@@ -2,7 +2,7 @@
 
 @push('header')
     {{ $reportdate->id ? 'Edit' : 'Tambah' }} tanggal penarikan laporan
-    @if ($reportdate->id &&  !$reportdate->dilaporkan)
+    @if (!$ada_laporan)
         <form id="delete-form" action="{{ route('reportdates.destroy',$reportdate->id) }}" method="POST">
             @csrf
             @method('DELETE')

@@ -104,6 +104,6 @@ class ViewExamPaymentReportsDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'ViewExamPaymentReports_' . date('YmdHis');
+        return 'laporan-honor-membimbing-menguji-skripsi-' . date('YmdHis');
     }
 }

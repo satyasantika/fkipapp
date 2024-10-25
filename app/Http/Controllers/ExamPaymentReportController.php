@@ -230,11 +230,8 @@ class ExamPaymentReportController extends Controller
             ReportDate::updateOrCreate([
                 'id'=>$report_date_id,
             ],array_merge([
-                'dibayar'=>ExamPayment::where('jabatan_akademik',$examregistration->$penguji->jabatan_akademik)->where('pendidikan',$examregistration->$penguji->pendidikan)->first()->honor
-                                        +ExamPayment::find(3)->honor,
-                                        +ExamPayment::find(1)->honor,
-                                        +ExamPayment::find(2)->honor,
-            ],$data_tambahan));
+                'dibayar'=>ViewExamPaymentReport::where('report_date_id',$report_date_id)->sum('total_honor')
+            ]));
         }
     }
 

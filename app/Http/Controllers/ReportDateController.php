@@ -55,15 +55,19 @@ class ReportDateController extends Controller
      */
     public function edit(ReportDate $reportdate)
     {
+        $ada_laporan = ExamRegistration::where('report_date_id',$reportdate->id)->exists();
         return view('forms.reportdate',array_merge(
-            [ 'reportdate' => $reportdate ],
+            [
+                'reportdate' => $reportdate,
+                'ada_laporan' => $ada_laporan,
+            ],
         ));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ReportDate $reportdate)
+    public function update(Request $request, ada_laporan $reportdate)
     {
         $data = $request->all();
         $reportdate->fill($data)->save();
