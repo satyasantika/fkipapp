@@ -47,6 +47,9 @@ class ViewExamRegistrationsDataTable extends DataTable
             ->editColumn('penguji3_nama',function($row){
                 return is_null($row->penguji3_nama) ? '' : $row->penguji3_nama ;
             })
+            ->editColumn('created_at', function($row) {
+                return $row->created_at->format('Y-m-d');
+            })
             ->setRowId('id');
     }
 
@@ -93,26 +96,41 @@ class ViewExamRegistrationsDataTable extends DataTable
      */
     public function getColumns(): array
     {
-        return [
-            Column::computed('action')
-                    ->exportable(false)
-                    ->printable(false)
-                    ->width(60)
-                    ->addClass('text-center'),
-                    // Column::make('departement_id')->title('Kode'),
-            Column::make('dilaporkan')->title('lapor?'),
-            Column::make('tanggal_ujian'),
-            Column::make('ruangan'),
-            Column::make('waktu_mulai')->title('waktu'),
-            Column::make('ujian'),
-            Column::make('nim'),
-            Column::make('mahasiswa'),
-            Column::make('pembimbing1_nama')->title('Pemb.1'),
-            Column::make('pembimbing2_nama')->title('Pemb.2'),
-            Column::make('penguji1_nama')->title('Peng.1'),
-            Column::make('penguji2_nama')->title('Peng.2'),
-            Column::make('penguji3_nama')->title('Peng.3'),
-        ];
+        if (auth()->user()->hasRole('jurusan')) {
+            return [
+                Column::computed('action')
+                        ->exportable(false)
+                        ->printable(false)
+                        ->width(60)
+                        ->addClass('text-center'),
+                        // Column::make('departement_id')->title('Kode'),
+                Column::make('dilaporkan')->title('lapor?'),
+                Column::make('tanggal_ujian'),
+                Column::make('ruangan'),
+                Column::make('waktu_mulai')->title('waktu'),
+                Column::make('ujian'),
+                Column::make('nim'),
+                Column::make('mahasiswa'),
+                Column::make('pembimbing1_nama')->title('Pemb.1'),
+                Column::make('pembimbing2_nama')->title('Pemb.2'),
+                Column::make('penguji1_nama')->title('Peng.1'),
+                Column::make('penguji2_nama')->title('Peng.2'),
+                Column::make('penguji3_nama')->title('Peng.3'),
+                ];
+        } else {
+            return [
+                Column::make('dilaporkan')->title('lapor?'),
+                Column::make('tanggal_ujian'),
+                Column::make('created_at')->title('tanggal_laporan'),
+                Column::make('nim'),
+                Column::make('mahasiswa'),
+                Column::make('pembimbing1_nama')->title('Pemb.1'),
+                Column::make('pembimbing2_nama')->title('Pemb.2'),
+                Column::make('penguji1_nama')->title('Peng.1'),
+                Column::make('penguji2_nama')->title('Peng.2'),
+                Column::make('penguji3_nama')->title('Peng.3'),
+                ];
+        }
     }
 
     /**
