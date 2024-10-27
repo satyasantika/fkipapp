@@ -120,8 +120,8 @@ class ViewExamRegistrationsDataTable extends DataTable
         } else {
             return [
                 Column::make('dilaporkan')->title('lapor?'),
-                Column::make('tanggal_ujian'),
-                Column::make('created_at')->title('tanggal_laporan'),
+                Column::make('tanggal_ujian')->title('diujiankan'),
+                Column::make('created_at')->title('dilaporkan'),
                 Column::make('nim'),
                 Column::make('mahasiswa'),
                 Column::make('pembimbing1_nama')->title('Pemb.1'),
