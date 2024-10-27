@@ -27,7 +27,6 @@ Route::middleware('auth')->group(function () {
         Route::get('exam/reports/departement', [App\Http\Controllers\ReportController::class,'showExamReport'])->name('reports.by.departement');
         Route::get('exam/reports/date/{date}', [App\Http\Controllers\ReportController::class,'showExamReportBydate'])->name('reports.by.date');
         Route::get('exam/reports/examiner/{date}', [App\Http\Controllers\ReportController::class,'showExamReportByExaminer'])->name('reports.by.examiner');
-        Route::resource('exam/registrations', App\Http\Controllers\ExamRegistrationController::class)->except('create');
     });
     Route::group(['middleware' => ['role:keuangan']], function () {
         Route::get('exam/reports/{pns}/{report_date_id}', [App\Http\Controllers\ExamPaymentReportController::class,'reportBySection'])->name('reports.section');
@@ -39,6 +38,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('exam/reportdates', App\Http\Controllers\ReportDateController::class);
         Route::resource('exam/paymentreports', App\Http\Controllers\ExamPaymentReportController::class);
     });
+    Route::resource('exam/registrations', App\Http\Controllers\ExamRegistrationController::class)->except('create');
     Route::resource('users', App\Http\Controllers\UserController::class)->except('show');
     Route::resource('students', App\Http\Controllers\StudentController::class)->except('show');
     Route::resource('lectures', App\Http\Controllers\LectureController::class)->except('show');

@@ -13,7 +13,7 @@
 
 @role('keuangan')
 <a class="dropdown-item" href="{{ route('lectures.index') }}">{{ __('Dosen') }}</a>
-<a class="dropdown-item" href="{{ route('paymentreports.index') }}">{{ __('Laporan') }}</a>
+<a class="dropdown-item" href="{{ route('reportdates.index') }}">{{ __('Laporan') }}</a>
 @endrole
 
 @role('dekanat')
