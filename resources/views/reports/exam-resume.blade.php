@@ -54,9 +54,9 @@
                                                     @if (App\Models\ViewExamRegistration::where([
                                                         'departement_id'=>auth()->user()->departement_id,
                                                         'tanggal_ujian'=>$list2->tanggal_ujian,
-                                                        'dilaporkan'=>0
+                                                        'report_date_id'=>NULL
                                                         ])->exists())
-                                                    <br><span class="badge bg-danger">ada yang belum dilaporkan</span>
+                                                    <br><span class="badge bg-danger">ada yang belum dibayar</span>
                                                     @endif
 
                                                 </td>
