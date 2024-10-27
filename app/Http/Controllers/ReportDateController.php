@@ -67,7 +67,7 @@ class ReportDateController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ada_laporan $reportdate)
+    public function update(Request $request, ReportDate $reportdate)
     {
         $data = $request->all();
         $reportdate->fill($data)->save();
