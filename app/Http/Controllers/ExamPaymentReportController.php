@@ -97,6 +97,14 @@ class ExamPaymentReportController extends Controller
         return to_route('reports.section',$pass)->with('warning','data penguji '.$name.' telah dihapus');
     }
 
+    public function emptyZeroHonor(){
+        $paymentreport_ids = ViewExamPaymentReport::where('honor_dibayar',0)->get()->pluck('id');
+        foreach (collect($paymentreport_ids) as $zero) {
+            ExamPaymentReport::destroy($zero);
+        }
+        return redirect()->back();
+    }
+
     public function reportBySection(ViewExamPaymentReportsDataTable $dataTable, $pns, $report_date_id)
     {
         return $dataTable->with([

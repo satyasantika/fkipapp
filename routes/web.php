@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     });
     Route::group(['middleware' => ['role:keuangan']], function () {
         Route::get('exam/reports/{pns}/{report_date_id}', [App\Http\Controllers\ExamPaymentReportController::class,'reportBySection'])->name('reports.section');
+        Route::get('reports/empty-zero', [App\Http\Controllers\ExamPaymentReportController::class,'emptyZeroHonor'])->name('reports.empty-zero');
         Route::get('reports/periode-fresh/{periode}', [App\Http\Controllers\ExamPaymentReportController::class,'reportFreshByPeriode'])->name('reports.fresh.periode');
         Route::post('exam/massreports/{periode}/{date}', [App\Http\Controllers\ExamPaymentReportController::class,'massReportByDate'])->name('reports.mass');
         Route::get('exam/reportdates/reported-list/{report_date_id}', [App\Http\Controllers\ReportDateController::class,'reportedList'])->name('reportdates.reportedlist');

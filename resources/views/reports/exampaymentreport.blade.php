@@ -9,6 +9,9 @@
                     Rekap Laporan Bulan {{ App\Models\ReportDate::find($report_date_id)->tanggal }} untuk Kelompok ({{ request()->segment(3) == 1 ? 'ASN' : 'non ASN' }})
                     <a href="{{ route('reports.fresh.periode',$report_date_id) }}" class="btn btn-sm btn-primary float-end">kembali</a>
                 </div>
+                <div class="card-body">
+                    <a href="{{ route('reports.empty-zero') }}" class="btn btn-sm btn-warning float-end">kosongkan tanpa honor</a>
+                </div>
                 <div class="card-body table-responsive">
                     @if (session('success'))
                         <div class="alert alert-success">
