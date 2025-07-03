@@ -38,6 +38,7 @@ class LectureController extends Controller
     {
         $name = strtoupper($request->name);
         $data = $request->all();
+        $data['pns'] = $request->pns ? 1 : 0;
         Lecture::create($data->all());
         return to_route('lectures.index')->with('success','lecture '.$name.' telah ditambahkan');
     }
