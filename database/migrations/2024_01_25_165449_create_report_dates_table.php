@@ -24,7 +24,7 @@ return new class extends Migration
             $table->foreignIdFor(ReportDate::class)->after('dilaporkan')->nullable();
         });
         Schema::table('exam_payment_reports', function (Blueprint $table) {
-            $table->foreignIdFor(ReportDate::class)->after('dilaporkan')->nullable();
+            $table->foreignIdFor(ReportDate::class)->after('banyak_menguji_seminar')->nullable();
         });
     }
 

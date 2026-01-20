@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Lecture;
 use Illuminate\Http\Request;
 use App\Models\ViewExamRegistration;
+use App\DataTables\ViewExamDateDataTable;
 use App\DataTables\ViewExamRegistrationByDateDataTable;
 
 class ReportController extends Controller
 {
-    public function showExamReport()
+    public function showExamReport(ViewExamDateDataTable $dataTable)
     {
-        return view('reports.exam-resume');
+        return $dataTable->render('layouts.setting');
     }
 
     public function showExamReportByDate(ViewExamRegistrationByDateDataTable $dataTable, $date)
