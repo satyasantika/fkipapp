@@ -51,6 +51,9 @@ class ViewExamReportedDataTable extends DataTable
             })
             ->editColumn('penguji3_nama',function($row){
                 return is_null($row->penguji3_nama) ? '' : $row->penguji3_nama ;
+            })
+            ->editColumn('tanggal_ujian', function($row){
+                return $row->tanggal_ujian?->format('Y-m-d');
             });
 
         return $this->applyExamRegistrationNameColumns($dataTable)->setRowId('id');

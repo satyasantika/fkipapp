@@ -55,6 +55,9 @@ class ViewExamSidangConfirmedDataTable extends DataTable
             ->editColumn('dilaporkan', function ($row) {
                 return $row->dilaporkan ? 'sudah' : 'belum';
             })
+            ->editColumn('tanggal_ujian', function ($row) {
+                return $row->tanggal_ujian?->format('Y-m-d');
+            })
             ->editColumn('ujian', function ($row) {
                 $badges = '<span class="badge bg-primary">'.($row->ujian ?? '').'</span>';
 
