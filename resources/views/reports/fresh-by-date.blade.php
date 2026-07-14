@@ -37,8 +37,8 @@
                         <tbody>
                             @foreach ($dates as $date)
                             @php
-                                $departement = App\Models\ViewExamRegistration::where('tanggal_ujian',$date)->where('report_date_id',$periode)->pluck('departement_id');
-                                $peserta = App\Models\ViewExamRegistration::where('tanggal_ujian',$date)->where('report_date_id',$periode)->count();
+                                $departement = App\Models\ExamRegistration::where('tanggal_ujian',$date)->where('report_date_id',$periode)->pluck('departement_id');
+                                $peserta = App\Models\ExamRegistration::where('tanggal_ujian',$date)->where('report_date_id',$periode)->count();
                                 $departement_id = collect($departement)->unique()->sort()->values()->all();
                                 $tanggal = Carbon\Carbon::createFromFormat('Y-m-d',$date)->isoFormat('dddd, LL');
                             @endphp
@@ -55,7 +55,7 @@
                                     <td class="text-center">{{ $peserta }}</td>
                                     <td>@foreach ($departement_id as $id)
                                         {{ App\Models\Departement::find($id)->mapel }}
-                                        <span class="badge bg-dark">{{ App\Models\ViewExamRegistration::where('departement_id',$id)->where('report_date_id',$periode)->where('tanggal_ujian',$date)->count() }}</span>&nbsp;|
+                                        <span class="badge bg-dark">{{ App\Models\ExamRegistration::where('departement_id',$id)->where('report_date_id',$periode)->where('tanggal_ujian',$date)->count() }}</span>&nbsp;|
                                         @endforeach
                                     </td>
                                 </tr>

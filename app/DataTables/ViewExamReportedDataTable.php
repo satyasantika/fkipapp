@@ -2,7 +2,8 @@
 
 namespace App\DataTables;
 
-use App\Models\ViewExamRegistration;
+use App\DataTables\Concerns\FiltersExamRegistrationNames;
+use App\Models\ExamRegistration;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -14,6 +15,8 @@ use Yajra\DataTables\Services\DataTable;
 
 class ViewExamReportedDataTable extends DataTable
 {
+    use FiltersExamRegistrationNames;
+
     /**
      * Build the DataTable class.
      *
@@ -21,7 +24,7 @@ class ViewExamReportedDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        return (new EloquentDataTable($query))
+        $dataTable = (new EloquentDataTable($query))
             ->addColumn('action', function($row){
                 $action = ' <form id="drop-form" action='.route('reportdates.setreportdate',$row->id).' method="POST">';
                 $action = $action.'<input type="hidden" name="_token" value='.csrf_token().'>';
@@ -54,20 +57,23 @@ class ViewExamReportedDataTable extends DataTable
             })
             ->editColumn('updated_at', function($row) {
                 return $row->updated_at->format('Y-m-d');
-            })
-            ->setRowId('id');
+            });
+
+        return $this->applyExamRegistrationNameColumns($dataTable)->setRowId('id');
     }
 
     /**
      * Get the query source of dataTable.
      */
-    public function query(ViewExamRegistration $model): QueryBuilder
+    public function query(ExamRegistration $model): QueryBuilder
     {
+        $query = $this->eagerLoadExamRegistrationNames($model);
+
         if (auth()->user()->hasRole('keuangan')) {
-            return $model->where('report_date_id',$this->report_date_id)
+            return $query->where('report_date_id',$this->report_date_id)
                         ->newQuery();
         } else {
-            return $model->newQuery();
+            return $query->newQuery();
         }
     }
 
