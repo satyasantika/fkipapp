@@ -51,12 +51,6 @@ class ViewExamReportedDataTable extends DataTable
             })
             ->editColumn('penguji3_nama',function($row){
                 return is_null($row->penguji3_nama) ? '' : $row->penguji3_nama ;
-            })
-            ->editColumn('created_at', function($row) {
-                return $row->created_at->format('Y-m-d');
-            })
-            ->editColumn('updated_at', function($row) {
-                return $row->updated_at->format('Y-m-d');
             });
 
         return $this->applyExamRegistrationNameColumns($dataTable)->setRowId('id');
@@ -87,7 +81,7 @@ class ViewExamReportedDataTable extends DataTable
                     ->columns($this->getColumns())
                     ->minifiedAjax()
                     //->dom('Bfrtip')
-                    ->orderBy(11,'desc')
+                    ->orderBy(3,'desc')
                     ->selectStyleSingle()
                     ->buttons([
                         Button::make('excel'),
@@ -120,7 +114,6 @@ class ViewExamReportedDataTable extends DataTable
             Column::make('penguji1_nama')->title('Peng.1'),
             Column::make('penguji2_nama')->title('Peng.2'),
             Column::make('penguji3_nama')->title('Peng.3'),
-            Column::make('created_at'),
         ];
     }
 

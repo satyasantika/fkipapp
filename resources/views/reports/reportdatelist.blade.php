@@ -11,6 +11,7 @@
                 </div>
                 <div class="card-body table-responsive">
                     <a href="{{ route('reportdates.notreportedlist',$report_date_id) }}" class="btn btn-sm btn-success mb-2">+ data pelaporan</a>
+                    <a href="{{ route('reportdates.sidangconfirmedlist',$report_date_id) }}" class="btn btn-sm btn-info mb-2">+ data pasti sidang</a>
                     @if (session('success'))
                         <div class="alert alert-success">
                             {{ session('success') }}
