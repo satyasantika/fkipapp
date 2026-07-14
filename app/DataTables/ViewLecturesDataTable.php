@@ -53,7 +53,7 @@ class ViewLecturesDataTable extends DataTable
         return $this->builder()
                     ->setTableId('viewlectures-table')
                     ->columns($this->getColumns())
-                    ->minifiedAjax()
+                    ->minifiedAjax(url()->current())
                     //->dom('Bfrtip')
                     ->orderBy(1,'asc')
                     ->selectStyleSingle()

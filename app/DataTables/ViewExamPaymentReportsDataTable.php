@@ -83,7 +83,7 @@ class ViewExamPaymentReportsDataTable extends DataTable
         return $this->builder()
                     ->setTableId('viewexampaymentreports-table')
                     ->columns($this->getColumns())
-                    ->minifiedAjax()
+                    ->minifiedAjax(url()->current())
                     //->dom('Bfrtip')
                     ->orderBy(2,3)
                     ->selectStyleSingle()

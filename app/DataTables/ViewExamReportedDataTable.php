@@ -79,7 +79,7 @@ class ViewExamReportedDataTable extends DataTable
         return $this->builder()
                     ->setTableId('viewexamreported-table')
                     ->columns($this->getColumns())
-                    ->minifiedAjax()
+                    ->minifiedAjax(url()->current())
                     //->dom('Bfrtip')
                     ->orderBy(3,'desc')
                     ->selectStyleSingle()
