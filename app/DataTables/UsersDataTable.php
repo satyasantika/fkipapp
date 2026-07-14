@@ -45,7 +45,7 @@ class UsersDataTable extends DataTable
         return $this->builder()
                     ->setTableId('users-table')
                     ->columns($this->getColumns())
-                    ->minifiedAjax()
+                    ->minifiedAjax(url()->current())
                     //->dom('Bfrtip')
                     ->orderBy(2,'ascending')
                     ->selectStyleSingle()

@@ -154,7 +154,7 @@ class ViewExamSidangConfirmedDataTable extends DataTable
         return $this->builder()
                     ->setTableId('viewexamsidangconfirmed-table')
                     ->columns($this->getColumns())
-                    ->minifiedAjax()
+                    ->minifiedAjax(url()->current())
                     ->orderBy(3, 'asc')
                     ->selectStyleSingle()
                     ->buttons([

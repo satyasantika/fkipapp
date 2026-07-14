@@ -78,7 +78,7 @@ class ViewExamRegistrationByDateDataTable extends DataTable
         return $this->builder()
                     ->setTableId('viewexamregistrations-table')
                     ->columns($this->getColumns())
-                    ->minifiedAjax()
+                    ->minifiedAjax(url()->current())
                     //->dom('Bfrtip')
                     ->orderBy(1,'Desc')
                     ->orderBy(2)

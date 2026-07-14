@@ -63,7 +63,7 @@ class ViewExamDateDataTable extends DataTable
         return $this->builder()
                     ->setTableId('viewexamdates-table')
                     ->columns($this->getColumns())
-                    ->minifiedAjax()
+                    ->minifiedAjax(url()->current())
                     ->selectStyleSingle()
                     ->buttons([
                         Button::make('excel'),
