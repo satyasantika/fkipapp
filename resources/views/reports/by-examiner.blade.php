@@ -17,7 +17,8 @@
                     <div class="accordion" id="accordionExaminer">
                         @forelse ($examiners as $examiner)
                         @php
-                            $examregistrations = App\Models\ViewExamRegistration::where('tanggal_ujian',$date)
+                            $examregistrations = App\Models\ExamRegistration::with(['exam_type', 'student', 'pembimbing1', 'pembimbing2', 'penguji1', 'penguji2', 'penguji3'])
+                                                ->where('tanggal_ujian',$date)
                                                 ->where(function($query) use ($examiner){
                                                     $query->where('pembimbing1_id',$examiner->id)
                                                         ->orWhere('pembimbing2_id',$examiner->id)

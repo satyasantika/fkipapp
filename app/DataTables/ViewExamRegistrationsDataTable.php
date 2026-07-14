@@ -2,7 +2,8 @@
 
 namespace App\DataTables;
 
-use App\Models\ViewExamRegistration;
+use App\DataTables\Concerns\FiltersExamRegistrationNames;
+use App\Models\ExamRegistration;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -14,6 +15,8 @@ use Yajra\DataTables\Services\DataTable;
 
 class ViewExamRegistrationsDataTable extends DataTable
 {
+    use FiltersExamRegistrationNames;
+
     /**
      * Build the DataTable class.
      *
@@ -21,7 +24,7 @@ class ViewExamRegistrationsDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        return (new EloquentDataTable($query))
+        $dataTable = (new EloquentDataTable($query))
             ->addColumn('action', function($row){
                 $action = ' <a href="'.route('registrations.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
                 return $action;
@@ -49,20 +52,23 @@ class ViewExamRegistrationsDataTable extends DataTable
             })
             ->editColumn('created_at', function($row) {
                 return $row->created_at->format('Y-m-d');
-            })
-            ->setRowId('id');
+            });
+
+        return $this->applyExamRegistrationNameColumns($dataTable)->setRowId('id');
     }
 
     /**
      * Get the query source of dataTable.
      */
-    public function query(ViewExamRegistration $model): QueryBuilder
+    public function query(ExamRegistration $model): QueryBuilder
     {
+        $query = $this->eagerLoadExamRegistrationNames($model);
+
         if (auth()->user()->hasRole('jurusan')) {
-            return $model->where('departement_id',auth()->user()->departement_id)
+            return $query->where('departement_id',auth()->user()->departement_id)
                         ->newQuery();
         } else {
-            return $model->newQuery();
+            return $query->newQuery();
         }
     }
 

@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\ViewExamDate;
+use App\Models\ExamRegistration;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -29,20 +29,30 @@ class ViewExamDateDataTable extends DataTable
             ->editColumn('tanggal_ujian',function($row){
                 return \Carbon\Carbon::parse($row->tanggal_ujian)->locale('id')->translatedFormat('l, d F Y');
             })
-            ->setRowId('id');
+            ->setRowId(fn ($row) => \Carbon\Carbon::parse($row->tanggal_ujian)->format('Y-m-d'));
     }
 
     /**
      * Get the query source of dataTable.
+     *
+     * Tidak ada view_exam_dates di database manapun (memang tidak pernah dibuat
+     * migration-nya — bug lama, route ini pasti 500 di deployment yang migrasi
+     * dari nol). Diganti agregasi langsung dari exam_registrations per tanggal.
      */
-    public function query(ViewExamDate $model): QueryBuilder
+    public function query(ExamRegistration $model): QueryBuilder
     {
+        $query = $model->selectRaw("tanggal_ujian,
+                COUNT(*) as total,
+                SUM(exam_type_id = 1) as sempro,
+                SUM(exam_type_id = 2) as semhas,
+                SUM(exam_type_id = 3) as sidang")
+            ->groupBy('tanggal_ujian');
+
         if (auth()->user()->hasRole('jurusan')) {
-            return $model->where('departement_id',auth()->user()->departement_id)
-                        ->newQuery();
-        } else {
-            return $model->newQuery();
+            $query->where('departement_id',auth()->user()->departement_id);
         }
+
+        return $query;
     }
 
     /**

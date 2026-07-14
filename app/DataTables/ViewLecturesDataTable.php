@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\ViewLecture;
+use App\Models\Lecture;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -35,7 +35,7 @@ class ViewLecturesDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(ViewLecture $model): QueryBuilder
+    public function query(Lecture $model): QueryBuilder
     {
         if (auth()->user()->hasRole('jurusan')) {
             return $model->where('departement_id',auth()->user()->departement_id)->newQuery();

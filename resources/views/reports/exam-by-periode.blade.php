@@ -19,7 +19,7 @@
                         <tbody>
                             @foreach ($examiners as $examiner)
                             @php
-                                $examregistrations = App\Models\ViewExamRegistration::where('kode_laporan',$kode_laporan)
+                                $examregistrations = App\Models\ExamRegistration::whereKodeLaporan($kode_laporan)
                                                     ->where(function($query) use ($examiner){
                                                         $query->where('pembimbing1_id',$examiner->id)
                                                             ->orWhere('pembimbing2_id',$examiner->id)
@@ -28,7 +28,7 @@
                                                             ->orWhere('penguji3_id',$examiner->id);
                                                     });
 
-                                $sidang = App\Models\ViewExamRegistration::where('kode_laporan',$kode_laporan)
+                                $sidang = App\Models\ExamRegistration::whereKodeLaporan($kode_laporan)
                                                     ->where(function($query) use ($examiner){
                                                         $query->where('pembimbing1_id',$examiner->id)
                                                             ->orWhere('pembimbing2_id',$examiner->id)
@@ -36,7 +36,7 @@
                                                             ->orWhere('penguji2_id',$examiner->id)
                                                             ->orWhere('penguji3_id',$examiner->id);
                                                     })->where('exam_type_id',3)->get()->count();
-                                $proposal = App\Models\ViewExamRegistration::where('kode_laporan',$kode_laporan)
+                                $proposal = App\Models\ExamRegistration::whereKodeLaporan($kode_laporan)
                                                     ->where(function($query) use ($examiner){
                                                         $query->where('pembimbing1_id',$examiner->id)
                                                             ->orWhere('pembimbing2_id',$examiner->id)
@@ -44,7 +44,7 @@
                                                             ->orWhere('penguji2_id',$examiner->id)
                                                             ->orWhere('penguji3_id',$examiner->id);
                                                     })->where('exam_type_id',1)->get()->count();
-                                $seminar = App\Models\ViewExamRegistration::where('kode_laporan',$kode_laporan)
+                                $seminar = App\Models\ExamRegistration::whereKodeLaporan($kode_laporan)
                                                     ->where(function($query) use ($examiner){
                                                         $query->where('pembimbing1_id',$examiner->id)
                                                             ->orWhere('pembimbing2_id',$examiner->id)

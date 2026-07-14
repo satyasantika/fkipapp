@@ -8,7 +8,6 @@ use App\Models\ExamType;
 use Illuminate\Http\Request;
 use App\Models\ExamRegistration;
 use App\Http\Controllers\Controller;
-use App\Models\ViewExamRegistration;
 use App\DataTables\ViewExamRegistrationsDataTable;
 
 class ExamRegistrationController extends Controller
@@ -146,7 +145,8 @@ class ExamRegistrationController extends Controller
 
     public function showByStudent($student_id)
     {
-        $examregistrations = ViewExamRegistration::where('student_id',$student_id)->orderBy('tanggal_ujian')->get();
+        $examregistrations = ExamRegistration::with(['exam_type', 'student', 'pembimbing1', 'pembimbing2', 'penguji1', 'penguji2', 'penguji3'])
+            ->where('student_id',$student_id)->orderBy('tanggal_ujian')->get();
         return view('reports.examregistration',compact('examregistrations','student_id'));
     }
 

@@ -8,8 +8,6 @@ use App\Models\ExamPayment;
 use Illuminate\Http\Request;
 use App\Models\ExamRegistration;
 use App\Models\ExamPaymentReport;
-use App\Models\ViewExamRegistration;
-use App\Models\ViewExamPaymentReport;
 use App\DataTables\ViewReportDatesDataTable;
 use App\DataTables\ViewExamReportedDataTable;
 use App\DataTables\ViewExamNotReportedDataTable;
@@ -117,7 +115,7 @@ class ReportDateController extends Controller
 
     private function _getCountOfExaminer($exam_type_id,$report_date_id,$guide_cek,$guide_order,$guide_id)
     {
-        return ViewExamRegistration::where('exam_type_id',$exam_type_id)
+        return ExamRegistration::where('exam_type_id',$exam_type_id)
                                     ->where('report_date_id',$report_date_id)
                                     ->where('dilaporkan',1)
                                     ->where($guide_cek,1)
@@ -181,7 +179,7 @@ class ReportDateController extends Controller
             ReportDate::updateOrCreate([
                 'id'=>$report_date_id,
             ],array_merge([
-                'dibayar'=>ViewExamPaymentReport::where('report_date_id',$report_date_id)->sum('total_honor')
+                'dibayar'=>ExamPaymentReport::where('report_date_id',$report_date_id)->get()->sum('total_honor')
             ]));
         }
     }

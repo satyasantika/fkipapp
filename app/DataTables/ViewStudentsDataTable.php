@@ -2,7 +2,8 @@
 
 namespace App\DataTables;
 
-use App\Models\ViewStudent;
+use App\Models\Lecture;
+use App\Models\Student;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -30,32 +31,44 @@ class ViewStudentsDataTable extends DataTable
                 return $action;
             })
             ->editColumn('pembimbing_1',function($row){
-                return is_null($row->pembimbing_1) ? '' : $row->pembimbing_1 ;
+                return $row->pembimbing1?->nama ?? '';
             })
             ->editColumn('pembimbing_2',function($row){
-                return is_null($row->pembimbing_2) ? '' : $row->pembimbing_2 ;
+                return $row->pembimbing2?->nama ?? '';
             })
             ->editColumn('penguji_1',function($row){
-                return is_null($row->penguji_1) ? '' : $row->penguji_1 ;
+                return $row->penguji1?->nama ?? '';
             })
             ->editColumn('penguji_2',function($row){
-                return is_null($row->penguji_2) ? '' : $row->penguji_2 ;
+                return $row->penguji2?->nama ?? '';
             })
             ->editColumn('penguji_3',function($row){
-                return is_null($row->penguji_3) ? '' : $row->penguji_3 ;
+                return $row->penguji3?->nama ?? '';
             })
+            ->filterColumn('pembimbing_1', fn ($q, $kw) => $q->whereHas('pembimbing1', fn ($q2) => $q2->where('nama', 'like', "%{$kw}%")))
+            ->orderColumn('pembimbing_1', fn ($q, $dir) => $q->orderBy(Lecture::select('nama')->whereColumn('lectures.id', 'students.pembimbing1_id'), $dir))
+            ->filterColumn('pembimbing_2', fn ($q, $kw) => $q->whereHas('pembimbing2', fn ($q2) => $q2->where('nama', 'like', "%{$kw}%")))
+            ->orderColumn('pembimbing_2', fn ($q, $dir) => $q->orderBy(Lecture::select('nama')->whereColumn('lectures.id', 'students.pembimbing2_id'), $dir))
+            ->filterColumn('penguji_1', fn ($q, $kw) => $q->whereHas('penguji1', fn ($q2) => $q2->where('nama', 'like', "%{$kw}%")))
+            ->orderColumn('penguji_1', fn ($q, $dir) => $q->orderBy(Lecture::select('nama')->whereColumn('lectures.id', 'students.penguji1_id'), $dir))
+            ->filterColumn('penguji_2', fn ($q, $kw) => $q->whereHas('penguji2', fn ($q2) => $q2->where('nama', 'like', "%{$kw}%")))
+            ->orderColumn('penguji_2', fn ($q, $dir) => $q->orderBy(Lecture::select('nama')->whereColumn('lectures.id', 'students.penguji2_id'), $dir))
+            ->filterColumn('penguji_3', fn ($q, $kw) => $q->whereHas('penguji3', fn ($q2) => $q2->where('nama', 'like', "%{$kw}%")))
+            ->orderColumn('penguji_3', fn ($q, $dir) => $q->orderBy(Lecture::select('nama')->whereColumn('lectures.id', 'students.penguji3_id'), $dir))
             ->setRowId('id');
     }
 
     /**
      * Get the query source of dataTable.
      */
-    public function query(ViewStudent $model): QueryBuilder
+    public function query(Student $model): QueryBuilder
     {
+        $query = $model->with(['pembimbing1', 'pembimbing2', 'penguji1', 'penguji2', 'penguji3']);
+
         if (auth()->user()->hasRole('jurusan')) {
-            return $model->where('departement_id',auth()->user()->departement_id)->newQuery();
+            return $query->where('departement_id',auth()->user()->departement_id)->newQuery();
         } else {
-            return $model->newQuery();
+            return $query->newQuery();
         }
     }
 

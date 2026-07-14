@@ -9,8 +9,6 @@ use App\Models\ExamPayment;
 use Illuminate\Http\Request;
 use App\Models\ExamRegistration;
 use App\Models\ExamPaymentReport;
-use App\Models\ViewExamRegistration;
-use App\Models\ViewExamPaymentReport;
 use App\DataTables\ViewExamPaymentReportsDataTable;
 
 class ExamPaymentReportController extends Controller
@@ -55,8 +53,10 @@ class ExamPaymentReportController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ViewExamPaymentReport $paymentreport)
+    public function edit(ExamPaymentReport $paymentreport)
     {
+        $paymentreport->load('lecture');
+
         return view('forms.exampaymentreport',array_merge(
             [
                 'paymentreport' => $paymentreport,
@@ -98,10 +98,10 @@ class ExamPaymentReportController extends Controller
     }
 
     public function emptyZeroHonor(){
-        $paymentreport_ids = ViewExamPaymentReport::where('honor_dibayar',0)->get()->pluck('id');
-        foreach (collect($paymentreport_ids) as $zero) {
-            ExamPaymentReport::destroy($zero);
-        }
+        $paymentreport_ids = ExamPaymentReport::all()
+            ->filter(fn ($paymentreport) => $paymentreport->honor_dibayar == 0)
+            ->pluck('id');
+        ExamPaymentReport::destroy($paymentreport_ids);
         return redirect()->back();
     }
 
@@ -115,11 +115,11 @@ class ExamPaymentReportController extends Controller
 
     public function reportExaminerByPeriode($report_date_id)
     {
-        $pembimbing1 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('pembimbing1_id');
-        $pembimbing2 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('pembimbing2_id');
-        $penguji1 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji1_id');
-        $penguji2 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji2_id');
-        $penguji3 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji3_id');
+        $pembimbing1 = ExamRegistration::where('report_date_id',$report_date_id)->pluck('pembimbing1_id');
+        $pembimbing2 = ExamRegistration::where('report_date_id',$report_date_id)->pluck('pembimbing2_id');
+        $penguji1 = ExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji1_id');
+        $penguji2 = ExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji2_id');
+        $penguji3 = ExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji3_id');
         $penguji = collect($pembimbing1)->concat($pembimbing2)->concat($penguji1)->concat($penguji2)->concat($penguji3)->unique()->values()->all();
         $examiners = Lecture::whereIn('id',$penguji)->orderBy('nama')->get();
         return view('reports.exam-by-periode',compact('report_date_id','examiners'));
@@ -127,11 +127,11 @@ class ExamPaymentReportController extends Controller
 
     public function reportExaminerByDate($date)
     {
-        $pembimbing1 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('pembimbing1_id');
-        $pembimbing2 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('pembimbing2_id');
-        $penguji1 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji1_id');
-        $penguji2 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji2_id');
-        $penguji3 = ViewExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji3_id');
+        $pembimbing1 = ExamRegistration::where('report_date_id',$report_date_id)->pluck('pembimbing1_id');
+        $pembimbing2 = ExamRegistration::where('report_date_id',$report_date_id)->pluck('pembimbing2_id');
+        $penguji1 = ExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji1_id');
+        $penguji2 = ExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji2_id');
+        $penguji3 = ExamRegistration::where('report_date_id',$report_date_id)->pluck('penguji3_id');
         $penguji = collect($pembimbing1)->concat($pembimbing2)->concat($penguji1)->concat($penguji2)->concat($penguji3)->unique()->values()->all();
         $examiners = Lecture::whereIn('id',$penguji)->orderBy('nama')->get();
         return view('reports.exam-by-periode',compact('report_date_id','examiners'));
@@ -139,7 +139,7 @@ class ExamPaymentReportController extends Controller
 
     public function reportFreshByPeriode($periode)
     {
-        $tanggal = ViewExamRegistration::where('report_date_id',$periode)->pluck('tanggal_ujian');
+        $tanggal = ExamRegistration::where('report_date_id',$periode)->pluck('tanggal_ujian');
         $dates = collect($tanggal)->unique()->sort()->values()->all();
         $total = collect($tanggal)->unique()->count();
         return view('reports.fresh-by-date',compact('periode','dates','total'));
@@ -149,7 +149,7 @@ class ExamPaymentReportController extends Controller
     public function massReportByDate($periode,$date)
     {
         $tanggal = Carbon::createFromFormat('Y-m-d',$date)->isoFormat('dddd, LL');
-        $examregistrations = ViewExamRegistration::where('tanggal_ujian',$date)->where('report_date_id',$periode)->pluck('id');
+        $examregistrations = ExamRegistration::where('tanggal_ujian',$date)->where('report_date_id',$periode)->pluck('id');
         // dd($examregistrations);
         foreach ($examregistrations as $examregistration) {
             $this->_reportStore($examregistration);
@@ -161,7 +161,7 @@ class ExamPaymentReportController extends Controller
     // banyaknya membimbing/menguji pada ujian skripsi/proposal/seminar
     private function _getCountOfExaminer($exam_type_id,$report_date_id,$guide_cek,$guide_order,$guide_id)
     {
-        return ViewExamRegistration::where('exam_type_id',$exam_type_id)
+        return ExamRegistration::where('exam_type_id',$exam_type_id)
                                     ->where('report_date_id',$report_date_id)
                                     ->where('dilaporkan',1)
                                     ->where($guide_cek,1)
@@ -238,7 +238,7 @@ class ExamPaymentReportController extends Controller
             ReportDate::updateOrCreate([
                 'id'=>$report_date_id,
             ],array_merge([
-                'dibayar'=>ViewExamPaymentReport::where('report_date_id',$report_date_id)->sum('total_honor')
+                'dibayar'=>ExamPaymentReport::where('report_date_id',$report_date_id)->get()->sum('total_honor')
             ]));
         }
     }

@@ -29,8 +29,8 @@
                                         <a href="{{ route('reports.fresh.periode',$list->kode_laporan) }}" class="btn btn-sm btn-outline-primary">refresh</a>
                                     </td>
                                     @php
-                                        $bayar_pns = App\Models\ViewExamPaymentReport::where('kode_laporan',$list->kode_laporan)->where('status',1)->sum('honor_dibayar');
-                                        $bayar_nonpns = App\Models\ViewExamPaymentReport::where('kode_laporan',$list->kode_laporan)->where('status',0)->sum('honor_dibayar');
+                                        $bayar_pns = App\Models\ExamPaymentReport::where('kode_laporan',$list->kode_laporan)->where('status',1)->get()->sum('honor_dibayar');
+                                        $bayar_nonpns = App\Models\ExamPaymentReport::where('kode_laporan',$list->kode_laporan)->where('status',0)->get()->sum('honor_dibayar');
                                         // dd((int)$bayar_pns);
                                         @endphp
                                     <td>
