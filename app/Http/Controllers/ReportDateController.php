@@ -101,45 +101,47 @@ class ReportDateController extends Controller
     }
 
     /**
-     * Roster mahasiswa yang ujian sidangnya sudah dilaporkan (ke periode
-     * manapun) — halaman ini global lintas periode, $report_date_id cuma
-     * dipakai untuk tautan "kembali" ke reported-list asal.
+     * Roster mahasiswa dengan data ujian sidang yang belum pernah dimasukkan
+     * ke reported-list periode manapun (report_date_id null). $report_date_id
+     * dipakai sebagai tautan "kembali" DAN sebagai periode tujuan saat tombol
+     * aksi menambahkan data ke laporan.
      */
     public function sidangConfirmedList(ViewExamSidangConfirmedDataTable $dataTable, $report_date_id)
     {
         $tanggal = ReportDate::find($report_date_id)->tanggal;
-        return $dataTable->render('reports.sidangconfirmedlist',compact('tanggal','report_date_id'));
+        return $dataTable->with('report_date_id',$report_date_id)->render('reports.sidangconfirmedlist',compact('tanggal','report_date_id'));
     }
 
     /**
-     * Menyusulkan (cascade) sempro/semhas mahasiswa yang sama dengan
-     * $examregistration (baris sidang) yang belum pernah dilaporkan ke
-     * periode manapun, ke periode YANG SAMA dengan sidangnya.
+     * Menambahkan ujian sidang $examregistration beserta sempro/semhas
+     * mahasiswa yang sama yang belum pernah dilaporkan ke periode manapun,
+     * sekaligus ke periode $request->report_date_id (periode yang sedang
+     * dibuka staf keuangan saat menekan tombol ini).
      */
-    public function confirmSidangCascade(ExamRegistration $examregistration)
+    public function confirmSidangCascade(Request $request, ExamRegistration $examregistration)
     {
-        $report_date_id = $examregistration->report_date_id;
+        $report_date_id = $request->report_date_id;
 
         if (empty($report_date_id)) {
-            return redirect()->back()->with('warning','Data sidang ini belum dilaporkan ke periode manapun.');
+            return redirect()->back()->with('warning','Periode laporan tujuan tidak ditemukan.');
         }
 
-        $siblings = ExamRegistration::where('student_id',$examregistration->student_id)
-            ->whereIn('exam_type_id',[1,2])
+        $toAdd = ExamRegistration::where('student_id',$examregistration->student_id)
+            ->whereIn('exam_type_id',[1,2,3])
             ->whereNull('report_date_id')
             ->get();
 
-        foreach ($siblings as $sibling) {
-            $sibling->update([
+        foreach ($toAdd as $item) {
+            $item->update([
                 'report_date_id' => $report_date_id,
                 'dilaporkan' => 1,
             ]);
-            $this->_reportStore($sibling->id,$report_date_id);
+            $this->_reportStore($item->id,$report_date_id);
         }
 
-        $message = $siblings->isEmpty()
-            ? 'Tidak ada data sempro/semhas tambahan untuk mahasiswa ini.'
-            : 'Berhasil menambahkan '.$siblings->count().' data ujian tambahan ke laporan.';
+        $message = $toAdd->isEmpty()
+            ? 'Tidak ada data ujian untuk mahasiswa ini.'
+            : 'Berhasil menambahkan '.$toAdd->count().' data ujian ke laporan.';
 
         return redirect()->back()->with('success',$message);
     }
