@@ -12,11 +12,11 @@ use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
 /**
- * Roster mahasiswa yang ujian sidangnya sudah dilaporkan ke periode manapun
- * (report_date_id sidang tidak null) — dipakai staf keuangan untuk menyusul
- * (cascade) sempro/semhas mahasiswa yang sama yang belum pernah dilaporkan ke
- * periode manapun, ke periode YANG SAMA dengan sidangnya (bukan periode
- * tertentu — halaman ini global lintas periode).
+ * Roster mahasiswa dengan data ujian sidang yang belum pernah dimasukkan ke
+ * reported-list periode manapun (report_date_id sidang null) — dipakai staf
+ * keuangan untuk menambahkan sidang beserta sempro/semhas mahasiswa yang sama
+ * (kalau tersedia dan juga belum pernah dilaporkan) sekaligus ke periode yang
+ * sedang dibuka ($report_date_id, diteruskan dari reported-list asal).
  */
 class ViewExamSidangConfirmedDataTable extends DataTable
 {
@@ -24,7 +24,7 @@ class ViewExamSidangConfirmedDataTable extends DataTable
 
     private const EXAM_TYPE_SIDANG = 3;
 
-    private const EXAM_TYPE_BELUM_DILAPORKAN = [1, 2]; // sempro, semhas
+    private const EXAM_TYPE_SEMPRO_SEMHAS = [1, 2];
 
     /**
      * Build the DataTable class.
@@ -38,16 +38,17 @@ class ViewExamSidangConfirmedDataTable extends DataTable
         // belakangan, itu akan menimpa balik badge sempro/semhas di bawah ini.
         $dataTable = $this->applyExamRegistrationNameColumns(new EloquentDataTable($query))
             ->addColumn('action', function ($row) {
-                $pending = $this->pendingSiblings($row);
-
-                if ($pending->isEmpty()) {
-                    return '<span class="badge bg-secondary">lengkap</span>';
-                }
+                // Baris ini (sidang) sendiri sudah pasti belum dilaporkan
+                // (syarat query()), jadi selalu ada minimal 1 data untuk
+                // ditambahkan — tidak ada lagi kondisi "lengkap, tidak ada
+                // yang perlu ditambahkan" seperti sebelumnya.
+                $total = 1 + $this->pendingSiblings($row)->count();
 
                 $action = ' <form action="'.route('reportdates.confirmsidangcascade', $row->id).'" method="POST">';
                 $action .= '<input type="hidden" name="_token" value="'.csrf_token().'">';
                 $action .= '<input type="hidden" name="_method" value="PUT">';
-                $action .= '<button type="submit" class="btn btn-success btn-sm" title="Tambahkan '.$pending->count().' data ujian lain yang belum dilaporkan">+ '.$pending->count().'</button> </form> ';
+                $action .= '<input type="hidden" name="report_date_id" value="'.$this->report_date_id.'">';
+                $action .= '<button type="submit" class="btn btn-success btn-sm" title="Tambahkan '.$total.' data ujian ke laporan ini">+ '.$total.'</button> </form> ';
 
                 return $action;
             })
@@ -93,7 +94,7 @@ class ViewExamSidangConfirmedDataTable extends DataTable
     private function pendingSiblings(ExamRegistration $row)
     {
         return $this->siblingsAll($row)
-            ->whereIn('exam_type_id', self::EXAM_TYPE_BELUM_DILAPORKAN)
+            ->whereIn('exam_type_id', self::EXAM_TYPE_SEMPRO_SEMHAS)
             ->whereNull('report_date_id');
     }
 
@@ -105,7 +106,7 @@ class ViewExamSidangConfirmedDataTable extends DataTable
     private function siblingsByType(ExamRegistration $row): array
     {
         $result = [];
-        foreach (self::EXAM_TYPE_BELUM_DILAPORKAN as $exam_type_id) {
+        foreach (self::EXAM_TYPE_SEMPRO_SEMHAS as $exam_type_id) {
             $sibling = $this->siblingsAll($row)->firstWhere('exam_type_id', $exam_type_id);
             if ($sibling) {
                 $result[$exam_type_id] = $sibling;
@@ -141,7 +142,7 @@ class ViewExamSidangConfirmedDataTable extends DataTable
         $query = $this->eagerLoadExamRegistrationNames($model)
             ->with(['student.examregistrations' => fn ($q) => $q->whereIn('exam_type_id', [1, 2, self::EXAM_TYPE_SIDANG])])
             ->where('exam_type_id', self::EXAM_TYPE_SIDANG)
-            ->whereNotNull('report_date_id');
+            ->whereNull('report_date_id');
 
         return $query->newQuery();
     }

@@ -6,14 +6,15 @@
         <div class="col-auto">
             <div class="card">
                 <div class="card-header">
-                    Data Pasti Sidang &mdash; Mahasiswa yang Ujian Sidangnya Sudah Dilaporkan
+                    Data Pasti Sidang &mdash; Mahasiswa yang Ujian Sidangnya Belum Dilaporkan
                     <a href="{{ route('reportdates.reportedlist',$report_date_id) }}" class="btn btn-sm btn-primary float-end">kembali</a>
                 </div>
                 <div class="card-body table-responsive">
                     <p class="text-muted small">
-                        Daftar berikut lintas semua periode penarikan laporan. Tombol pada kolom action
-                        menyusulkan (menambahkan) data sempro/semhas mahasiswa yang sama &mdash; kalau tersedia
-                        dan belum pernah dilaporkan ke periode manapun &mdash; ke periode yang sama dengan sidangnya.
+                        Daftar berikut berisi mahasiswa yang ujian sidangnya belum pernah dimasukkan ke
+                        laporan periode manapun. Tombol pada kolom action menambahkan sidang tersebut
+                        &mdash; beserta sempro/semhas mahasiswa yang sama, kalau tersedia dan juga belum
+                        pernah dilaporkan &mdash; sekaligus ke periode laporan ini.
                     </p>
                     @if (session('success'))
                         <div class="alert alert-success">
