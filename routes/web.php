@@ -36,6 +36,8 @@ Route::middleware('auth')->group(function () {
         Route::get('exam/reportdates/reported-list/{report_date_id}', [App\Http\Controllers\ReportDateController::class,'reportedList'])->name('reportdates.reportedlist');
         Route::put('exam/reportdates/set-report-date/{examregistration}', [App\Http\Controllers\ReportDateController::class,'setReportDate'])->name('reportdates.setreportdate');
         Route::get('exam/reportdates/not-reported-list/{report_date_id}', [App\Http\Controllers\ReportDateController::class,'notReportedList'])->name('reportdates.notreportedlist');
+        Route::get('exam/reportdates/sidang-confirmed/{report_date_id}', [App\Http\Controllers\ReportDateController::class,'sidangConfirmedList'])->name('reportdates.sidangconfirmedlist');
+        Route::put('exam/reportdates/confirm-sidang-cascade/{examregistration}', [App\Http\Controllers\ReportDateController::class,'confirmSidangCascade'])->name('reportdates.confirmsidangcascade');
         Route::resource('exam/reportdates', App\Http\Controllers\ReportDateController::class);
         Route::resource('exam/paymentreports', App\Http\Controllers\ExamPaymentReportController::class);
     });

@@ -188,11 +188,29 @@ class ExamPaymentReportController extends Controller
             'dilaporkan'=>1,
         ]);
 
+        // kode_laporan wajib diisi (kolom NOT NULL, tanpa default) — dulu tidak
+        // pernah di-set di sini sama sekali, jadi ExamPaymentReport::updateOrCreate()
+        // selalu gagal saat harus INSERT baris baru (bug lama, baru ketahuan
+        // sekarang karena baru sekarang path INSERT-nya benar-benar dipakai).
+        // Dipakai tanggal periode laporan (bukan tanggal ujian), karena satu
+        // baris exam_payment_reports meringkas SEMUA ujian milik satu dosen
+        // dalam satu report_date_id — jadi kode_laporan adalah properti periode
+        // laporannya, bukan properti ujian per baris.
+        $kode_laporan = Carbon::parse(ReportDate::find($report_date_id)->tanggal)->format('Y-m');
+
         foreach (['pembimbing1','pembimbing2','penguji1','penguji2','penguji3'] as $penguji) {
             $urutan_penguji = $penguji.'_id';
             $cek_penguji_dibayar = $penguji.'_dibayar';
             $banyak_menguji = 'banyak_'.$penguji;
             $id_penguji = $examregistration->$urutan_penguji;
+
+            // Slot ini tidak diisi untuk ujian ini (mis. sempro/semhas yang
+            // cuma punya 1 pembimbing) — lewati, tidak ada dosen untuk dibayar
+            // di slot ini. Tanpa ini, updateOrCreate() di bawah gagal karena
+            // lecture_id (foreign key, NOT NULL) tidak boleh null.
+            if (empty($id_penguji)) {
+                continue;
+            }
 
             $pembimbing1 = $this->_getCountOfExaminer($exam_type_id,$report_date_id,'pembimbing1_dibayar','pembimbing1_id',$id_penguji);
             $pembimbing2 = $this->_getCountOfExaminer($exam_type_id,$report_date_id,'pembimbing2_dibayar','pembimbing2_id',$id_penguji);
@@ -223,6 +241,7 @@ class ExamPaymentReportController extends Controller
                 'report_date_id'=>$report_date_id,
                 'lecture_id'=>$id_penguji,
             ],array_merge([
+                'kode_laporan'=>$kode_laporan,
                 'status'=>$examregistration->$penguji->pns ? 1 : 0,
                 'golongan'=>substr($examregistration->$penguji->golongan,0,1),
                 'npwp'=>$examregistration->$penguji->npwp,

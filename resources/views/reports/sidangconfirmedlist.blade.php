@@ -6,12 +6,15 @@
         <div class="col-auto">
             <div class="card">
                 <div class="card-header">
-                    Daftar Laporan Ujian pada Sesi Penarikan Tanggal {{ Carbon\Carbon::parse($tanggal)->isoFormat('LL') }}
-                    <a href="{{ route('reportdates.index') }}" class="btn btn-sm btn-primary float-end">kembali</a>
+                    Data Pasti Sidang &mdash; Mahasiswa yang Ujian Sidangnya Sudah Dilaporkan
+                    <a href="{{ route('reportdates.reportedlist',$report_date_id) }}" class="btn btn-sm btn-primary float-end">kembali</a>
                 </div>
                 <div class="card-body table-responsive">
-                    <a href="{{ route('reportdates.notreportedlist',$report_date_id) }}" class="btn btn-sm btn-success mb-2">+ data pelaporan</a>
-                    <a href="{{ route('reportdates.sidangconfirmedlist',$report_date_id) }}" class="btn btn-sm btn-info mb-2">+ data pasti sidang</a>
+                    <p class="text-muted small">
+                        Daftar berikut lintas semua periode penarikan laporan. Tombol pada kolom action
+                        menyusulkan (menambahkan) data sempro/semhas mahasiswa yang sama &mdash; kalau tersedia
+                        dan belum pernah dilaporkan ke periode manapun &mdash; ke periode yang sama dengan sidangnya.
+                    </p>
                     @if (session('success'))
                         <div class="alert alert-success">
                             {{ session('success') }}
