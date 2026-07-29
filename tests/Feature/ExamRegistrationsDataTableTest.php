@@ -29,7 +29,8 @@ class ExamRegistrationsDataTableTest extends TestCase
 
         $response->assertOk();
         $response->assertJsonPath('recordsTotal', 1);
-        $response->assertJsonPath('data.0.ujian', 'sempro');
+        $this->assertStringContainsString('sempro', $response->json('data.0.ujian'));
+        $this->assertStringContainsString('bg-secondary', $response->json('data.0.ujian'));
         $response->assertJsonPath('data.0.nim', '172103001');
         $response->assertJsonPath('data.0.mahasiswa', 'Galih Surya');
         $response->assertJsonPath('data.0.pembimbing1_nama', 'Lilis Karwati');
@@ -95,5 +96,37 @@ class ExamRegistrationsDataTableTest extends TestCase
         $this->assertStringContainsString('text-success', $reported['dilaporkan']);
         $this->assertNotNull($notReported);
         $this->assertStringContainsString('text-danger', $notReported['dilaporkan']);
+    }
+
+    public function test_ujian_column_shows_distinct_badge_per_exam_type(): void
+    {
+        $departement = $this->makeDepartement();
+        $student = $this->makeStudent($departement);
+        $sempro = $this->makeExamType('sempro');
+        $semhas = $this->makeExamType('semhas');
+        $sidang = $this->makeExamType('sidang');
+        $this->makeExamRegistration($departement, $student, $sempro);
+        $this->makeExamRegistration($departement, $student, $semhas);
+        $this->makeExamRegistration($departement, $student, $sidang);
+        $admin = $this->makeUserWithRole('admin');
+
+        $response = $this->actingAs($admin)->getJson(
+            '/exam/registrations?draw=1&start=0&length=10',
+            ['X-Requested-With' => 'XMLHttpRequest']
+        );
+
+        $response->assertOk();
+
+        $rows = collect($response->json('data'));
+        $semproBadge = $rows->first(fn ($row) => str_contains($row['ujian'], '>sempro<'));
+        $semhasBadge = $rows->first(fn ($row) => str_contains($row['ujian'], '>semhas<'));
+        $sidangBadge = $rows->first(fn ($row) => str_contains($row['ujian'], '>sidang<'));
+
+        $this->assertNotNull($semproBadge);
+        $this->assertStringContainsString('bg-secondary', $semproBadge['ujian']);
+        $this->assertNotNull($semhasBadge);
+        $this->assertStringContainsString('bg-info', $semhasBadge['ujian']);
+        $this->assertNotNull($sidangBadge);
+        $this->assertStringContainsString('bg-primary', $sidangBadge['ujian']);
     }
 }
