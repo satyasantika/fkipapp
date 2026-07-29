@@ -23,7 +23,8 @@ class ViewExamDateDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('action', function($row){
-                $action = ' <a href="'.route('reports.by.date',$row->tanggal_ujian).'" class="btn btn-outline-primary btn-sm action">detail</a> ';
+                $tanggal = \Carbon\Carbon::parse($row->tanggal_ujian)->format('Y-m-d');
+                $action = ' <a href="'.route('reports.by.date',$tanggal).'" class="btn btn-outline-primary btn-sm action">detail</a> ';
                 return $action;
             })
             ->editColumn('tanggal_ujian',function($row){

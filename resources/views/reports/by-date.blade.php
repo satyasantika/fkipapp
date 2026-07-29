@@ -6,7 +6,7 @@
         <div class="col-auto">
             <div class="card">
                 <div class="card-header">
-                    {{ __('Rekap Penyelenggaraan Ujian hari ').Carbon\Carbon::createFromFormat('Y-m-d',$date)->isoFormat('dddd, LL') }}
+                    {{ __('Rekap Penyelenggaraan Ujian hari ').Carbon\Carbon::parse($date)->isoFormat('dddd, LL') }}
                     <a href="{{ route('reports.by.departement',substr($date,0,7)) }}" class="btn btn-sm btn-primary float-end">kembali</a>
                 </div>
                 <div class="card-body table-responsive">
