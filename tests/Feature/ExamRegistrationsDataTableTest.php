@@ -53,4 +53,21 @@ class ExamRegistrationsDataTableTest extends TestCase
         $response->assertOk();
         $response->assertJsonPath('recordsTotal', 1);
     }
+
+    public function test_tanggal_ujian_column_shows_date_only(): void
+    {
+        $departement = $this->makeDepartement();
+        $student = $this->makeStudent($departement);
+        $examType = $this->makeExamType('sempro');
+        $this->makeExamRegistration($departement, $student, $examType, ['tanggal_ujian' => '2026-07-14']);
+        $admin = $this->makeUserWithRole('admin');
+
+        $response = $this->actingAs($admin)->getJson(
+            '/exam/registrations?draw=1&start=0&length=10',
+            ['X-Requested-With' => 'XMLHttpRequest']
+        );
+
+        $response->assertOk();
+        $response->assertJsonPath('data.0.tanggal_ujian', '2026-07-14');
+    }
 }
