@@ -3,6 +3,7 @@
 namespace App\DataTables;
 
 use App\DataTables\Concerns\FiltersExamRegistrationNames;
+use App\DataTables\Concerns\FormatsExamStatusBadges;
 use App\Models\ExamRegistration;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -16,6 +17,7 @@ use Yajra\DataTables\Services\DataTable;
 class ViewExamRegistrationsDataTable extends DataTable
 {
     use FiltersExamRegistrationNames;
+    use FormatsExamStatusBadges;
 
     /**
      * Build the DataTable class.
@@ -24,7 +26,10 @@ class ViewExamRegistrationsDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        $dataTable = (new EloquentDataTable($query))
+        // applyExamRegistrationNameColumns() dipanggil DULUAN karena ia juga
+        // meregister editColumn('ujian', ...) versi polos — kalau dipanggil
+        // belakangan, itu akan menimpa balik badge di bawah ini.
+        $dataTable = $this->applyExamRegistrationNameColumns(new EloquentDataTable($query))
             ->addColumn('action', function($row){
                 $action = ' <a href="'.route('registrations.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
                 return $action;
@@ -36,9 +41,10 @@ class ViewExamRegistrationsDataTable extends DataTable
                 return is_null($row->waktu_mulai) ? '' : (substr($row->waktu_mulai,0,5).' - '.substr($row->waktu_akhir,0,5)) ;
             })
             ->editColumn('dilaporkan',function($row){
-                return $row->dilaporkan
-                    ? '<i class="bi bi-check-circle-fill text-success" title="sudah dilaporkan"></i>'
-                    : '<i class="bi bi-x-circle-fill text-danger" title="belum dilaporkan"></i>';
+                return $this->dilaporkanIcon($row->dilaporkan);
+            })
+            ->editColumn('ujian', function($row){
+                return $this->examTypeBadge($row->ujian);
             })
             ->editColumn('pembimbing1_nama',function($row){
                 return is_null($row->pembimbing1_nama) ? '' : $row->pembimbing1_nama ;
@@ -57,11 +63,10 @@ class ViewExamRegistrationsDataTable extends DataTable
             })
             ->editColumn('created_at', function($row) {
                 return $row->created_at->format('Y-m-d');
-            });
+            })
+            ->rawColumns(['dilaporkan', 'ujian'], true);
 
-        return $this->applyExamRegistrationNameColumns($dataTable)
-            ->rawColumns(['dilaporkan'], true)
-            ->setRowId('id');
+        return $dataTable->setRowId('id');
     }
 
     /**
