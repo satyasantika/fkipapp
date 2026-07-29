@@ -36,7 +36,9 @@ class ViewExamRegistrationsDataTable extends DataTable
                 return is_null($row->waktu_mulai) ? '' : (substr($row->waktu_mulai,0,5).' - '.substr($row->waktu_akhir,0,5)) ;
             })
             ->editColumn('dilaporkan',function($row){
-                return $row->dilaporkan ? 'sudah' : 'belum' ;
+                return $row->dilaporkan
+                    ? '<i class="bi bi-check-circle-fill text-success" title="sudah dilaporkan"></i>'
+                    : '<i class="bi bi-x-circle-fill text-danger" title="belum dilaporkan"></i>';
             })
             ->editColumn('pembimbing1_nama',function($row){
                 return is_null($row->pembimbing1_nama) ? '' : $row->pembimbing1_nama ;
@@ -57,7 +59,9 @@ class ViewExamRegistrationsDataTable extends DataTable
                 return $row->created_at->format('Y-m-d');
             });
 
-        return $this->applyExamRegistrationNameColumns($dataTable)->setRowId('id');
+        return $this->applyExamRegistrationNameColumns($dataTable)
+            ->rawColumns(['dilaporkan'], true)
+            ->setRowId('id');
     }
 
     /**

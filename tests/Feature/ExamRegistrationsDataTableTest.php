@@ -70,4 +70,30 @@ class ExamRegistrationsDataTableTest extends TestCase
         $response->assertOk();
         $response->assertJsonPath('data.0.tanggal_ujian', '2026-07-14');
     }
+
+    public function test_dilaporkan_column_shows_representative_icon(): void
+    {
+        $departement = $this->makeDepartement();
+        $student = $this->makeStudent($departement);
+        $examType = $this->makeExamType('sempro');
+        $this->makeExamRegistration($departement, $student, $examType, ['dilaporkan' => 1]);
+        $this->makeExamRegistration($departement, $student, $examType, ['dilaporkan' => 0]);
+        $admin = $this->makeUserWithRole('admin');
+
+        $response = $this->actingAs($admin)->getJson(
+            '/exam/registrations?draw=1&start=0&length=10',
+            ['X-Requested-With' => 'XMLHttpRequest']
+        );
+
+        $response->assertOk();
+
+        $rows = collect($response->json('data'));
+        $reported = $rows->first(fn ($row) => str_contains($row['dilaporkan'], 'bi-check-circle-fill'));
+        $notReported = $rows->first(fn ($row) => str_contains($row['dilaporkan'], 'bi-x-circle-fill'));
+
+        $this->assertNotNull($reported);
+        $this->assertStringContainsString('text-success', $reported['dilaporkan']);
+        $this->assertNotNull($notReported);
+        $this->assertStringContainsString('text-danger', $notReported['dilaporkan']);
+    }
 }
