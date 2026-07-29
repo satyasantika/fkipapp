@@ -29,6 +29,9 @@ class ViewExamRegistrationsDataTable extends DataTable
                 $action = ' <a href="'.route('registrations.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
                 return $action;
             })
+            ->editColumn('tanggal_ujian', function($row){
+                return $row->tanggal_ujian?->format('Y-m-d');
+            })
             ->editColumn('waktu_mulai',function($row){
                 return is_null($row->waktu_mulai) ? '' : (substr($row->waktu_mulai,0,5).' - '.substr($row->waktu_akhir,0,5)) ;
             })
