@@ -54,4 +54,49 @@ class ExamDateDataTableTest extends TestCase
         $this->assertSame(1, $rows['2026-07-15']['total']);
         $this->assertSame('1', $rows['2026-07-15']['sidang']);
     }
+
+    /**
+     * `tanggal_ujian` di-cast sebagai Carbon oleh ExamRegistration, jadi
+     * link "detail" (action column) wajib format eksplisit ke Y-m-d sebelum
+     * dipakai di route('reports.by.date', ...) — kalau tidak, Carbon
+     * ter-stringify jadi "Y-m-d H:i:s" dan bikin reports.by.date 500
+     * (Carbon::createFromFormat('Y-m-d', ...) gagal karena "Trailing data").
+     */
+    public function test_action_link_uses_clean_ymd_date(): void
+    {
+        $departement = $this->makeDepartement();
+        $student = $this->makeStudent($departement);
+        $sempro = $this->makeExamType('sempro');
+
+        $this->makeExamRegistration($departement, $student, $sempro, ['tanggal_ujian' => '2026-07-14']);
+
+        $jurusan = $this->makeUserWithRole('jurusan', $departement->id);
+
+        $response = $this->actingAs($jurusan)->getJson(
+            '/exam/reports/departement?draw=1&start=0&length=10',
+            ['X-Requested-With' => 'XMLHttpRequest']
+        );
+
+        $response->assertOk();
+
+        $action = $response->json('data.0.action');
+        $this->assertStringContainsString('/exam/reports/date/2026-07-14"', $action);
+        $this->assertStringNotContainsString('00%3A00%3A00', $action);
+        $this->assertStringNotContainsString(' 00:00:00', $action);
+    }
+
+    public function test_report_by_date_page_renders_without_error(): void
+    {
+        $departement = $this->makeDepartement();
+        $student = $this->makeStudent($departement);
+        $sempro = $this->makeExamType('sempro');
+
+        $this->makeExamRegistration($departement, $student, $sempro, ['tanggal_ujian' => '2026-07-14']);
+
+        $jurusan = $this->makeUserWithRole('jurusan', $departement->id);
+
+        $response = $this->actingAs($jurusan)->get('/exam/reports/date/2026-07-14');
+
+        $response->assertOk();
+    }
 }
