@@ -65,6 +65,7 @@ class ViewExamDateDataTable extends DataTable
                     ->setTableId('viewexamdates-table')
                     ->columns($this->getColumns())
                     ->minifiedAjax(url()->current())
+                    ->orderBy(1, 'desc')
                     ->selectStyleSingle()
                     ->buttons([
                         Button::make('excel'),
