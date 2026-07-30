@@ -89,8 +89,8 @@ class ViewExamRegistrationByDateDataTable extends DataTable
                     ->columns($this->getColumns())
                     ->minifiedAjax(url()->current())
                     //->dom('Bfrtip')
+                    ->orderBy(3, 'asc')
                     ->orderBy(2, 'asc')
-                    ->orderBy(3, 'desc')
                     ->selectStyleSingle()
                     ->buttons([
                         // auth()->user()->hasRole('jurusan') ? Button::make('add') :'',
