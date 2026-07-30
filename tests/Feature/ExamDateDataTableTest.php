@@ -99,4 +99,15 @@ class ExamDateDataTableTest extends TestCase
 
         $response->assertOk();
     }
+
+    public function test_default_sort_is_tanggal_ujian_descending(): void
+    {
+        $departement = $this->makeDepartement();
+        $jurusan = $this->makeUserWithRole('jurusan', $departement->id);
+
+        $response = $this->actingAs($jurusan)->get('/exam/reports/departement');
+
+        $response->assertOk();
+        $response->assertSee('"order":[[1,"desc"]]', false);
+    }
 }

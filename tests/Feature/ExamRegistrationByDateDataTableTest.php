@@ -52,4 +52,15 @@ class ExamRegistrationByDateDataTableTest extends TestCase
         $this->assertNotNull($semhasBadge);
         $this->assertStringContainsString('bg-info', $semhasBadge['ujian']);
     }
+
+    public function test_default_sort_is_ruangan_asc_then_waktu_desc(): void
+    {
+        $departement = $this->makeDepartement();
+        $jurusan = $this->makeUserWithRole('jurusan', $departement->id);
+
+        $response = $this->actingAs($jurusan)->get('/exam/reports/date/2026-07-14');
+
+        $response->assertOk();
+        $response->assertSee('"order":[[2,"asc"],[3,"desc"]]', false);
+    }
 }
