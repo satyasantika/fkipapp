@@ -35,9 +35,13 @@ class ExamPaymentReportController extends Controller
      */
     public function store(Request $request)
     {
-        $this->_reportStore($request->examregistration_id);
-        $name = strtoupper(ExamRegistration::find($request->examregistration_id)->student->nama);
+        try {
+            $this->_reportStore($request->examregistration_id);
+        } catch (\RuntimeException $e) {
+            return back()->with('warning',$e->getMessage());
+        }
 
+        $name = strtoupper(ExamRegistration::find($request->examregistration_id)->student->nama);
 
         return back()->with('success','data laporan para penguji untuk mahasiswa '.$name.' telah ditambahkan');
     }
@@ -70,9 +74,15 @@ class ExamPaymentReportController extends Controller
      */
     public function update(Request $request, ExamPaymentReport $paymentreport)
     {
+        $examPayment = ExamPayment::where('jabatan_akademik',$request->jabatan_akademik)->where('pendidikan',$request->pendidikan)->first();
+
+        if (!$examPayment) {
+            return back()->with('warning','Data honor untuk jabatan akademik "'.$request->jabatan_akademik.'" dan pendidikan "'.$request->pendidikan.'" belum diatur di data honor ujian.');
+        }
+
         $data = $request->all();
         $data['status'] = $request->pns ? 1 : 0;
-        $data['honor_pembimbing'] =  ExamPayment::where('jabatan_akademik',$request->jabatan_akademik)->where('pendidikan',$request->pendidikan)->first()->honor;
+        $data['honor_pembimbing'] = $examPayment->honor;
         $paymentreport->fill($data)->save();
 
         $pass = [
@@ -152,7 +162,11 @@ class ExamPaymentReportController extends Controller
         $examregistrations = ExamRegistration::where('tanggal_ujian',$date)->where('report_date_id',$periode)->pluck('id');
         // dd($examregistrations);
         foreach ($examregistrations as $examregistration) {
-            $this->_reportStore($examregistration);
+            try {
+                $this->_reportStore($examregistration);
+            } catch (\RuntimeException $e) {
+                return redirect()->back()->with('warning',$e->getMessage());
+            }
         }
 
         return redirect()->back()->with('success','data ujian tanggal '.$tanggal.' telah disegarkan');
@@ -237,6 +251,20 @@ class ExamPaymentReportController extends Controller
                 $data_tambahan['banyak_menguji_seminar'] = $semua;
             }
 
+            // exam_payments cuma berisi kombinasi jabatan_akademik+pendidikan
+            // tertentu (bukan semua kombinasi dari dropdown edit form) — dosen
+            // dengan kombinasi yang belum didaftarkan (mis. jabatan/pendidikan
+            // belum lengkap diisi) bikin first() null dan crash tanpa guard ini.
+            $examPayment = ExamPayment::where('jabatan_akademik',$examregistration->$penguji->jabatan_akademik)
+                ->where('pendidikan',$examregistration->$penguji->pendidikan)
+                ->first();
+
+            if (!$examPayment) {
+                throw new \RuntimeException(
+                    'Data honor untuk jabatan akademik "'.$examregistration->$penguji->jabatan_akademik.'" dan pendidikan "'.$examregistration->$penguji->pendidikan.'" (dosen '.$examregistration->$penguji->nama.') belum diatur di data honor ujian.'
+                );
+            }
+
             ExamPaymentReport::updateOrCreate([
                 'report_date_id'=>$report_date_id,
                 'lecture_id'=>$id_penguji,
@@ -248,7 +276,7 @@ class ExamPaymentReportController extends Controller
                 'rekening'=>$examregistration->$penguji->rekening,
                 'jabatan_akademik'=>$examregistration->$penguji->jabatan_akademik,
                 'pendidikan'=>$examregistration->$penguji->pendidikan,
-                'honor_pembimbing'=>ExamPayment::where('jabatan_akademik',$examregistration->$penguji->jabatan_akademik)->where('pendidikan',$examregistration->$penguji->pendidikan)->first()->honor,
+                'honor_pembimbing'=>$examPayment->honor,
                 'honor_penguji_skripsi'=>ExamPayment::find(3)->honor,
                 'honor_penguji_proposal'=>ExamPayment::find(1)->honor,
                 'honor_penguji_seminar'=>ExamPayment::find(2)->honor,

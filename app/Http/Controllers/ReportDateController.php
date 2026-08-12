@@ -136,7 +136,12 @@ class ReportDateController extends Controller
                 'report_date_id' => $report_date_id,
                 'dilaporkan' => 1,
             ]);
-            $this->_reportStore($item->id,$report_date_id);
+
+            try {
+                $this->_reportStore($item->id,$report_date_id);
+            } catch (\RuntimeException $e) {
+                return redirect()->back()->with('warning',$e->getMessage());
+            }
         }
 
         $message = $toAdd->isEmpty()
@@ -155,7 +160,12 @@ class ReportDateController extends Controller
 
         $data = $request->all();
         $examregistration->fill($data)->save();
-        $this->_reportStore($examregistration->id,$report_date_id);
+
+        try {
+            $this->_reportStore($examregistration->id,$report_date_id);
+        } catch (\RuntimeException $e) {
+            return redirect()->back()->with('warning',$e->getMessage());
+        }
 
         return redirect()->back();
     }
@@ -224,6 +234,20 @@ class ReportDateController extends Controller
                 $data_tambahan['banyak_menguji_seminar'] = $semua;
             }
 
+            // exam_payments cuma berisi kombinasi jabatan_akademik+pendidikan
+            // tertentu (bukan semua kombinasi dari dropdown edit form) — dosen
+            // dengan kombinasi yang belum didaftarkan (mis. jabatan/pendidikan
+            // belum lengkap diisi) bikin first() null dan crash tanpa guard ini.
+            $examPayment = ExamPayment::where('jabatan_akademik',$examregistration->$penguji->jabatan_akademik)
+                ->where('pendidikan',$examregistration->$penguji->pendidikan)
+                ->first();
+
+            if (!$examPayment) {
+                throw new \RuntimeException(
+                    'Data honor untuk jabatan akademik "'.$examregistration->$penguji->jabatan_akademik.'" dan pendidikan "'.$examregistration->$penguji->pendidikan.'" (dosen '.$examregistration->$penguji->nama.') belum diatur di data honor ujian.'
+                );
+            }
+
             ExamPaymentReport::updateOrCreate([
                 'report_date_id'=>$report_date_id,
                 'lecture_id'=>$id_penguji,
@@ -235,7 +259,7 @@ class ReportDateController extends Controller
                 'rekening'=>$examregistration->$penguji->rekening,
                 'jabatan_akademik'=>$examregistration->$penguji->jabatan_akademik,
                 'pendidikan'=>$examregistration->$penguji->pendidikan,
-                'honor_pembimbing'=>ExamPayment::where('jabatan_akademik',$examregistration->$penguji->jabatan_akademik)->where('pendidikan',$examregistration->$penguji->pendidikan)->first()->honor,
+                'honor_pembimbing'=>$examPayment->honor,
                 'honor_penguji_skripsi'=>ExamPayment::find(3)->honor,
                 'honor_penguji_proposal'=>ExamPayment::find(1)->honor,
                 'honor_penguji_seminar'=>ExamPayment::find(2)->honor,
