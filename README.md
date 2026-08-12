@@ -1,66 +1,60 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# fkipapp
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi rekap ujian proposal, seminar hasil penelitian, dan sidang skripsi, sekaligus perhitungan dan pelaporan honor pembimbing/penguji untuk **FKIP Universitas Siliwangi**.
 
-## About Laravel
+Dibangun dengan [Laravel 10](https://laravel.com), [Yajra DataTables](https://yajra-datatables.readthedocs.io/), dan [Spatie Laravel Permission](https://spatie.be/docs/laravel-permission).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur Utama
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Pendaftaran ujian** — pencatatan pendaftaran ujian proposal, seminar hasil, dan sidang skripsi mahasiswa beserta pembimbing dan penguji.
+- **Rekap & laporan ujian** — laporan ujian per jurusan, per tanggal, dan per penguji, lengkap dengan status pelaporan dan konfirmasi sidang.
+- **Perhitungan honor** — perhitungan otomatis honor pembimbing dan penguji (proposal, seminar, skripsi) beserta potongan pajak berdasarkan golongan dan status kepegawaian dosen.
+- **Laporan pembayaran honor** — rekap honor per periode, status ASN/NON ASN, dan status pembayaran per dosen untuk bagian keuangan.
+- **Manajemen data master** — data mahasiswa, dosen, jurusan, dan pengguna aplikasi.
+- **Hak akses berbasis peran** — peran `admin`, `jurusan`, `keuangan`, dan `dekanat` dengan cakupan menu dan data yang berbeda-beda.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Teknologi
 
-## Learning Laravel
+- PHP 8.1+ dan Laravel 10
+- MySQL
+- Bootstrap 5, Sass, Vite
+- Yajra DataTables untuk tabel data interaktif
+- Spatie Laravel Permission untuk role & permission
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Instalasi
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+git clone <url-repo-ini> fkipapp
+cd fkipapp
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+composer install
+npm install
 
-## Laravel Sponsors
+cp .env.example .env
+php artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Atur koneksi database pada `.env` (default menggunakan MySQL dengan nama basis data `db_fkipapp`), lalu jalankan migrasi dan seeder:
 
-### Premium Partners
+```bash
+php artisan migrate --seed
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Seeder awal akan membuat akun admin (`admin` / `asdfasdf`), peran (`admin`, `jurusan`, `keuangan`, `dekanat`), serta data master jurusan, dosen, mahasiswa, dan akun operator jurusan dari berkas CSV di `database/seeders/csvs`.
 
-## Contributing
+Jalankan aplikasi untuk pengembangan:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+php artisan serve
+npm run dev
+```
 
-## Code of Conduct
+## Menjalankan Test
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan test
+```
 
-## Security Vulnerabilities
+## Lisensi
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Proyek ini menggunakan lisensi [MIT](https://opensource.org/licenses/MIT).
