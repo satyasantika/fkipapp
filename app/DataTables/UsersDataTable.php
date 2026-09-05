@@ -24,6 +24,12 @@ class UsersDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('action', function($row){
                 $action = ' <a href="'.route('users.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
+                if ($row->id !== auth()->id() && ! $row->hasRole('admin')) {
+                    $action .= '<form action="'.route('impersonate.take',$row->id).'" method="POST" class="d-inline">'
+                        .csrf_field()
+                        .'<button type="submit" class="btn btn-outline-secondary btn-sm action" title="Impersonate" onclick="return confirm(\'Login sebagai '.e($row->name).'?\');">I</button>'
+                        .'</form>';
+                }
                 return $action;
             })
             ->setRowId('id');
