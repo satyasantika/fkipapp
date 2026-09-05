@@ -103,6 +103,16 @@
             </div>
         </nav>
 
+        @if (session('impersonator_id'))
+            <div class="alert alert-warning text-center mb-0 rounded-0" role="alert">
+                Anda sedang login sebagai <strong>{{ Auth::user()->name }}</strong>.
+                <form action="{{ route('impersonate.leave') }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-warning">Kembali ke Admin</button>
+                </form>
+            </div>
+        @endif
+
         <main class="py-4">
             @yield('content')
         </main>

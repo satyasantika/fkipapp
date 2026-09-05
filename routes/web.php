@@ -23,7 +23,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::group(['middleware' => ['role:admin']], function () {
         Route::resource('users', App\Http\Controllers\UserController::class)->except('show');
+        Route::post('users/{user}/impersonate', [App\Http\Controllers\ImpersonateController::class, 'take'])->name('impersonate.take');
     });
+    Route::post('impersonate/leave', [App\Http\Controllers\ImpersonateController::class, 'leave'])->name('impersonate.leave');
     Route::group(['middleware' => ['role:jurusan']], function () {
         Route::get('exam/registrations/{student_id}/create', [App\Http\Controllers\ExamRegistrationController::class,'createByStudent'])->name('registrations.student');
         Route::get('exam/registrations/{student_id}/show', [App\Http\Controllers\ExamRegistrationController::class,'showByStudent'])->name('registrations.show.student');
