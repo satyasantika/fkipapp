@@ -7,6 +7,7 @@ use App\Models\Departement;
 use Illuminate\Http\Request;
 use App\DataTables\UsersDataTable;
 use App\Http\Controllers\Controller;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -39,7 +40,8 @@ class UserController extends Controller
         $data = $request->merge([
             'password'=> bcrypt($request->password),
         ]);
-        User::create($data->all());
+        $user = User::create($data->all());
+        $user->syncRoles($request->input('roles', []));
         return to_route('users.index')->with('success','user '.$name.' telah ditambahkan');
     }
 
@@ -70,6 +72,7 @@ class UserController extends Controller
         $name = strtoupper($user->name);
         $data = $request->all();
         $user->fill($data)->save();
+        $user->syncRoles($request->input('roles', []));
 
         return to_route('users.index')->with('success','user '.$name.' telah diperbarui');
     }
@@ -87,7 +90,7 @@ class UserController extends Controller
     private function _dataSelection()
     {
         return [
-            // 'roles' =>  Role::all()->pluck('name')->sort(),
+            'roles' => Role::pluck('name'),
             'departements' =>  Departement::all()->sort(),
         ];
     }

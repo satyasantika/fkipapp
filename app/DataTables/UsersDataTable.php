@@ -34,6 +34,8 @@ class UsersDataTable extends DataTable
      */
     public function query(User $model): QueryBuilder
     {
+        abort_unless(auth()->user()->hasRole('admin'), 403);
+
         return $model->newQuery();
     }
 

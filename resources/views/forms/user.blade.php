@@ -47,6 +47,17 @@
                 </select>
             </div>
         </div>
+        {{-- roles --}}
+        <div class="row mb-3">
+            <label for="roles" class="col-md-4 col-form-label text-md-end">Role</label>
+            <div class="col-md-8">
+                <select id="roles" class="form-control" name="roles[]" multiple>
+                    @foreach ($roles as $role)
+                    <option value="{{ $role }}" @selected($user->hasRole($role))>{{ $role }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
         {{-- email --}}
         <div class="row mb-3">
             <label for="email" class="col-md-4 col-form-label text-md-end">email</label>
