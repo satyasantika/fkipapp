@@ -9,7 +9,9 @@ use App\Filament\Concerns\ShowsDeletionBlockAlert;
 use App\Models\Departement;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Exceptions\Halt;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -69,6 +71,17 @@ class DepartementResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->iconButton(),
+                Tables\Actions\DeleteAction::make()
+                    ->iconButton()
+                    ->modalHeading('Hapus jurusan ini?')
+                    ->modalDescription('Data jurusan ini akan dihapus permanen.')
+                    ->before(function (Departement $record) {
+                        if ($reason = $record->deletionBlockReason()) {
+                            Notification::make()->title($reason)->danger()->send();
+
+                            throw new Halt();
+                        }
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -91,8 +104,6 @@ class DepartementResource extends Resource
     {
         return [
             'index' => Pages\ListDepartements::route('/'),
-            'create' => Pages\CreateDepartement::route('/create'),
-            'edit' => Pages\EditDepartement::route('/{record}/edit'),
         ];
     }
 }

@@ -90,6 +90,10 @@ class ExamPaymentResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->iconButton(),
+                Tables\Actions\DeleteAction::make()
+                    ->iconButton()
+                    ->modalHeading('Hapus rate honor ini?')
+                    ->modalDescription('Data rate honor untuk kombinasi jabatan akademik dan pendidikan ini akan dihapus permanen.'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -111,8 +115,6 @@ class ExamPaymentResource extends Resource
     {
         return [
             'index' => Pages\ListExamPayments::route('/'),
-            'create' => Pages\CreateExamPayment::route('/create'),
-            'edit' => Pages\EditExamPayment::route('/{record}/edit'),
         ];
     }
 }

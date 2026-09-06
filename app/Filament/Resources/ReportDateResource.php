@@ -9,7 +9,9 @@ use App\Models\ExamRegistration;
 use App\Models\ReportDate;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Exceptions\Halt;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -76,6 +78,17 @@ class ReportDateResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->iconButton(),
+                Tables\Actions\DeleteAction::make()
+                    ->iconButton()
+                    ->modalHeading('Hapus tanggal penarikan laporan ini?')
+                    ->modalDescription('Tanggal penarikan laporan ini akan dihapus permanen.')
+                    ->before(function (ReportDate $record) {
+                        if ($reason = $record->deletionBlockReason()) {
+                            Notification::make()->title($reason)->danger()->send();
+
+                            throw new Halt();
+                        }
+                    }),
                 Tables\Actions\Action::make('reportedList')
                     ->label('L')
                     ->tooltip('Daftar yang sudah dilaporkan')
@@ -103,8 +116,6 @@ class ReportDateResource extends Resource
     {
         return [
             'index' => Pages\ListReportDates::route('/'),
-            'create' => Pages\CreateReportDate::route('/create'),
-            'edit' => Pages\EditReportDate::route('/{record}/edit'),
             'not-reported-list' => Pages\NotReportedList::route('/{record}/not-reported'),
             'reported-list' => Pages\ReportedList::route('/{record}/reported'),
             'sidang-confirmed-list' => Pages\SidangConfirmedList::route('/{record}/sidang-confirmed'),

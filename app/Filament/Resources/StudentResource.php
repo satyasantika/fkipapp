@@ -10,7 +10,9 @@ use App\Models\Lecture;
 use App\Models\Student;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Exceptions\Halt;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -182,6 +184,17 @@ class StudentResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->iconButton(),
+                Tables\Actions\DeleteAction::make()
+                    ->iconButton()
+                    ->modalHeading('Hapus data mahasiswa ini?')
+                    ->modalDescription('Data mahasiswa ini akan dihapus permanen.')
+                    ->before(function (Student $record) {
+                        if ($reason = $record->deletionBlockReason()) {
+                            Notification::make()->title($reason)->danger()->send();
+
+                            throw new Halt();
+                        }
+                    }),
                 Tables\Actions\Action::make('ujian')
                     ->label('Ujian')
                     ->icon('heroicon-o-academic-cap')
@@ -209,8 +222,6 @@ class StudentResource extends Resource
     {
         return [
             'index' => Pages\ListStudents::route('/'),
-            'create' => Pages\CreateStudent::route('/create'),
-            'edit' => Pages\EditStudent::route('/{record}/edit'),
         ];
     }
 }
