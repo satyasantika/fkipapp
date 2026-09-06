@@ -10,6 +10,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -65,6 +66,15 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            // Tombol "kembali ke akun admin" saat sedang impersonate - render
+            // hook resmi Filament ini persis dipanggil sebelum dropdown avatar
+            // (fi-user-avatar) di topbar, jadi tombolnya muncul di kiri avatar.
+            // View-nya sendiri yang mengecek session('impersonator_id') supaya
+            // hanya tampil saat benar-benar sedang impersonate.
+            ->renderHook(
+                PanelsRenderHook::USER_MENU_BEFORE,
+                fn (): string => view('filament.leave-impersonation-button')->render(),
+            );
     }
 }
