@@ -1,21 +1,22 @@
 <div class="flex flex-col gap-3">
     <div class="flex items-center gap-3">
-        <button
-            type="button"
+        {{-- <x-filament::badge> dipakai (bukan kelas Tailwind tebakan
+             bg-success-600) supaya warnanya benar-benar terkompilasi -
+             lihat catatan panjang di student-card.blade.php. --}}
+        <x-filament::badge
+            tag="button"
+            :color="$sudahSidangOnly ? 'success' : 'gray'"
             wire:click="toggleSudahSidang"
-            @class([
-                'shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition',
-                'bg-success-600 text-white hover:bg-success-500' => $sudahSidangOnly,
-                'bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-white/5 dark:text-gray-200 dark:ring-white/10' => ! $sudahSidangOnly,
-            ])
+            style="border-radius:9999px;cursor:pointer"
+            class="shrink-0 whitespace-nowrap"
         >
             {{ $sudahSidangOnly ? 'Buang Filter' : 'Filter Sidang' }}
-        </button>
+        </x-filament::badge>
 
         <input
             type="text"
             wire:model.live.debounce.300ms="studentSearch"
-            placeholder="Cari NIM, nama, pembimbing, atau penguji..."
+            placeholder="Cari NIM atau nama..."
             class="block w-full min-w-0 flex-1 rounded-lg border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500 dark:border-white/10 dark:bg-white/5 dark:text-white"
         />
     </div>
