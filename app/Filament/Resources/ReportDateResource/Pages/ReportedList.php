@@ -77,7 +77,14 @@ class ReportedList extends Page implements HasTable
     {
         return [
             Tables\Columns\TextColumn::make('exam_type.singkat_ujian')
-                ->label('Ujian'),
+                ->label('Ujian')
+                ->badge()
+                ->color(fn (string $state): string => match ($state) {
+                    'sempro' => 'gray',
+                    'semhas' => 'info',
+                    'sidang' => 'success',
+                    default => 'gray',
+                }),
             Tables\Columns\TextColumn::make('tanggal_ujian')
                 ->date(),
             Tables\Columns\TextColumn::make('student.nama')
