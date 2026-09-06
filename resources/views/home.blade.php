@@ -16,6 +16,9 @@
 
                     {{ __('Selamat Datang di Aplikasi Laporan Ujian FKIP Universitas Siliwangi!') }}<br>
                     <p>silakan pilih menu berikut</p>
+                    <a href="{{ route('filament.admin.pages.dashboard') }}" class="btn btn-outline-success btn-sm mb-3">
+                        Coba tampilan baru &rarr;
+                    </a>
                     @includeWhen(auth()->user()->hasRole('admin'),'dashboards.admin')
                     @includeWhen(auth()->user()->hasRole('jurusan'),'dashboards.departement')
                     @includeWhen(auth()->user()->hasRole('keuangan'),'dashboards.financial')
