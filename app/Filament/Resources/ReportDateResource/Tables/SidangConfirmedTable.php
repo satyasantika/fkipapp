@@ -1,49 +1,43 @@
 <?php
 
-namespace App\Filament\Resources\ReportDateResource\Pages;
+namespace App\Filament\Resources\ReportDateResource\Tables;
 
-use App\Filament\Resources\ReportDateResource;
 use App\Http\Controllers\ReportDateController;
 use App\Models\ExamRegistration;
+use App\Models\ReportDate;
+use Filament\Actions;
+use Filament\Forms;
+use Filament\Infolists;
 use Filament\Notifications\Notification;
-use Filament\Resources\Pages\Concerns\InteractsWithRecord;
-use Filament\Resources\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\HtmlString;
+use Livewire\Component;
 
 /**
- * Roster mahasiswa dengan data ujian sidang yang belum pernah dimasukkan ke
- * periode laporan manapun - porting dari ViewExamSidangConfirmedDataTable,
- * meniru persis logika markIfChanged/pendingSiblings/siblingsByType-nya.
+ * Sama persis logikanya dengan SidangConfirmedList (bekas halaman penuh di
+ * /admin/report-dates/{record}/sidang-confirmed) - dipindah jadi komponen
+ * Livewire biasa supaya bisa ditanam di slide-over ReportedList.
+ *
+ * Kombinasi 4 interface+trait ini meniru persis Filament\Widgets\TableWidget
+ * bawaan (lihat vendor/filament/widgets/src/TableWidget.php).
  */
-class SidangConfirmedList extends Page implements HasTable
+class SidangConfirmedTable extends Component implements Actions\Contracts\HasActions, Forms\Contracts\HasForms, Infolists\Contracts\HasInfolists, HasTable
 {
-    use InteractsWithRecord;
+    use Actions\Concerns\InteractsWithActions;
+    use Forms\Concerns\InteractsWithForms;
+    use Infolists\Concerns\InteractsWithInfolists;
     use InteractsWithTable;
 
-    protected static string $resource = ReportDateResource::class;
-
-    protected static string $view = 'filament.resources.report-date-resource.pages.table-page';
+    public ReportDate $record;
 
     private const EXAM_TYPE_SIDANG = 3;
 
     private const EXAM_TYPE_SEMPRO_SEMHAS = [1, 2];
-
-    public function mount(int|string $record): void
-    {
-        $this->record = $this->resolveRecord($record);
-    }
-
-    public function getTitle(): string
-    {
-        return 'Pasti Sidang Belum Dilaporkan - '.Carbon::parse($this->record->tanggal)->format('Y-m-d');
-    }
 
     public function table(Table $table): Table
     {
@@ -115,10 +109,9 @@ class SidangConfirmedList extends Page implements HasTable
             Tables\Columns\TextColumn::make('tanggal_ujian')
                 ->label('Tgl. Sidang')
                 ->date(),
-            Tables\Columns\TextColumn::make('student.nim')
-                ->label('NIM'),
             Tables\Columns\TextColumn::make('student.nama')
-                ->label('Mahasiswa'),
+                ->label('Mahasiswa')
+                ->description(fn (ExamRegistration $record): ?string => $record->student?->nim),
             Tables\Columns\TextColumn::make('pembimbing1_id')
                 ->label('Pemb.1')
                 ->html()
@@ -165,5 +158,10 @@ class SidangConfirmedList extends Page implements HasTable
                     $this->resetTable();
                 }),
         ];
+    }
+
+    public function render()
+    {
+        return view('filament.resources.report-date-resource.tables.embedded-table');
     }
 }
