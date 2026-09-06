@@ -25,6 +25,14 @@ class Login extends BaseLogin
 {
     protected static string $view = 'filament.pages.auth.login';
 
+    /**
+     * View kita sudah dokumen HTML utuh (<!doctype>...</html>) sendiri -
+     * override ini supaya TIDAK ikut dibungkus layout bawaan Filament
+     * (yang punya <html> sendiri + kelas fi-simple-main-ctn/latar #FAFAFA),
+     * yang kalau dibiarkan menghasilkan dua dokumen HTML bersarang.
+     */
+    protected static string $layout = 'filament.layouts.blank';
+
     public function authenticate(): ?LoginResponse
     {
         try {
