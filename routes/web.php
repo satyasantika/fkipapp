@@ -14,11 +14,16 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return to_route('login');
-    // return view('welcome');
+    if (auth()->check()) {
+        return redirect(\Filament\Facades\Filament::getUrl());
+    }
+
+    return view('landing');
 });
 
-Auth::routes(['register' => false]);
+Route::get('/login', fn () => redirect(\Filament\Facades\Filament::getLoginUrl()));
+
+Auth::routes(['register' => false, 'login' => false]);
 Route::middleware('auth')->group(function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::group(['middleware' => ['role:admin']], function () {
