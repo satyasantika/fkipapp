@@ -43,7 +43,7 @@ class ReportedList extends Page implements HasTable
                 ->label('+ data pelaporan')
                 ->icon('heroicon-o-plus-circle')
                 ->slideOver()
-                ->modalWidth('4xl')
+                ->modalWidth('7xl')
                 ->modalHeading('Akan Dilaporkan - '.Carbon::parse($this->record->tanggal)->format('Y-m-d'))
                 ->modalContent(fn () => view('filament.resources.report-date-resource.tables.not-reported-slideover', [
                     'record' => $this->record,

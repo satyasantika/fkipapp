@@ -56,7 +56,7 @@ class NotReportedTable extends Component implements Actions\Contracts\HasActions
     {
         return $table
             ->query($this->getTableQuery())
-            ->contentGrid(['md' => 2, 'xl' => 3])
+            ->contentGrid(['sm' => 2, 'md' => 3, 'xl' => 4])
             ->columns($this->getTableColumns())
             ->filters($this->getTableFilters())
             ->filtersLayout(Tables\Enums\FiltersLayout::AboveContent)

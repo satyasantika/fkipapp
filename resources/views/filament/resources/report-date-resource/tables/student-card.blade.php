@@ -8,6 +8,7 @@
     $isDanger = $hasReportedSidang && $hasPendingNonSidang;
     $isSuccess = (! $isDanger) && $hasPendingSidang;
     $latest = $pending->first();
+    $pendingChrono = $pending->sortBy('tanggal_ujian')->values();
 
     $typeColors = [
         'sempro' => ['bg-gray-100', 'text-gray-700', 'hover:bg-gray-200', 'dark:bg-gray-500/20', 'dark:text-gray-300'],
@@ -15,8 +16,13 @@
         'sidang' => ['bg-success-100', 'text-success-700', 'hover:bg-success-200', 'dark:bg-success-500/20', 'dark:text-success-300'],
     ];
 
-    $pembimbing = collect([$latest?->pembimbing1?->nama, $latest?->pembimbing2?->nama])->filter()->implode(', ');
-    $penguji = collect([$latest?->penguji1?->nama, $latest?->penguji2?->nama, $latest?->penguji3?->nama])->filter()->implode(', ');
+    $roles = [
+        'Penguji 1' => $latest?->penguji1?->nama,
+        'Penguji 2' => $latest?->penguji2?->nama,
+        'Penguji 3' => $latest?->penguji3?->nama,
+        'Pembimbing 1' => $latest?->pembimbing1?->nama,
+        'Pembimbing 2' => $latest?->pembimbing2?->nama,
+    ];
 @endphp
 
 <div
@@ -39,7 +45,7 @@
     @endif
 
     <div class="flex flex-wrap gap-1">
-        @foreach ($pending as $examRegistration)
+        @foreach ($pendingChrono as $examRegistration)
             @php
                 $type = $examRegistration->ujian ?? '';
                 [$bg, $text, $hover, $darkBg, $darkText] = $typeColors[$type] ?? $typeColors['sempro'];
@@ -69,7 +75,10 @@
     </div>
 
     <div class="space-y-0.5 text-xs text-gray-600 dark:text-gray-300">
-        <p><span class="font-medium">Pembimbing:</span> {{ $pembimbing !== '' ? $pembimbing : '-' }}</p>
-        <p><span class="font-medium">Penguji:</span> {{ $penguji !== '' ? $penguji : '-' }}</p>
+        @foreach ($roles as $roleLabel => $name)
+            @if ($name)
+                <p><span class="font-medium">{{ $roleLabel }}:</span> {{ $name }}</p>
+            @endif
+        @endforeach
     </div>
 </div>
