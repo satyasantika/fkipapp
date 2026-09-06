@@ -23,13 +23,25 @@ Route::get('/', function () {
 
 // Login sungguhan ada di sini (bukan cuma redirect ke /admin/login) - dipakai
 // langsung lewat halaman kustom App\Filament\Auth\Login (tetap tampilan/layout
-// Filament), plus middleware panel yang sama persis dipakai panel admin supaya
-// context Filament (guard, current panel, dst) tersedia di luar prefix /admin.
-// Route bernama "login" ini juga dibutuhkan supaya route('login') di
-// app/Http/Middleware/Authenticate.php (dipakai rute lama yang belum pindah ke
-// Filament, mis. /students) tidak error "Route [login] not defined".
+// Filament). Route bernama "login" ini juga dibutuhkan supaya route('login')
+// di app/Http/Middleware/Authenticate.php (dipakai rute lama yang belum
+// pindah ke Filament, mis. /students) tidak error "Route [login] not defined".
+//
+// HANYA middleware KHUSUS Filament yang ditambah di sini (bukan
+// $panel->getMiddleware() penuh) - EncryptCookies/StartSession/
+// VerifyCsrfToken/dkk SUDAH dipasang otomatis oleh grup 'web' (lihat
+// RouteServiceProvider) karena file ini memang didaftarkan lewat grup itu.
+// Menambahkannya lagi berarti dijalankan DUA KALI per request - EncryptCookies
+// yang kedua mencoba mendekripsi cookie sesi yang sudah didekripsi oleh yang
+// pertama, sesi jadi rusak di tengah request, dan hasilnya token CSRF di HTML
+// tidak lagi cocok dengan sesi yang benar-benar tersimpan -> error 419 saat
+// submit form (baru ketahuan pas login sungguhan dicoba, bukan pas GET biasa).
 Route::get('/login', \App\Filament\Auth\Login::class)
-    ->middleware(\Filament\Facades\Filament::getPanel('admin')->getMiddleware())
+    ->middleware([
+        'panel:admin',
+        \Filament\Http\Middleware\DisableBladeIconComponents::class,
+        \Filament\Http\Middleware\DispatchServingFilamentEvent::class,
+    ])
     ->name('login');
 
 Auth::routes(['register' => false, 'login' => false]);
