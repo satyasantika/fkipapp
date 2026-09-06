@@ -9,6 +9,7 @@ use App\Models\ExamPayment;
 use Illuminate\Http\Request;
 use App\Models\ExamRegistration;
 use App\Models\ExamPaymentReport;
+use App\Services\ExamPaymentReportService;
 use App\DataTables\ViewExamPaymentReportsDataTable;
 
 class ExamPaymentReportController extends Controller
@@ -172,17 +173,6 @@ class ExamPaymentReportController extends Controller
         return redirect()->back()->with('success','data ujian tanggal '.$tanggal.' telah disegarkan');
     }
 
-    // banyaknya membimbing/menguji pada ujian skripsi/proposal/seminar
-    private function _getCountOfExaminer($exam_type_id,$report_date_id,$guide_cek,$guide_order,$guide_id)
-    {
-        return ExamRegistration::where('exam_type_id',$exam_type_id)
-                                    ->where('report_date_id',$report_date_id)
-                                    ->where('dilaporkan',1)
-                                    ->where($guide_cek,1)
-                                    ->where($guide_order,$guide_id)
-                                    ->count();
-    }
-
     private function _dataSelection()
     {
         return [
@@ -192,102 +182,17 @@ class ExamPaymentReportController extends Controller
         ];
     }
 
+    /**
+     * Beda dengan ReportDateController::_reportStore() (dipakai alur
+     * cabut-laporan yang justru men-set dilaporkan=0 sendiri sebelum
+     * memanggil), caller-caller method ini (store(), massReportByDate())
+     * memang bermaksud "tandai sudah dilaporkan" - jadi paksa
+     * dilaporkan=1 di sini sebelum mendelegasikan ke service bersama.
+     */
     public function _reportStore($examregistration_id)
     {
-        $examregistration = ExamRegistration::find($examregistration_id);
-        $report_date_id = $examregistration->report_date_id;
-        $exam_type_id = $examregistration->exam_type_id;
-
-        $examregistration->update([
-            'dilaporkan'=>1,
-        ]);
-
-        // kode_laporan wajib diisi (kolom NOT NULL, tanpa default) — dulu tidak
-        // pernah di-set di sini sama sekali, jadi ExamPaymentReport::updateOrCreate()
-        // selalu gagal saat harus INSERT baris baru (bug lama, baru ketahuan
-        // sekarang karena baru sekarang path INSERT-nya benar-benar dipakai).
-        // Dipakai tanggal periode laporan (bukan tanggal ujian), karena satu
-        // baris exam_payment_reports meringkas SEMUA ujian milik satu dosen
-        // dalam satu report_date_id — jadi kode_laporan adalah properti periode
-        // laporannya, bukan properti ujian per baris.
-        $kode_laporan = Carbon::parse(ReportDate::find($report_date_id)->tanggal)->format('Y-m');
-
-        foreach (['pembimbing1','pembimbing2','penguji1','penguji2','penguji3'] as $penguji) {
-            $urutan_penguji = $penguji.'_id';
-            $cek_penguji_dibayar = $penguji.'_dibayar';
-            $banyak_menguji = 'banyak_'.$penguji;
-            $id_penguji = $examregistration->$urutan_penguji;
-
-            // Slot ini tidak diisi untuk ujian ini (mis. sempro/semhas yang
-            // cuma punya 1 pembimbing) — lewati, tidak ada dosen untuk dibayar
-            // di slot ini. Tanpa ini, updateOrCreate() di bawah gagal karena
-            // lecture_id (foreign key, NOT NULL) tidak boleh null.
-            if (empty($id_penguji)) {
-                continue;
-            }
-
-            $pembimbing1 = $this->_getCountOfExaminer($exam_type_id,$report_date_id,'pembimbing1_dibayar','pembimbing1_id',$id_penguji);
-            $pembimbing2 = $this->_getCountOfExaminer($exam_type_id,$report_date_id,'pembimbing2_dibayar','pembimbing2_id',$id_penguji);
-            $penguji1 = $this->_getCountOfExaminer($exam_type_id,$report_date_id,'penguji1_dibayar','penguji1_id',$id_penguji);
-            $penguji2 = $this->_getCountOfExaminer($exam_type_id,$report_date_id,'penguji2_dibayar','penguji2_id',$id_penguji);
-            $penguji3 = $this->_getCountOfExaminer($exam_type_id,$report_date_id,'penguji3_dibayar','penguji3_id',$id_penguji);
-
-            $semua = $pembimbing1 + $pembimbing2 + $penguji1 + $penguji2 + $penguji3;
-
-            $data_tambahan = [];
-            if ($exam_type_id == 3) {
-                if ($penguji == 'pembimbing1') {
-                    $data_tambahan['banyak_membimbing1'] = $pembimbing1;
-                }
-                if ($penguji == 'pembimbing2') {
-                    $data_tambahan['banyak_membimbing2'] = $pembimbing2;
-                }
-
-                $data_tambahan['banyak_menguji_skripsi'] = $semua;
-
-            } elseif ($exam_type_id == 1) {
-                $data_tambahan['banyak_menguji_proposal'] = $semua;
-            } else {
-                $data_tambahan['banyak_menguji_seminar'] = $semua;
-            }
-
-            // exam_payments cuma berisi kombinasi jabatan_akademik+pendidikan
-            // tertentu (bukan semua kombinasi dari dropdown edit form) — dosen
-            // dengan kombinasi yang belum didaftarkan (mis. jabatan/pendidikan
-            // belum lengkap diisi) bikin first() null dan crash tanpa guard ini.
-            $examPayment = ExamPayment::where('jabatan_akademik',$examregistration->$penguji->jabatan_akademik)
-                ->where('pendidikan',$examregistration->$penguji->pendidikan)
-                ->first();
-
-            if (!$examPayment) {
-                throw new \RuntimeException(
-                    'Data honor untuk jabatan akademik "'.$examregistration->$penguji->jabatan_akademik.'" dan pendidikan "'.$examregistration->$penguji->pendidikan.'" (dosen '.$examregistration->$penguji->nama.') belum diatur di data honor ujian.'
-                );
-            }
-
-            ExamPaymentReport::updateOrCreate([
-                'report_date_id'=>$report_date_id,
-                'lecture_id'=>$id_penguji,
-            ],array_merge([
-                'kode_laporan'=>$kode_laporan,
-                'status'=>$examregistration->$penguji->pns ? 1 : 0,
-                'golongan'=>substr($examregistration->$penguji->golongan,0,1),
-                'npwp'=>$examregistration->$penguji->npwp,
-                'rekening'=>$examregistration->$penguji->rekening,
-                'jabatan_akademik'=>$examregistration->$penguji->jabatan_akademik,
-                'pendidikan'=>$examregistration->$penguji->pendidikan,
-                'honor_pembimbing'=>$examPayment->honor,
-                'honor_penguji_skripsi'=>ExamPayment::find(3)->honor,
-                'honor_penguji_proposal'=>ExamPayment::find(1)->honor,
-                'honor_penguji_seminar'=>ExamPayment::find(2)->honor,
-            ],$data_tambahan));
-
-            ReportDate::updateOrCreate([
-                'id'=>$report_date_id,
-            ],array_merge([
-                'dibayar'=>ExamPaymentReport::where('report_date_id',$report_date_id)->get()->sum('total_honor')
-            ]));
-        }
+        ExamRegistration::find($examregistration_id)->update(['dilaporkan' => 1]);
+        app(ExamPaymentReportService::class)->store($examregistration_id);
     }
 
 }
