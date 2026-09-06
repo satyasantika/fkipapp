@@ -2,18 +2,24 @@
 
 @push('header')
     {{ $reportdate->id ? 'Edit' : 'Tambah' }} tanggal penarikan laporan
-    @if ($reportdate->id && !$ada_laporan)
+    @if ($reportdate->id && ! $deletionBlockReason)
         <form id="delete-form" action="{{ route('reportdates.destroy',$reportdate->id) }}" method="POST">
             @csrf
             @method('DELETE')
-            <button type="submit" class="btn btn-outline-danger btn-sm float-end" onclick="return confirm('Yakin akan menghapus data penarikan tanggal {{ Carbon\Carbon::parse($reportdate->tanggal)->isoFormat('LL') }}?');">
-                {{ __('del') }}
+            <button type="submit" class="btn btn-outline-danger btn-sm float-end" title="Hapus" onclick="return confirm('Yakin akan menghapus data penarikan tanggal {{ Carbon\Carbon::parse($reportdate->tanggal)->isoFormat('LL') }}?');">
+                <i class="bi bi-trash"></i>
             </button>
         </form>
     @endif
 @endpush
 
 @push('body')
+    @if ($reportdate->id && $deletionBlockReason)
+        <div class="alert alert-warning d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <div>{{ $deletionBlockReason }}</div>
+        </div>
+    @endif
 
 <form id="formAction" action="{{ $reportdate->id ? route('reportdates.update',$reportdate->id) : route('reportdates.store') }}" method="post">
     @csrf
