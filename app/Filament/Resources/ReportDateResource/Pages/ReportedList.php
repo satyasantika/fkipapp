@@ -41,10 +41,26 @@ class ReportedList extends Page implements HasTable
         return [
             Actions\Action::make('addFromNotReported')
                 ->label('+ data pelaporan')
-                ->url(fn (): string => ReportDateResource::getUrl('not-reported-list', ['record' => $this->record])),
+                ->icon('heroicon-o-plus-circle')
+                ->slideOver()
+                ->modalWidth('7xl')
+                ->modalHeading('Belum Dilaporkan - '.Carbon::parse($this->record->tanggal)->format('Y-m-d'))
+                ->modalContent(fn () => view('filament.resources.report-date-resource.tables.not-reported-slideover', [
+                    'record' => $this->record,
+                ]))
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Tutup'),
             Actions\Action::make('addFromSidangConfirmed')
                 ->label('+ data pasti sidang')
-                ->url(fn (): string => ReportDateResource::getUrl('sidang-confirmed-list', ['record' => $this->record])),
+                ->icon('heroicon-o-plus-circle')
+                ->slideOver()
+                ->modalWidth('7xl')
+                ->modalHeading('Pasti Sidang Belum Dilaporkan - '.Carbon::parse($this->record->tanggal)->format('Y-m-d'))
+                ->modalContent(fn () => view('filament.resources.report-date-resource.tables.sidang-confirmed-slideover', [
+                    'record' => $this->record,
+                ]))
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Tutup'),
         ];
     }
 
@@ -78,20 +94,26 @@ class ReportedList extends Page implements HasTable
                 ->label('Ujian'),
             Tables\Columns\TextColumn::make('tanggal_ujian')
                 ->date(),
-            Tables\Columns\TextColumn::make('student.nim')
-                ->label('NIM'),
             Tables\Columns\TextColumn::make('student.nama')
-                ->label('Mahasiswa'),
-            Tables\Columns\TextColumn::make('pembimbing1.nama')
-                ->label('Pemb.1'),
-            Tables\Columns\TextColumn::make('pembimbing2.nama')
-                ->label('Pemb.2'),
-            Tables\Columns\TextColumn::make('penguji1.nama')
-                ->label('Peng.1'),
-            Tables\Columns\TextColumn::make('penguji2.nama')
-                ->label('Peng.2'),
-            Tables\Columns\TextColumn::make('penguji3.nama')
-                ->label('Peng.3'),
+                ->label('Mahasiswa')
+                ->description(fn (ExamRegistration $record): ?string => $record->student?->nim),
+            Tables\Columns\TextColumn::make('pembimbing')
+                ->label('Pembimbing')
+                ->getStateUsing(fn (ExamRegistration $record): array => collect([
+                    $record->pembimbing1?->nama,
+                    $record->pembimbing2?->nama,
+                ])->filter()->values()->all())
+                ->listWithLineBreaks()
+                ->bulleted(),
+            Tables\Columns\TextColumn::make('penguji')
+                ->label('Penguji')
+                ->getStateUsing(fn (ExamRegistration $record): array => collect([
+                    $record->penguji1?->nama,
+                    $record->penguji2?->nama,
+                    $record->penguji3?->nama,
+                ])->filter()->values()->all())
+                ->listWithLineBreaks()
+                ->bulleted(),
         ];
     }
 
@@ -99,7 +121,9 @@ class ReportedList extends Page implements HasTable
     {
         return [
             Tables\Actions\Action::make('retract')
-                ->label('-')
+                ->label('Cabut dari laporan')
+                ->icon('heroicon-o-arrow-uturn-left')
+                ->iconButton()
                 ->color('danger')
                 ->requiresConfirmation()
                 ->modalDescription('Batalkan laporan ujian ini? Status dibayar tiap pembimbing/penguji akan direset (mengikuti perilaku form lama).')

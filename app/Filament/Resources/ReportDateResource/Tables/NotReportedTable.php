@@ -1,39 +1,41 @@
 <?php
 
-namespace App\Filament\Resources\ReportDateResource\Pages;
+namespace App\Filament\Resources\ReportDateResource\Tables;
 
-use App\Filament\Resources\ReportDateResource;
 use App\Http\Controllers\ReportDateController;
 use App\Models\ExamRegistration;
+use App\Models\ReportDate;
+use Filament\Actions;
+use Filament\Forms;
+use Filament\Infolists;
 use Filament\Notifications\Notification;
-use Filament\Resources\Pages\Concerns\InteractsWithRecord;
-use Filament\Resources\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
+use Livewire\Component;
 
-class NotReportedList extends Page implements HasTable
+/**
+ * Sama persis logikanya dengan NotReportedList (bekas halaman penuh di
+ * /admin/report-dates/{record}/not-reported) - dipindah jadi komponen
+ * Livewire biasa (bukan Filament Page) supaya bisa ditanam di mana saja,
+ * termasuk di dalam slide-over ReportedList lewat ->modalContent().
+ *
+ * Kombinasi 4 interface+trait ini meniru persis Filament\Widgets\TableWidget
+ * bawaan (lihat vendor/filament/widgets/src/TableWidget.php) - HasTable saja
+ * TIDAK cukup karena tabel Filament dibangun di atas forms/actions/infolists
+ * (filter, action dengan form, dst semua butuh method dari situ).
+ */
+class NotReportedTable extends Component implements Actions\Contracts\HasActions, Forms\Contracts\HasForms, Infolists\Contracts\HasInfolists, HasTable
 {
-    use InteractsWithRecord;
+    use Actions\Concerns\InteractsWithActions;
+    use Forms\Concerns\InteractsWithForms;
+    use Infolists\Concerns\InteractsWithInfolists;
     use InteractsWithTable;
 
-    protected static string $resource = ReportDateResource::class;
-
-    protected static string $view = 'filament.resources.report-date-resource.pages.table-page';
-
-    public function mount(int|string $record): void
-    {
-        $this->record = $this->resolveRecord($record);
-    }
-
-    public function getTitle(): string
-    {
-        return 'Belum Dilaporkan - '.Carbon::parse($this->record->tanggal)->format('Y-m-d');
-    }
+    public ReportDate $record;
 
     public function table(Table $table): Table
     {
@@ -65,20 +67,26 @@ class NotReportedList extends Page implements HasTable
                 ->label('Ujian'),
             Tables\Columns\TextColumn::make('tanggal_ujian')
                 ->date(),
-            Tables\Columns\TextColumn::make('student.nim')
-                ->label('NIM'),
             Tables\Columns\TextColumn::make('student.nama')
-                ->label('Mahasiswa'),
-            Tables\Columns\TextColumn::make('pembimbing1.nama')
-                ->label('Pemb.1'),
-            Tables\Columns\TextColumn::make('pembimbing2.nama')
-                ->label('Pemb.2'),
-            Tables\Columns\TextColumn::make('penguji1.nama')
-                ->label('Peng.1'),
-            Tables\Columns\TextColumn::make('penguji2.nama')
-                ->label('Peng.2'),
-            Tables\Columns\TextColumn::make('penguji3.nama')
-                ->label('Peng.3'),
+                ->label('Mahasiswa')
+                ->description(fn (ExamRegistration $record): ?string => $record->student?->nim),
+            Tables\Columns\TextColumn::make('pembimbing')
+                ->label('Pembimbing')
+                ->getStateUsing(fn (ExamRegistration $record): array => collect([
+                    $record->pembimbing1?->nama,
+                    $record->pembimbing2?->nama,
+                ])->filter()->values()->all())
+                ->listWithLineBreaks()
+                ->bulleted(),
+            Tables\Columns\TextColumn::make('penguji')
+                ->label('Penguji')
+                ->getStateUsing(fn (ExamRegistration $record): array => collect([
+                    $record->penguji1?->nama,
+                    $record->penguji2?->nama,
+                    $record->penguji3?->nama,
+                ])->filter()->values()->all())
+                ->listWithLineBreaks()
+                ->bulleted(),
         ];
     }
 
@@ -86,7 +94,9 @@ class NotReportedList extends Page implements HasTable
     {
         return [
             Tables\Actions\Action::make('assign')
-                ->label('+')
+                ->label('Tambahkan')
+                ->icon('heroicon-o-plus')
+                ->iconButton()
                 ->color('success')
                 ->action(function (ExamRegistration $record): void {
                     $request = Request::create('', 'PUT', [
@@ -104,5 +114,10 @@ class NotReportedList extends Page implements HasTable
                     $this->resetTable();
                 }),
         ];
+    }
+
+    public function render()
+    {
+        return view('filament.resources.report-date-resource.tables.embedded-table');
     }
 }

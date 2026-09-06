@@ -118,9 +118,7 @@ class ReportDateResource extends Resource
     {
         return [
             'index' => Pages\ListReportDates::route('/'),
-            'not-reported-list' => Pages\NotReportedList::route('/{record}/not-reported'),
             'reported-list' => Pages\ReportedList::route('/{record}/reported'),
-            'sidang-confirmed-list' => Pages\SidangConfirmedList::route('/{record}/sidang-confirmed'),
         ];
     }
 }
