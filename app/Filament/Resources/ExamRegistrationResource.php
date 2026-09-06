@@ -205,34 +205,30 @@ class ExamRegistrationResource extends Resource
         $isJurusan = auth()->user()?->hasRole('jurusan') ?? false;
 
         $sharedColumns = [
-            Tables\Columns\TextColumn::make('student.nim')
-                ->label('NIM')
-                ->searchable()
-                ->sortable(),
             Tables\Columns\TextColumn::make('student.nama')
                 ->label('Mahasiswa')
-                ->searchable()
+                ->description(fn (ExamRegistration $record): ?string => $record->student?->nim)
+                ->searchable(['student.nim', 'student.nama'])
                 ->sortable(),
-            Tables\Columns\TextColumn::make('pembimbing1.nama')
-                ->label('Pemb.1')
-                ->searchable()
-                ->sortable(),
-            Tables\Columns\TextColumn::make('pembimbing2.nama')
-                ->label('Pemb.2')
-                ->searchable()
-                ->sortable(),
-            Tables\Columns\TextColumn::make('penguji1.nama')
-                ->label('Peng.1')
-                ->searchable()
-                ->sortable(),
-            Tables\Columns\TextColumn::make('penguji2.nama')
-                ->label('Peng.2')
-                ->searchable()
-                ->sortable(),
-            Tables\Columns\TextColumn::make('penguji3.nama')
-                ->label('Peng.3')
-                ->searchable()
-                ->sortable(),
+            Tables\Columns\TextColumn::make('pembimbing')
+                ->label('Pembimbing')
+                ->getStateUsing(fn (ExamRegistration $record): array => collect([
+                    $record->pembimbing1?->nama,
+                    $record->pembimbing2?->nama,
+                ])->filter()->values()->all())
+                ->listWithLineBreaks()
+                ->bulleted()
+                ->searchable(['pembimbing1.nama', 'pembimbing2.nama']),
+            Tables\Columns\TextColumn::make('penguji')
+                ->label('Penguji')
+                ->getStateUsing(fn (ExamRegistration $record): array => collect([
+                    $record->penguji1?->nama,
+                    $record->penguji2?->nama,
+                    $record->penguji3?->nama,
+                ])->filter()->values()->all())
+                ->listWithLineBreaks()
+                ->bulleted()
+                ->searchable(['penguji1.nama', 'penguji2.nama', 'penguji3.nama']),
         ];
 
         $examTypeColumn = Tables\Columns\TextColumn::make('exam_type.singkat_ujian')
