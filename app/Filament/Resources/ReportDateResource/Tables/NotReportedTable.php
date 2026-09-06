@@ -18,15 +18,17 @@ use Illuminate\Http\Request;
 use Livewire\Component;
 
 /**
- * Sama persis logikanya dengan NotReportedList (bekas halaman penuh di
- * /admin/report-dates/{record}/not-reported) - dipindah jadi komponen
- * Livewire biasa (bukan Filament Page) supaya bisa ditanam di mana saja,
- * termasuk di dalam slide-over ReportedList lewat ->modalContent().
+ * Roster gabungan semua ujian yang belum dilaporkan ke periode manapun -
+ * dulu terpisah jadi dua slide-over (satu untuk semua jenis ujian, satu
+ * lagi khusus sidang dengan opsi tambah sekaligus sempro/semhas-nya).
+ * Digabung jadi satu tabel: badge "+ jenis: tanggal" menambahkan hanya
+ * baris itu, badge "+N semua ujian" (muncul kalau mahasiswa itu masih
+ * punya lebih dari satu ujian pending) menambahkan semuanya sekaligus -
+ * keduanya ditaruh di kolom Ujian supaya tidak perlu kolom tanggal terpisah.
  *
  * Kombinasi 4 interface+trait ini meniru persis Filament\Widgets\TableWidget
  * bawaan (lihat vendor/filament/widgets/src/TableWidget.php) - HasTable saja
- * TIDAK cukup karena tabel Filament dibangun di atas forms/actions/infolists
- * (filter, action dengan form, dst semua butuh method dari situ).
+ * TIDAK cukup karena tabel Filament dibangun di atas forms/actions/infolists.
  */
 class NotReportedTable extends Component implements Actions\Contracts\HasActions, Forms\Contracts\HasForms, Infolists\Contracts\HasInfolists, HasTable
 {
@@ -37,18 +39,23 @@ class NotReportedTable extends Component implements Actions\Contracts\HasActions
 
     public ReportDate $record;
 
+    private const EXAM_TYPE_SIDANG = 3;
+
     public function table(Table $table): Table
     {
         return $table
             ->query($this->getTableQuery())
             ->columns($this->getTableColumns())
-            ->actions($this->getTableActions())
+            ->filters($this->getTableFilters())
             ->defaultSort('tanggal_ujian', 'desc');
     }
 
     protected function getTableQuery(): Builder
     {
-        $query = ExamRegistration::with(['exam_type', 'student', 'pembimbing1', 'pembimbing2', 'penguji1', 'penguji2', 'penguji3']);
+        $query = ExamRegistration::with([
+            'exam_type', 'student',
+            'student.examregistrations' => fn ($q) => $q->whereNull('report_date_id'),
+        ]);
 
         if (auth()->user()?->hasRole('keuangan')) {
             $query->whereNull('report_date_id');
@@ -60,57 +67,63 @@ class NotReportedTable extends Component implements Actions\Contracts\HasActions
     protected function getTableColumns(): array
     {
         return [
-            Tables\Columns\TextColumn::make('exam_type.singkat_ujian')
-                ->label('Ujian'),
-            Tables\Columns\TextColumn::make('tanggal_ujian')
-                ->date(),
+            Tables\Columns\ViewColumn::make('ujian')
+                ->label('Ujian')
+                ->view('filament.resources.report-date-resource.tables.ujian-badge'),
+            Tables\Columns\TextColumn::make('student.nim')
+                ->label('NIM')
+                ->searchable(),
             Tables\Columns\TextColumn::make('student.nama')
                 ->label('Mahasiswa')
-                ->description(fn (ExamRegistration $record): ?string => $record->student?->nim),
-            Tables\Columns\TextColumn::make('pembimbing')
-                ->label('Pembimbing')
-                ->getStateUsing(fn (ExamRegistration $record): array => collect([
-                    $record->pembimbing1?->nama,
-                    $record->pembimbing2?->nama,
-                ])->filter()->values()->all())
-                ->listWithLineBreaks()
-                ->bulleted(),
-            Tables\Columns\TextColumn::make('penguji')
-                ->label('Penguji')
-                ->getStateUsing(fn (ExamRegistration $record): array => collect([
-                    $record->penguji1?->nama,
-                    $record->penguji2?->nama,
-                    $record->penguji3?->nama,
-                ])->filter()->values()->all())
-                ->listWithLineBreaks()
-                ->bulleted(),
+                ->searchable(),
         ];
     }
 
-    protected function getTableActions(): array
+    protected function getTableFilters(): array
     {
         return [
-            Tables\Actions\Action::make('assign')
-                ->label('Tambahkan')
-                ->icon('heroicon-o-plus')
-                ->iconButton()
-                ->color('success')
-                ->action(function (ExamRegistration $record): void {
-                    $request = Request::create('', 'PUT', [
-                        'report_date_id' => $this->record->id,
-                        'dilaporkan' => 1,
-                    ]);
-
-                    try {
-                        app(ReportDateController::class)->setReportDate($request, $record);
-                        Notification::make()->title('Ditambahkan ke laporan')->success()->send();
-                    } catch (\RuntimeException $e) {
-                        Notification::make()->title($e->getMessage())->warning()->send();
-                    }
-
-                    $this->resetTable();
-                }),
+            Tables\Filters\Filter::make('sidangSaja')
+                ->label('Hanya sidang')
+                ->toggle()
+                ->query(fn (Builder $query): Builder => $query->where('exam_type_id', self::EXAM_TYPE_SIDANG)),
         ];
+    }
+
+    public function assignSingle(int $examRegistrationId): void
+    {
+        $record = ExamRegistration::findOrFail($examRegistrationId);
+
+        $request = Request::create('', 'PUT', [
+            'report_date_id' => $this->record->id,
+            'dilaporkan' => 1,
+        ]);
+
+        try {
+            app(ReportDateController::class)->setReportDate($request, $record);
+            Notification::make()->title('Ditambahkan ke laporan')->success()->send();
+        } catch (\RuntimeException $e) {
+            Notification::make()->title($e->getMessage())->warning()->send();
+        }
+
+        $this->resetTable();
+    }
+
+    public function assignAllForStudent(int $examRegistrationId): void
+    {
+        $record = ExamRegistration::findOrFail($examRegistrationId);
+
+        $request = Request::create('', 'PUT', [
+            'report_date_id' => $this->record->id,
+        ]);
+
+        try {
+            app(ReportDateController::class)->confirmSidangCascade($request, $record);
+            Notification::make()->title('Berhasil menambahkan data ujian ke laporan')->success()->send();
+        } catch (\RuntimeException $e) {
+            Notification::make()->title($e->getMessage())->warning()->send();
+        }
+
+        $this->resetTable();
     }
 
     public function render()
