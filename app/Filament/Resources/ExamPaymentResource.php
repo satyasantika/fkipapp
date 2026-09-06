@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ExamPaymentResource extends Resource
@@ -23,14 +24,34 @@ class ExamPaymentResource extends Resource
 
     protected static ?string $modelLabel = 'Rate Honor';
 
+    // Data rate honor cuma urusan bagian keuangan - dulu cuma dicek admin,
+    // sekarang gerbangnya keuangan, dan dipasang di canViewAny/canCreate/
+    // canEdit/canDelete sekaligus (bukan cuma shouldRegisterNavigation),
+    // supaya role lain juga tidak bisa nyelonong lewat URL langsung
+    // /admin/exam-payments/{id}/edit.
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->hasRole('admin') ?? false;
+        return auth()->user()?->hasRole('keuangan') ?? false;
     }
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->hasRole('admin') ?? false;
+        return auth()->user()?->hasRole('keuangan') ?? false;
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->hasRole('keuangan') ?? false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()?->hasRole('keuangan') ?? false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()?->hasRole('keuangan') ?? false;
     }
 
     public static function form(Form $form): Form
@@ -67,7 +88,8 @@ class ExamPaymentResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
