@@ -9,8 +9,10 @@ use App\Models\ExamPayment;
 use Illuminate\Http\Request;
 use App\Models\ExamRegistration;
 use App\Models\ExamPaymentReport;
+use App\Exports\PaymentSectionExport;
 use App\Services\ExamPaymentReportService;
 use App\DataTables\ViewExamPaymentReportsDataTable;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ExamPaymentReportController extends Controller
 {
@@ -122,6 +124,22 @@ class ExamPaymentReportController extends Controller
             'pns'=>$pns,
             'report_date_id'=>$report_date_id,
             ])->render('reports.exampaymentreport',compact('report_date_id'));
+    }
+
+    /**
+     * Dipakai oleh tombol "Export Excel" di slide-over "List Bayar ASN"/
+     * "List Bayar Non-ASN" (PaymentSectionTable).
+     */
+    public function exportSection($pns, $report_date_id)
+    {
+        $reportDate = ReportDate::findOrFail($report_date_id);
+        $statusLabel = $pns ? 'ASN' : 'NonASN';
+        $tanggal = Carbon::parse($reportDate->tanggal)->format('Y-m-d');
+
+        return Excel::download(
+            new PaymentSectionExport((int) $report_date_id, (int) $pns),
+            "bayar-{$statusLabel}-{$tanggal}.xlsx"
+        );
     }
 
     public function reportExaminerByPeriode($report_date_id)
