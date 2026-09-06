@@ -7,21 +7,12 @@
     $hasReportedSidang = (bool) ($student->has_reported_sidang ?? false);
     $isDanger = $hasReportedSidang && $hasPendingNonSidang;
     $isSuccess = (! $isDanger) && $hasPendingSidang;
-    $latest = $pending->first();
     $pendingChrono = $pending->sortBy('tanggal_ujian')->values();
 
     $typeColors = [
         'sempro' => ['bg-gray-100', 'text-gray-700', 'hover:bg-gray-200', 'dark:bg-gray-500/20', 'dark:text-gray-300'],
         'semhas' => ['bg-info-100', 'text-info-700', 'hover:bg-info-200', 'dark:bg-info-500/20', 'dark:text-info-300'],
         'sidang' => ['bg-success-100', 'text-success-700', 'hover:bg-success-200', 'dark:bg-success-500/20', 'dark:text-success-300'],
-    ];
-
-    $roles = [
-        'Penguji 1' => $latest?->penguji1?->nama,
-        'Penguji 2' => $latest?->penguji2?->nama,
-        'Penguji 3' => $latest?->penguji3?->nama,
-        'Pembimbing 1' => $latest?->pembimbing1?->nama,
-        'Pembimbing 2' => $latest?->pembimbing2?->nama,
     ];
 @endphp
 
@@ -72,13 +63,5 @@
                 +{{ $pendingCount }} semua ujian
             </button>
         @endif
-    </div>
-
-    <div class="space-y-0.5 text-xs text-gray-600 dark:text-gray-300">
-        @foreach ($roles as $roleLabel => $name)
-            @if ($name)
-                <p><span class="font-medium">{{ $roleLabel }}:</span> {{ $name }}</p>
-            @endif
-        @endforeach
     </div>
 </div>

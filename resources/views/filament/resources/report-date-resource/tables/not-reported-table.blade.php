@@ -4,7 +4,7 @@
             type="button"
             wire:click="toggleSudahSidang"
             @class([
-                'shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition',
+                'shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition',
                 'bg-success-600 text-white hover:bg-success-500' => $sudahSidangOnly,
                 'bg-white text-gray-700 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-white/5 dark:text-gray-200 dark:ring-white/10' => ! $sudahSidangOnly,
             ])
