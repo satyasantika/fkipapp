@@ -83,16 +83,36 @@
        terlihat masuk akal tapi sebenarnya tidak pernah dikompilasi
        (panel ini tidak punya build Tailwind sendiri, cuma CSS bawaan
        Filament yang sudah di-tree-shake sesuai komponennya sendiri).
+
+       PENTING: nilai var(--success-500) dkk itu angka RGB dipisah koma
+       TANPA pembungkus (mis. "34, 197, 94" - cek FilamentColor::getColors()),
+       bukan warna CSS yang utuh. Harus dibungkus rgb(...) dulu sebelum
+       dipakai di color-mix()/manapun, kalau tidak seluruh deklarasinya
+       dianggap invalid oleh browser dan DIAM-DIAM diabaikan (border/tint
+       jadi tidak muncul sama sekali, tanpa error yang kelihatan).
+
        color-mix dipakai supaya otomatis pas di mode gelap/terang tanpa
        aturan terpisah (campuran dengan transparent mengikuti latar di
        belakangnya). */
     .fi-report-card-success {
-        background-color: color-mix(in srgb, var(--success-500) 8%, transparent);
-        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--success-500) 35%, transparent);
+        background-color: color-mix(in srgb, rgb(var(--success-500)) 8%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, rgb(var(--success-500)) 35%, transparent);
     }
 
     .fi-report-card-danger {
-        background-color: color-mix(in srgb, var(--danger-500) 8%, transparent);
-        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger-500) 35%, transparent);
+        background-color: color-mix(in srgb, rgb(var(--danger-500)) 8%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, rgb(var(--danger-500)) 35%, transparent);
+    }
+
+    /* Tombol toggle "Filter Sidang"/"Buang Filter" (not-reported-table.blade.php)
+       saat aktif - solid, bukan badge, jadi butuh warna sendiri. Sama-sama
+       harus dibungkus rgb(...) seperti catatan di atas. */
+    .fi-filter-toggle-on {
+        background-color: rgb(var(--success-600));
+        color: #fff;
+    }
+
+    .fi-filter-toggle-on:hover {
+        background-color: rgb(var(--success-500));
     }
 </style>
