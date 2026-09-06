@@ -22,12 +22,23 @@ class UsersDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('user', function ($row) {
+                return '<div class="fw-semibold">'.e($row->name).'</div>'
+                    .'<div class="text-muted small">@'.e($row->username).'</div>';
+            })
+            ->filterColumn('user', function ($query, $keyword) {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('name', 'like', "%{$keyword}%")
+                        ->orWhere('username', 'like', "%{$keyword}%");
+                });
+            })
+            ->orderColumn('user', 'name $1')
             ->addColumn('action', function($row){
-                $action = ' <a href="'.route('users.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
+                $action = ' <a href="'.route('users.edit',$row->id).'" class="btn btn-outline-primary btn-sm action" title="Ubah"><i class="bi bi-pencil-square"></i></a> ';
                 if ($row->id !== auth()->id() && ! $row->hasRole('admin')) {
                     $action .= '<form action="'.route('impersonate.take',$row->id).'" method="POST" class="d-inline">'
                         .csrf_field()
-                        .'<button type="submit" class="btn btn-outline-secondary btn-sm action" title="Impersonate" onclick="return confirm(\'Login sebagai '.e($row->name).'?\');">I</button>'
+                        .'<button type="submit" class="btn btn-outline-secondary btn-sm action" title="Impersonate" onclick="return confirm(\'Login sebagai '.e($row->name).'?\');"><i class="bi bi-incognito"></i></button>'
                         .'</form>';
                 }
                 return $action;
@@ -79,9 +90,11 @@ class UsersDataTable extends DataTable
                     ->printable(false)
                     ->width(60)
                     ->addClass('text-center'),
-            Column::make('name'),
+            Column::computed('user')
+                    ->title('Pengguna')
+                    ->searchable(true)
+                    ->orderable(true),
             Column::make('departement_id')->title('jurusan'),
-            Column::make('username'),
         ];
     }
 
