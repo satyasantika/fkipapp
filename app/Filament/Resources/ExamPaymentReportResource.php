@@ -1,0 +1,145 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\ExamPaymentReportResource\Pages;
+use App\Filament\Resources\ExamPaymentReportResource\RelationManagers;
+use App\Models\ExamPaymentReport;
+use App\Models\ReportDate;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+class ExamPaymentReportResource extends Resource
+{
+    protected static ?string $model = ExamPaymentReport::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $navigationLabel = 'Laporan Honor';
+
+    protected static ?string $modelLabel = 'Laporan Honor';
+
+    private const JABATAN_AKADEMIKS = ['Asisten Ahli', 'Lektor', 'Lektor Kepala', 'Guru Besar'];
+
+    private const GOLONGANS = ['3', '4'];
+
+    private const PENDIDIKANS = ['S2', 'S3'];
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->hasRole('keuangan') ?? false;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->hasRole('keuangan') ?? false;
+    }
+
+    public static function canCreate(): bool
+    {
+        // Baris exam_payment_reports hanya pernah dibuat lewat _reportStore()
+        // (proses "Laporkan Ujian"/mass-report/cascade-sidang), tidak pernah
+        // manual - sama seperti di aplikasi lama (route create/show kosong).
+        return false;
+    }
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Placeholder::make('dosen')
+                    ->label('Nama')
+                    ->content(fn (?ExamPaymentReport $record): string => $record?->dosen ?? ''),
+                Forms\Components\Checkbox::make('pns')
+                    ->label('ASN')
+                    ->default(fn (?ExamPaymentReport $record): bool => (int) $record?->status === 1)
+                    ->dehydrated(false),
+                Forms\Components\Select::make('golongan')
+                    ->options(array_combine(self::GOLONGANS, self::GOLONGANS)),
+                Forms\Components\Select::make('jabatan_akademik')
+                    ->label('Jabatan')
+                    ->options(array_combine(self::JABATAN_AKADEMIKS, self::JABATAN_AKADEMIKS)),
+                Forms\Components\Select::make('pendidikan')
+                    ->options(array_combine(self::PENDIDIKANS, self::PENDIDIKANS)),
+                Forms\Components\TextInput::make('npwp')
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('rekening')
+                    ->maxLength(255),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('reportdate.tanggal')
+                    ->label('Periode')
+                    ->date(),
+                Tables\Columns\TextColumn::make('departemen_id')
+                    ->label('Departemen'),
+                Tables\Columns\TextColumn::make('dosen')
+                    ->label('Dosen')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('status_nama')
+                    ->label('Status'),
+                Tables\Columns\TextColumn::make('golongan_nama')
+                    ->label('Gol'),
+                Tables\Columns\TextColumn::make('npwp'),
+                Tables\Columns\TextColumn::make('rekening'),
+                Tables\Columns\TextColumn::make('jabatan_akademik'),
+                Tables\Columns\TextColumn::make('pendidikan'),
+                Tables\Columns\TextColumn::make('jumlah_honor_pembimbing')
+                    ->money('idr', divideBy: 1),
+                Tables\Columns\TextColumn::make('jumlah_honor_penguji_skripsi')
+                    ->money('idr', divideBy: 1),
+                Tables\Columns\TextColumn::make('jumlah_honor_penguji_proposal')
+                    ->money('idr', divideBy: 1),
+                Tables\Columns\TextColumn::make('jumlah_honor_penguji_seminar')
+                    ->money('idr', divideBy: 1),
+                Tables\Columns\TextColumn::make('total_honor')
+                    ->money('idr', divideBy: 1),
+                Tables\Columns\TextColumn::make('potong_pajak')
+                    ->label('Pajak')
+                    ->money('idr', divideBy: 1),
+                Tables\Columns\TextColumn::make('honor_dibayar')
+                    ->label('Jumlah')
+                    ->money('idr', divideBy: 1),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('report_date_id')
+                    ->label('Periode')
+                    ->options(fn (): array => ReportDate::orderByDesc('tanggal')->get()->mapWithKeys(
+                        fn (ReportDate $rd) => [$rd->id => \Illuminate\Support\Carbon::parse($rd->tanggal)->format('Y-m-d').($rd->deskripsi ? ' - '.$rd->deskripsi : '')]
+                    )->all()),
+                Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
+                    ->options([1 => 'ASN', 0 => 'Non ASN']),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                //
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListExamPaymentReports::route('/'),
+            'edit' => Pages\EditExamPaymentReport::route('/{record}/edit'),
+        ];
+    }
+}
