@@ -79,40 +79,7 @@ class ExamPaymentReportResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('reportdate.tanggal')
-                    ->label('Periode')
-                    ->date(),
-                Tables\Columns\TextColumn::make('departemen_id')
-                    ->label('Departemen'),
-                Tables\Columns\TextColumn::make('dosen')
-                    ->label('Dosen')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('status_nama')
-                    ->label('Status'),
-                Tables\Columns\TextColumn::make('golongan_nama')
-                    ->label('Gol'),
-                Tables\Columns\TextColumn::make('npwp'),
-                Tables\Columns\TextColumn::make('rekening'),
-                Tables\Columns\TextColumn::make('jabatan_akademik'),
-                Tables\Columns\TextColumn::make('pendidikan'),
-                Tables\Columns\TextColumn::make('jumlah_honor_pembimbing')
-                    ->money('idr', divideBy: 1),
-                Tables\Columns\TextColumn::make('jumlah_honor_penguji_skripsi')
-                    ->money('idr', divideBy: 1),
-                Tables\Columns\TextColumn::make('jumlah_honor_penguji_proposal')
-                    ->money('idr', divideBy: 1),
-                Tables\Columns\TextColumn::make('jumlah_honor_penguji_seminar')
-                    ->money('idr', divideBy: 1),
-                Tables\Columns\TextColumn::make('total_honor')
-                    ->money('idr', divideBy: 1),
-                Tables\Columns\TextColumn::make('potong_pajak')
-                    ->label('Pajak')
-                    ->money('idr', divideBy: 1),
-                Tables\Columns\TextColumn::make('honor_dibayar')
-                    ->label('Jumlah')
-                    ->money('idr', divideBy: 1),
-            ])
+            ->columns(static::baseColumns(includeStatus: true))
             ->filters([
                 Tables\Filters\SelectFilter::make('report_date_id')
                     ->label('Periode')
@@ -126,28 +93,7 @@ class ExamPaymentReportResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->iconButton()
-                    ->using(function (ExamPaymentReport $record, array $data) {
-                        $examPayment = ExamPayment::where('jabatan_akademik', $data['jabatan_akademik'] ?? null)
-                            ->where('pendidikan', $data['pendidikan'] ?? null)
-                            ->first();
-
-                        if (! $examPayment) {
-                            Notification::make()
-                                ->title('Data honor untuk jabatan akademik "'.($data['jabatan_akademik'] ?? '').'" dan pendidikan "'.($data['pendidikan'] ?? '').'" belum diatur di data honor ujian.')
-                                ->warning()
-                                ->send();
-
-                            throw new Halt();
-                        }
-
-                        $data['status'] = $data['pns'] ?? false ? 1 : 0;
-                        $data['honor_pembimbing'] = $examPayment->honor;
-                        unset($data['pns']);
-
-                        $record->update($data);
-
-                        return $record;
-                    }),
+                    ->using(fn (ExamPaymentReport $record, array $data) => static::updateRecord($record, $data)),
                 Tables\Actions\DeleteAction::make()
                     ->iconButton()
                     ->modalHeading('Hapus laporan honor ini?')
@@ -156,6 +102,82 @@ class ExamPaymentReportResource extends Resource
             ->bulkActions([
                 //
             ]);
+    }
+
+    /**
+     * Dipakai bersama oleh table() di atas dan
+     * ReportDateResource\Tables\PaymentSectionTable (slide-over "List Bayar
+     * ASN"/"List Bayar Non-ASN" di baris ReportDateResource) - kolom Status
+     * dibuang di slide-over itu karena konstan (sudah difilter per status).
+     *
+     * @return array<Tables\Columns\Column>
+     */
+    public static function baseColumns(bool $includeStatus): array
+    {
+        return [
+            Tables\Columns\TextColumn::make('reportdate.tanggal')
+                ->label('Periode')
+                ->date(),
+            Tables\Columns\TextColumn::make('departemen_id')
+                ->label('Departemen'),
+            Tables\Columns\TextColumn::make('dosen')
+                ->label('Dosen')
+                ->searchable(),
+            ...($includeStatus ? [
+                Tables\Columns\TextColumn::make('status_nama')
+                    ->label('Status'),
+            ] : []),
+            Tables\Columns\TextColumn::make('golongan_nama')
+                ->label('Gol'),
+            Tables\Columns\TextColumn::make('npwp'),
+            Tables\Columns\TextColumn::make('rekening'),
+            Tables\Columns\TextColumn::make('jabatan_akademik'),
+            Tables\Columns\TextColumn::make('pendidikan'),
+            Tables\Columns\TextColumn::make('jumlah_honor_pembimbing')
+                ->money('idr', divideBy: 1),
+            Tables\Columns\TextColumn::make('jumlah_honor_penguji_skripsi')
+                ->money('idr', divideBy: 1),
+            Tables\Columns\TextColumn::make('jumlah_honor_penguji_proposal')
+                ->money('idr', divideBy: 1),
+            Tables\Columns\TextColumn::make('jumlah_honor_penguji_seminar')
+                ->money('idr', divideBy: 1),
+            Tables\Columns\TextColumn::make('total_honor')
+                ->money('idr', divideBy: 1),
+            Tables\Columns\TextColumn::make('potong_pajak')
+                ->label('Pajak')
+                ->money('idr', divideBy: 1),
+            Tables\Columns\TextColumn::make('honor_dibayar')
+                ->label('Jumlah')
+                ->money('idr', divideBy: 1),
+        ];
+    }
+
+    /**
+     * Dipakai bersama oleh EditAction di table() di atas dan di
+     * PaymentSectionTable, supaya logikanya tidak digandakan.
+     */
+    public static function updateRecord(ExamPaymentReport $record, array $data): ExamPaymentReport
+    {
+        $examPayment = ExamPayment::where('jabatan_akademik', $data['jabatan_akademik'] ?? null)
+            ->where('pendidikan', $data['pendidikan'] ?? null)
+            ->first();
+
+        if (! $examPayment) {
+            Notification::make()
+                ->title('Data honor untuk jabatan akademik "'.($data['jabatan_akademik'] ?? '').'" dan pendidikan "'.($data['pendidikan'] ?? '').'" belum diatur di data honor ujian.')
+                ->warning()
+                ->send();
+
+            throw new Halt();
+        }
+
+        $data['status'] = $data['pns'] ?? false ? 1 : 0;
+        $data['honor_pembimbing'] = $examPayment->honor;
+        unset($data['pns']);
+
+        $record->update($data);
+
+        return $record;
     }
 
     public static function getRelations(): array
