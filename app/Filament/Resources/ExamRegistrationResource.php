@@ -4,10 +4,13 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ExamRegistrationResource\Pages;
 use App\Filament\Resources\ExamRegistrationResource\RelationManagers;
+use App\Http\Controllers\ExamPaymentReportController;
 use App\Models\ExamRegistration;
 use App\Models\Lecture;
+use App\Models\Student;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -274,7 +277,78 @@ class ExamRegistrationResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->iconButton()
-                    ->visible(fn (): bool => $isJurusan),
+                    ->visible(fn (): bool => $isJurusan)
+                    ->after(function (ExamRegistration $record) {
+                        $student = Student::find($record->student_id);
+
+                        if (! $student) {
+                            return;
+                        }
+
+                        $student->update([
+                            'penguji1_id' => $record->penguji1_id,
+                            'penguji2_id' => $record->penguji2_id,
+                            'penguji3_id' => $record->penguji3_id,
+                            'pembimbing1_id' => $record->pembimbing1_id,
+                            'pembimbing2_id' => $record->pembimbing2_id,
+                            'ketuapenguji_id' => $record->ketuapenguji_id,
+                            ...(($column = ExamRegistrationResource::examTypeDateColumn($record->exam_type_id))
+                                ? [$column => $record->tanggal_ujian]
+                                : []),
+                        ]);
+                    }),
+                Tables\Actions\Action::make('laporkanUjian')
+                    ->label('Laporkan Ujian')
+                    ->icon('heroicon-o-paper-airplane')
+                    ->iconButton()
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalDescription('Data ujian ini akan dilaporkan ke atasan.')
+                    ->visible(fn (ExamRegistration $record): bool => (auth()->user()?->hasRole('keuangan') ?? false) && ! $record->dilaporkan)
+                    ->action(function (ExamRegistration $record) {
+                        try {
+                            app(ExamPaymentReportController::class)->_reportStore($record->id);
+                            Notification::make()
+                                ->title('Data laporan para penguji untuk mahasiswa '.strtoupper($record->student->nama).' telah ditambahkan')
+                                ->success()
+                                ->send();
+                        } catch (\RuntimeException $e) {
+                            Notification::make()
+                                ->title($e->getMessage())
+                                ->warning()
+                                ->send();
+                        }
+                    }),
+                Tables\Actions\Action::make('cabutLaporan')
+                    ->label('Cabut Laporan')
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->iconButton()
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalDescription('Batalkan laporan? Status dibayar tiap pembimbing/penguji akan direset (mengikuti perilaku form lama).')
+                    ->visible(fn (ExamRegistration $record): bool => (auth()->user()?->hasRole('keuangan') ?? false) && $record->dilaporkan)
+                    ->action(function (ExamRegistration $record) {
+                        $record->update([
+                            'dilaporkan' => false,
+                            'pembimbing1_dibayar' => false,
+                            'pembimbing2_dibayar' => false,
+                            'penguji1_dibayar' => false,
+                            'penguji2_dibayar' => false,
+                            'penguji3_dibayar' => false,
+                        ]);
+                        Notification::make()->title('Laporan dibatalkan')->success()->send();
+                    }),
+                Tables\Actions\DeleteAction::make()
+                    ->iconButton()
+                    ->modalHeading('Hapus registrasi ujian ini?')
+                    ->modalDescription('Registrasi ujian mahasiswa ini akan dihapus permanen. Tanggal ujian pada data mahasiswa terkait akan direset.')
+                    ->visible(fn (ExamRegistration $record): bool => ! $record->dilaporkan)
+                    ->before(function (ExamRegistration $record) {
+                        $student = Student::find($record->student_id);
+                        if ($student && ($column = ExamRegistrationResource::examTypeDateColumn($record->exam_type_id))) {
+                            $student->update([$column => null]);
+                        }
+                    }),
             ])
             ->bulkActions([
                 //
@@ -292,8 +366,6 @@ class ExamRegistrationResource extends Resource
     {
         return [
             'index' => Pages\ListExamRegistrations::route('/'),
-            'create' => Pages\CreateExamRegistration::route('/create'),
-            'edit' => Pages\EditExamRegistration::route('/{record}/edit'),
         ];
     }
 }
