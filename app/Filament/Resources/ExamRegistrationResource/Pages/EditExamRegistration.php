@@ -80,6 +80,9 @@ class EditExamRegistration extends EditRecord
                 }),
 
             Actions\DeleteAction::make()
+                ->iconButton()
+                ->modalHeading('Hapus registrasi ujian ini?')
+                ->modalDescription('Registrasi ujian mahasiswa ini akan dihapus permanen. Tanggal ujian pada data mahasiswa terkait akan direset.')
                 ->visible(fn (): bool => ! $this->record->dilaporkan)
                 ->before(function () {
                     $student = Student::find($this->record->student_id);

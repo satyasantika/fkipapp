@@ -17,7 +17,10 @@ class EditExamPaymentReport extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->iconButton()
+                ->modalHeading('Hapus laporan honor ini?')
+                ->modalDescription('Baris laporan honor ini akan dihapus permanen.'),
         ];
     }
 

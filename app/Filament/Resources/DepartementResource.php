@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DepartementResource\Pages;
 use App\Filament\Resources\DepartementResource\RelationManagers;
+use App\Filament\Concerns\GuardsBulkDeletion;
 use App\Models\Departement;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,12 +13,15 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Collection;
 
 class DepartementResource extends Resource
 {
+    use GuardsBulkDeletion;
+
     protected static ?string $model = Departement::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-library';
 
     protected static ?string $navigationLabel = 'Jurusan';
 
@@ -65,7 +69,10 @@ class DepartementResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->modalHeading('Hapus jurusan yang dipilih?')
+                        ->modalDescription('Semua jurusan yang dipilih akan dihapus permanen.')
+                        ->before(fn (Collection $records) => static::haltIfAnyRecordIsReferenced($records)),
                 ]),
             ]);
     }

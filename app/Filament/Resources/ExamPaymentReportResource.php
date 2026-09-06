@@ -18,7 +18,7 @@ class ExamPaymentReportResource extends Resource
 {
     protected static ?string $model = ExamPaymentReport::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-chart-bar';
 
     protected static ?string $navigationLabel = 'Laporan Honor';
 

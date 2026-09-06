@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\LectureResource\Pages;
 use App\Filament\Resources\LectureResource\RelationManagers;
+use App\Filament\Concerns\GuardsBulkDeletion;
 use App\Models\Lecture;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,12 +13,15 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Collection;
 
 class LectureResource extends Resource
 {
+    use GuardsBulkDeletion;
+
     protected static ?string $model = Lecture::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
     protected static ?string $navigationLabel = 'Dosen';
 
@@ -132,7 +136,10 @@ class LectureResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->modalHeading('Hapus dosen yang dipilih?')
+                        ->modalDescription('Semua dosen yang dipilih akan dihapus permanen.')
+                        ->before(fn (Collection $records) => static::haltIfAnyRecordIsReferenced($records)),
                 ]),
             ]);
     }

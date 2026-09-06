@@ -13,7 +13,10 @@ class EditExamPayment extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->iconButton()
+                ->modalHeading('Hapus rate honor ini?')
+                ->modalDescription('Data rate honor untuk kombinasi jabatan akademik dan pendidikan ini akan dihapus permanen.'),
         ];
     }
 }
