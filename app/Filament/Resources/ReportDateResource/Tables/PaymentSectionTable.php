@@ -106,58 +106,67 @@ class PaymentSectionTable extends Component implements Actions\Contracts\HasActi
     {
         return [
             Tables\Columns\TextColumn::make('reportdate.tanggal')
-                ->label('Periode')
+                ->label('Tanggal Laporan')
                 ->date(),
             Tables\Columns\TextColumn::make('departemen_id')
-                ->label('Departemen'),
+                ->label('Departemen Id'),
             Tables\Columns\TextColumn::make('dosen')
                 ->label('Dosen')
                 ->searchable(),
             Tables\Columns\TextColumn::make('status_nama')
-                ->label('Status'),
+                ->label('status'),
             Tables\Columns\TextColumn::make('golongan_nama')
-                ->label('Gol'),
-            Tables\Columns\TextColumn::make('npwp'),
-            Tables\Columns\TextColumn::make('rekening'),
-            Tables\Columns\TextColumn::make('jabatan_akademik'),
-            Tables\Columns\TextColumn::make('pendidikan'),
+                ->label('gol'),
+            Tables\Columns\TextColumn::make('npwp')
+                ->label('Npwp'),
+            Tables\Columns\TextColumn::make('rekening')
+                ->label('Rekening'),
+            Tables\Columns\TextColumn::make('jabatan_akademik')
+                ->label('Jabatan Akademik'),
+            Tables\Columns\TextColumn::make('pendidikan')
+                ->label('Pendidikan'),
             Tables\Columns\TextColumn::make('honor_pembimbing')
-                ->label('Rate Honor Pembimbing')
+                ->label('Honor Pembimbing')
                 ->money('idr', divideBy: 1),
             Tables\Columns\TextColumn::make('honor_penguji_skripsi')
-                ->label('Rate Honor Penguji Skripsi')
+                ->label('Honor Penguji Skripsi')
                 ->money('idr', divideBy: 1),
             Tables\Columns\TextColumn::make('honor_penguji_proposal')
-                ->label('Rate Honor Penguji Proposal')
+                ->label('Honor Penguji Proposal')
                 ->money('idr', divideBy: 1),
             Tables\Columns\TextColumn::make('honor_penguji_seminar')
-                ->label('Rate Honor Penguji Seminar')
+                ->label('Honor Penguji Seminar')
                 ->money('idr', divideBy: 1),
             Tables\Columns\TextColumn::make('banyak_membimbing1')
-                ->label('Bimbing 1'),
+                ->label('Banyak Membimbing1'),
             Tables\Columns\TextColumn::make('banyak_membimbing2')
-                ->label('Bimbing 2'),
+                ->label('Banyak Membimbing2'),
             Tables\Columns\TextColumn::make('banyak_menguji_skripsi')
-                ->label('Uji Skripsi'),
+                ->label('Banyak Menguji Skripsi'),
             Tables\Columns\TextColumn::make('banyak_menguji_proposal')
-                ->label('Uji Proposal'),
+                ->label('Banyak Menguji Proposal'),
             Tables\Columns\TextColumn::make('banyak_menguji_seminar')
-                ->label('Uji Seminar'),
+                ->label('Banyak Menguji Seminar'),
             Tables\Columns\TextColumn::make('jumlah_honor_pembimbing')
+                ->label('Jumlah Honor Pembimbing')
                 ->money('idr', divideBy: 1),
             Tables\Columns\TextColumn::make('jumlah_honor_penguji_skripsi')
+                ->label('Jumlah Honor Penguji Skripsi')
                 ->money('idr', divideBy: 1),
             Tables\Columns\TextColumn::make('jumlah_honor_penguji_proposal')
+                ->label('Jumlah Honor Penguji Proposal')
                 ->money('idr', divideBy: 1),
             Tables\Columns\TextColumn::make('jumlah_honor_penguji_seminar')
+                ->label('Jumlah Honor Penguji Seminar')
                 ->money('idr', divideBy: 1),
             Tables\Columns\TextColumn::make('total_honor')
+                ->label('Total Honor')
                 ->money('idr', divideBy: 1),
             Tables\Columns\TextColumn::make('potong_pajak')
-                ->label('Pajak')
+                ->label('PAJAK')
                 ->money('idr', divideBy: 1),
             Tables\Columns\TextColumn::make('honor_dibayar')
-                ->label('Jumlah')
+                ->label('JUMLAH')
                 ->money('idr', divideBy: 1),
         ];
     }
