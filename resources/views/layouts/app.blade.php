@@ -117,6 +117,21 @@
             @yield('content')
         </main>
     </div>
+    <script>
+        // Tinggi textarea otomatis menyesuaikan banyaknya konten (berlaku ke
+        // semua <textarea> di halaman ini, termasuk yang dimuat lewat AJAX -
+        // pakai event delegation di document, bukan bind per-elemen).
+        function autoResizeTextarea(el) {
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
+        }
+        document.querySelectorAll('textarea').forEach(autoResizeTextarea);
+        document.addEventListener('input', function (event) {
+            if (event.target.tagName === 'TEXTAREA') {
+                autoResizeTextarea(event.target);
+            }
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>

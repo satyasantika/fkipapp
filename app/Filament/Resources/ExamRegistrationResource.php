@@ -126,6 +126,7 @@ class ExamRegistrationResource extends Resource
                 Forms\Components\Textarea::make('judul_penelitian')
                     ->label('Judul Penelitian')
                     ->rows(5)
+                    ->autosize()
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('ipk')
                     ->label('IPK')
