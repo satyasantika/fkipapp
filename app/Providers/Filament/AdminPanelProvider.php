@@ -40,9 +40,16 @@ class AdminPanelProvider extends PanelProvider
             // - lebih aman daripada mengorbankan pendaftaran komponennya.
             ->login(\App\Filament\Auth\Login::class)
             ->authGuard('web')
+            // Warna & font disamakan dengan tema halaman login (lihat
+            // resources/views/filament/pages/auth/login.blade.php) - teal
+            // sebagai primary (persis --teal-600 di sana) dan emerald untuk
+            // aksen "success", supaya identitas visualnya konsisten dari
+            // pintu masuk sampai ke seluruh panel, bukan cuma di /login.
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Teal,
+                'success' => Color::Emerald,
             ])
+            ->font('Manrope')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -75,6 +82,14 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::USER_MENU_BEFORE,
                 fn (): string => view('filament.leave-impersonation-button')->render(),
+            )
+            // Font judul (Fraunces) yang sama dengan halaman login, dipasang
+            // lewat override CSS kecil di STYLES_AFTER (bukan lewat ->font(),
+            // yang cuma bisa satu font untuk seluruh panel) supaya heading
+            // tetap beda dari body text (Manrope) sama seperti di /login.
+            ->renderHook(
+                PanelsRenderHook::STYLES_AFTER,
+                fn (): string => view('filament.theme-overrides')->render(),
             );
     }
 }
