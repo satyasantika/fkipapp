@@ -60,9 +60,6 @@ class NotReportedTable extends Component implements Actions\Contracts\HasActions
     protected function getTableColumns(): array
     {
         return [
-            Tables\Columns\TextColumn::make('dilaporkan')
-                ->label('Lapor?')
-                ->formatStateUsing(fn (bool $state): string => $state ? 'sudah' : 'belum'),
             Tables\Columns\TextColumn::make('exam_type.singkat_ujian')
                 ->label('Ujian'),
             Tables\Columns\TextColumn::make('tanggal_ujian')
