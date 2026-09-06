@@ -7,6 +7,7 @@ use App\Models\ExamRegistration;
 use App\Models\Lecture;
 use App\Models\ReportDate;
 use App\Models\Student;
+use App\Models\User;
 use App\Services\ExamPaymentReportService;
 use Illuminate\Database\Seeder;
 
@@ -28,6 +29,11 @@ use Illuminate\Database\Seeder;
  *     asli (bukan angka rekaan) - supaya ExamPaymentReportResource langsung
  *     berisi baris honor yang benar-benar terhitung, dan tombol "cabut
  *     laporan" bisa dicoba.
+ *   - 1 akun role "keuangan" (username: keuangan / password: asdfasdf) supaya
+ *     alur "Laporkan Ujian"/"Cabut Laporan" (yang mengecek hasRole('keuangan'))
+ *     dan ExamPaymentReportResource bisa langsung dicoba tanpa perlu
+ *     membuatkan akunnya manual dulu - role "keuangan" sendiri sudah dibuat
+ *     CreateAdminUserSeeder, tapi belum pernah ada user yang memakainya.
  *
  * Jalankan manual saat dibutuhkan: php artisan db:seed --class=SimulationDataSeeder
  * (sengaja tidak didaftarkan di DatabaseSeeder supaya tidak ikut jalan
@@ -37,6 +43,19 @@ class SimulationDataSeeder extends Seeder
 {
     public function run(): void
     {
+        $keuangan = User::firstOrCreate(
+            ['username' => 'keuangan'],
+            [
+                'name' => 'Keuangan',
+                'email' => 'keuangan@gmail.com',
+                'password' => bcrypt('asdfasdf'),
+            ]
+        );
+        if (! $keuangan->hasRole('keuangan')) {
+            $keuangan->assignRole('keuangan');
+        }
+        $this->command?->info('SimulationDataSeeder: akun keuangan siap (username: keuangan / password: asdfasdf).');
+
         $departement = Departement::whereHas('users', fn ($q) => $q->role('jurusan'))->first()
             ?? Departement::first();
 
