@@ -41,7 +41,10 @@ use Livewire\Component;
  * Kartu diwarnai danger kalau mahasiswa itu sidangnya sudah pernah
  * dilaporkan (report_date_id terisi) TAPI masih ada sempro/semhas yang
  * baru muncul belum dilaporkan sama sekali - urutan yang janggal dan
- * perlu perhatian staf keuangan.
+ * perlu perhatian staf keuangan. Pewarnaan ini lewat ->recordClasses()
+ * (menambah kelas pada kartu BAWAAN Filament di grid), BUKAN dengan
+ * menggambar kotak/border sendiri di dalam student-card.blade.php - kalau
+ * begitu jadinya kartu di dalam kartu (kotak Filament + kotak sendiri).
  *
  * Kombinasi 4 interface+trait ini meniru persis Filament\Widgets\TableWidget
  * bawaan (lihat vendor/filament/widgets/src/TableWidget.php) - HasTable saja
@@ -68,7 +71,34 @@ class NotReportedTable extends Component implements Actions\Contracts\HasActions
             ->query($this->getTableQuery())
             ->contentGrid(['sm' => 2, 'md' => 3, 'xl' => 4])
             ->columns($this->getTableColumns())
+            ->recordClasses(function (Student $record): array {
+                $state = self::cardState($record);
+
+                return [
+                    'fi-report-card-danger' => $state['isDanger'],
+                    'fi-report-card-success' => $state['isSuccess'],
+                ];
+            })
             ->defaultSort('latest_ujian', 'desc');
+    }
+
+    /**
+     * Dipakai bersama oleh ->recordClasses() (mewarnai kartu bawaan Filament
+     * di grid, bukan menggambar kotak sendiri di dalamnya) dan
+     * student-card.blade.php (menampilkan catatan peringatannya).
+     *
+     * @return array{isDanger: bool, isSuccess: bool}
+     */
+    public static function cardState(Student $record): array
+    {
+        $pending = $record->examregistrations;
+        $hasPendingSidang = $pending->contains(fn ($e) => (int) $e->exam_type_id === self::EXAM_TYPE_SIDANG);
+        $hasPendingNonSidang = $pending->contains(fn ($e) => (int) $e->exam_type_id !== self::EXAM_TYPE_SIDANG);
+        $hasReportedSidang = (bool) ($record->has_reported_sidang ?? false);
+        $isDanger = $hasReportedSidang && $hasPendingNonSidang;
+        $isSuccess = (! $isDanger) && $hasPendingSidang;
+
+        return ['isDanger' => $isDanger, 'isSuccess' => $isSuccess];
     }
 
     protected function getTableQuery(): Builder

@@ -74,4 +74,25 @@
     html:not(.dark) body {
         background-color: #f4faf8;
     }
+
+    /* Tint kartu status (dipakai lewat Table::recordClasses() di kartu "akan
+       dilaporkan") - var(--success-*)/var(--danger-*) dijamin ada karena
+       Filament sendiri men-generate-nya di :root (lihat
+       vendor/filament/support/resources/views/assets.blade.php), TIDAK
+       seperti kelas Tailwind semacam bg-success-100/text-info-700 yang
+       terlihat masuk akal tapi sebenarnya tidak pernah dikompilasi
+       (panel ini tidak punya build Tailwind sendiri, cuma CSS bawaan
+       Filament yang sudah di-tree-shake sesuai komponennya sendiri).
+       color-mix dipakai supaya otomatis pas di mode gelap/terang tanpa
+       aturan terpisah (campuran dengan transparent mengikuti latar di
+       belakangnya). */
+    .fi-report-card-success {
+        background-color: color-mix(in srgb, var(--success-500) 8%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--success-500) 35%, transparent);
+    }
+
+    .fi-report-card-danger {
+        background-color: color-mix(in srgb, var(--danger-500) 8%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger-500) 35%, transparent);
+    }
 </style>

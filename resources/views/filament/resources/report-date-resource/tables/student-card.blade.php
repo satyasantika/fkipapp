@@ -2,35 +2,38 @@
     $student = $getRecord();
     $pending = $student->examregistrations;
     $pendingCount = $pending->count();
-    $hasPendingSidang = $pending->contains(fn ($e) => (int) $e->exam_type_id === 3);
-    $hasPendingNonSidang = $pending->contains(fn ($e) => (int) $e->exam_type_id !== 3);
-    $hasReportedSidang = (bool) ($student->has_reported_sidang ?? false);
-    $isDanger = $hasReportedSidang && $hasPendingNonSidang;
-    $isSuccess = (! $isDanger) && $hasPendingSidang;
     $pendingChrono = $pending->sortBy('tanggal_ujian')->values();
+    $state = \App\Filament\Resources\ReportDateResource\Tables\NotReportedTable::cardState($student);
 
+    // Warna badge lewat <x-filament::badge> (bukan kelas Tailwind tebakan
+    // semacam bg-info-100/text-warning-700) karena panel ini tidak punya
+    // build Tailwind sendiri - CSS yang dipakai cuma bawaan Filament yang
+    // sudah di-tree-shake sesuai komponen Filament sendiri, jadi kelas warna
+    // custom di luar itu tidak pernah benar-benar terkompilasi (baru
+    // ketahuan saat tombol "Buang Filter" ternyata tidak terlihat sama
+    // sekali). <x-filament::badge color="..."> dijamin benar karena
+    // memakai CSS custom property var(--{warna}-*) yang Filament generate
+    // sendiri di :root.
     $typeColors = [
-        'sempro' => ['bg-gray-100', 'text-gray-700', 'hover:bg-gray-200', 'dark:bg-gray-500/20', 'dark:text-gray-300'],
-        'semhas' => ['bg-info-100', 'text-info-700', 'hover:bg-info-200', 'dark:bg-info-500/20', 'dark:text-info-300'],
-        'sidang' => ['bg-success-100', 'text-success-700', 'hover:bg-success-200', 'dark:bg-success-500/20', 'dark:text-success-300'],
+        'sempro' => 'gray',
+        'semhas' => 'info',
+        'sidang' => 'success',
     ];
 @endphp
 
-<div
-    @class([
-        'flex flex-col gap-3 rounded-xl border p-4',
-        'border-danger-300 bg-danger-50 dark:border-danger-500/30 dark:bg-danger-500/10' => $isDanger,
-        'border-success-300 bg-success-50 dark:border-success-500/30 dark:bg-success-500/10' => $isSuccess,
-        'border-gray-200 dark:border-white/10' => (! $isDanger) && (! $isSuccess),
-    ])
->
+{{-- Tidak menggambar kotak/border sendiri di sini - kartu bawaan Filament
+     di grid (fi-ta-record, sudah rounded-xl+shadow+h-full) SUDAH jadi satu-
+     satunya kotak yang terlihat, supaya tidak ada kartu di dalam kartu.
+     Pewarnaan status (fi-report-card-success/danger) ditambahkan lewat
+     Table::recordClasses() di NotReportedTable, bukan di sini. --}}
+<div class="flex h-full flex-col gap-3 p-4">
     <div>
         <p class="text-sm font-semibold text-gray-950 dark:text-white">{{ $student->nama }}</p>
         <p class="text-xs text-gray-500 dark:text-gray-400">{{ $student->nim }}</p>
     </div>
 
-    @if ($isDanger)
-        <p class="text-xs font-medium text-danger-700 dark:text-danger-400">
+    @if ($state['isDanger'])
+        <p class="text-xs font-medium text-danger-600 dark:text-danger-400">
             Sidang sudah dilaporkan, tapi ada ujian lain yang belum
         </p>
     @endif
@@ -39,29 +42,30 @@
         @foreach ($pendingChrono as $examRegistration)
             @php
                 $type = $examRegistration->ujian ?? '';
-                [$bg, $text, $hover, $darkBg, $darkText] = $typeColors[$type] ?? $typeColors['sempro'];
                 $tanggal = $examRegistration->tanggal_ujian
                     ? \Illuminate\Support\Carbon::parse($examRegistration->tanggal_ujian)->format('d M Y')
                     : '-';
             @endphp
-            <button
-                type="button"
+            <x-filament::badge
+                tag="button"
+                color="{{ $typeColors[$type] ?? 'gray' }}"
                 wire:click="assignSingle({{ $examRegistration->id }})"
-                class="inline-flex cursor-pointer items-center rounded-full px-2.5 py-1 text-xs font-medium {{ $bg }} {{ $text }} {{ $hover }} {{ $darkBg }} {{ $darkText }}"
+                style="border-radius:9999px;cursor:pointer"
             >
                 + {{ $type }}: {{ $tanggal }}
-            </button>
+            </x-filament::badge>
         @endforeach
 
         @if ($pendingCount > 1)
-            <button
-                type="button"
+            <x-filament::badge
+                tag="button"
+                color="primary"
                 wire:click="assignAllForStudent({{ $pending->first()->id }})"
                 wire:confirm="Tambahkan {{ $pendingCount }} data ujian mahasiswa ini ke laporan?"
-                class="inline-flex cursor-pointer items-center rounded-full bg-primary-100 px-2.5 py-1 text-xs font-medium text-primary-700 hover:bg-primary-200 dark:bg-primary-500/20 dark:text-primary-300"
+                style="border-radius:9999px;cursor:pointer"
             >
                 +{{ $pendingCount }} semua ujian
-            </button>
+            </x-filament::badge>
         @endif
     </div>
 </div>
