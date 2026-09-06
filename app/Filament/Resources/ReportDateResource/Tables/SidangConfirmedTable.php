@@ -85,9 +85,6 @@ class SidangConfirmedTable extends Component implements Actions\Contracts\HasAct
     protected function getTableColumns(): array
     {
         return [
-            Tables\Columns\TextColumn::make('dilaporkan')
-                ->label('Lapor?')
-                ->formatStateUsing(fn (bool $state): string => $state ? 'sudah' : 'belum'),
             Tables\Columns\TextColumn::make('ujian')
                 ->label('Ujian')
                 ->html()
