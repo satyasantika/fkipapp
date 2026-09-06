@@ -25,8 +25,8 @@ use Livewire\Component;
  * (sempro/semhas/sidang, warna beda per jenis) - klik badge itu untuk
  * menambahkan ujian itu saja ke laporan, atau badge "+N semua ujian"
  * (muncul kalau mahasiswa itu punya >1 ujian pending) untuk menambahkan
- * semuanya sekaligus - beserta nama pembimbing/penguji dari ujian
- * terbarunya.
+ * semuanya sekaligus. Kartu cukup identitas (nama+NIM) & badge ujian saja,
+ * tanpa nama pembimbing/penguji.
  *
  * Pencarian & filter dibuat manual (bukan lewat Table::filters()/
  * ->searchable() bawaan Filament) supaya tombol filter bisa ditaruh
@@ -77,7 +77,7 @@ class NotReportedTable extends Component implements Actions\Contracts\HasActions
             ->whereHas('examregistrations', fn (Builder $q) => $q->whereNull('report_date_id'))
             ->with([
                 'examregistrations' => fn ($q) => $q->whereNull('report_date_id')
-                    ->with(['exam_type', 'pembimbing1', 'pembimbing2', 'penguji1', 'penguji2', 'penguji3'])
+                    ->with('exam_type')
                     ->orderByDesc('tanggal_ujian'),
             ])
             ->withMax(['examregistrations as latest_ujian' => fn ($q) => $q->whereNull('report_date_id')], 'tanggal_ujian')
