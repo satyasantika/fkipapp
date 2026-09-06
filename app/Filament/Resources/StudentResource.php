@@ -186,6 +186,7 @@ class StudentResource extends Resource
                     ->iconButton(),
                 Tables\Actions\DeleteAction::make()
                     ->iconButton()
+                    ->visible(fn (Student $record): bool => ! $record->deletionBlockReason())
                     ->modalHeading('Hapus data mahasiswa ini?')
                     ->modalDescription('Data mahasiswa ini akan dihapus permanen.')
                     ->before(function (Student $record) {

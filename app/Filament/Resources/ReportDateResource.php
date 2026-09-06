@@ -80,6 +80,7 @@ class ReportDateResource extends Resource
                     ->iconButton(),
                 Tables\Actions\DeleteAction::make()
                     ->iconButton()
+                    ->visible(fn (ReportDate $record): bool => ! $record->deletionBlockReason())
                     ->modalHeading('Hapus tanggal penarikan laporan ini?')
                     ->modalDescription('Tanggal penarikan laporan ini akan dihapus permanen.')
                     ->before(function (ReportDate $record) {
