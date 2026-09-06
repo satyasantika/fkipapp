@@ -53,6 +53,7 @@ class ReportDateResource extends Resource
                     ->required(),
                 Forms\Components\Textarea::make('deskripsi')
                     ->rows(3)
+                    ->autosize()
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('dibayar')
                     ->label('Dibayar')

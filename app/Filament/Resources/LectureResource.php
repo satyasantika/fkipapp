@@ -107,6 +107,7 @@ class LectureResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Textarea::make('alamat')
                     ->rows(5)
+                    ->autosize()
                     ->columnSpanFull(),
             ]);
     }
