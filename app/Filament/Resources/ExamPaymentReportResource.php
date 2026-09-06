@@ -121,7 +121,8 @@ class ExamPaymentReportResource extends Resource
                     ->options([1 => 'ASN', 0 => 'Non ASN']),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->iconButton(),
             ])
             ->bulkActions([
                 //

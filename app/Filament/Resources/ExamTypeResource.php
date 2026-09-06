@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ExamTypeResource\Pages;
 use App\Filament\Resources\ExamTypeResource\RelationManagers;
 use App\Filament\Concerns\GuardsBulkDeletion;
+use App\Filament\Concerns\ShowsDeletionBlockAlert;
 use App\Models\ExamType;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -17,7 +18,7 @@ use Illuminate\Support\Collection;
 
 class ExamTypeResource extends Resource
 {
-    use GuardsBulkDeletion;
+    use GuardsBulkDeletion, ShowsDeletionBlockAlert;
 
     protected static ?string $model = ExamType::class;
 
@@ -41,6 +42,7 @@ class ExamTypeResource extends Resource
     {
         return $form
             ->schema([
+                static::deletionBlockAlertField(),
                 Forms\Components\TextInput::make('nama_ujian')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('kode_ujian')
@@ -65,7 +67,8 @@ class ExamTypeResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
