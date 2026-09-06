@@ -25,7 +25,7 @@ class ImpersonateController extends Controller
         Auth::login($user);
         request()->session()->regenerate();
 
-        return to_route('home')->with('success', 'Anda sekarang login sebagai '.$user->name);
+        return redirect(\Filament\Facades\Filament::getUrl())->with('success', 'Anda sekarang login sebagai '.$user->name);
     }
 
     /**
@@ -44,6 +44,6 @@ class ImpersonateController extends Controller
         Auth::loginUsingId($impersonatorId);
         request()->session()->regenerate();
 
-        return to_route('users.index')->with('success', 'Kembali ke akun admin.');
+        return redirect(\App\Filament\Resources\UserResource::getUrl())->with('success', 'Kembali ke akun admin.');
     }
 }
