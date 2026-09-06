@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ReportDateResource\Pages;
 use App\Filament\Resources\ReportDateResource\RelationManagers;
 use App\Filament\Concerns\ShowsDeletionBlockAlert;
+use App\Models\ExamPaymentReport;
 use App\Models\ExamRegistration;
 use App\Models\ReportDate;
 use Filament\Forms;
@@ -16,6 +17,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Number;
 
 class ReportDateResource extends Resource
 {
@@ -71,7 +73,19 @@ class ReportDateResource extends Resource
                     ->date(),
                 Tables\Columns\TextColumn::make('deskripsi'),
                 Tables\Columns\TextColumn::make('dibayar')
-                    ->money('idr', divideBy: 1),
+                    ->money('idr', divideBy: 1)
+                    ->description(function (ReportDate $record): string {
+                        // total_honor adalah accessor (dihitung dari kolom honor_*/banyak_*),
+                        // bukan kolom asli, jadi harus dijumlah di PHP lewat Collection::sum(),
+                        // tidak bisa lewat SUM() SQL - sama seperti dibayar dihitung ulang di
+                        // ExamPaymentReportService::store().
+                        $reports = ExamPaymentReport::where('report_date_id', $record->id)->get();
+
+                        $asn = Number::currency($reports->where('status', 1)->sum('total_honor'), in: 'IDR', locale: 'id');
+                        $nonAsn = Number::currency($reports->where('status', 0)->sum('total_honor'), in: 'IDR', locale: 'id');
+
+                        return "ASN: {$asn} · nonASN: {$nonAsn}";
+                    }),
             ])
             ->filters([
                 //
