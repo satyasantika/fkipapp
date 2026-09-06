@@ -5,8 +5,8 @@
         <form id="delete-form" action="{{ route('paymentreports.destroy',$paymentreport->id) }}" method="POST">
             @csrf
             @method('DELETE')
-            <button type="submit" class="btn btn-outline-danger btn-sm float-end" onclick="return confirm('Yakin akan menghapus data penguji {{ $paymentreport->dosen }}?');">
-                {{ __('del') }}
+            <button type="submit" class="btn btn-outline-danger btn-sm float-end" title="Hapus" onclick="return confirm('Yakin akan menghapus data penguji {{ $paymentreport->dosen }}?');">
+                <i class="bi bi-trash"></i>
             </button>
         </form>
 @endpush
