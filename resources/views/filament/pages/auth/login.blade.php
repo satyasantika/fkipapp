@@ -437,6 +437,7 @@
     </style>
 
     @livewireStyles
+    @filamentStyles
 </head>
 <body>
     <div class="hero">
@@ -597,8 +598,22 @@
         </div>
 
         <p class="hero-footer">&copy; {{ now()->year }} FKIP &middot; Universitas Siliwangi</p>
-    </div>
 
-    @livewireScripts
+        {{-- Komponen notifikasi Filament (toast) - tanpa ini, notifikasi seperti
+             peringatan rate-limit ("terlalu banyak percobaan login") dikirim
+             tapi tidak pernah tampil sama sekali, terasa seperti "tidak terjadi
+             apa-apa" saat tombol Masuk diklik. Ditaruh DI DALAM .hero (bukan
+             sebagai sibling) karena Livewire cuma boleh satu root element per
+             komponen - taruh di luar akan bikin error "multiple root elements". --}}
+        @livewire(\Filament\Livewire\Notifications::class)
+
+        {{-- @filamentScripts juga merender <style> penutup (variabel CSS), bukan
+             cuma <script> - kalau ditaruh sebagai sibling .hero di luar sini,
+             <body> akan punya 2 elemen anak (.hero + <style>) dan Livewire
+             melempar "multiple root elements" lagi. Makanya ikut ditaruh DI
+             DALAM .hero, supaya <body> tetap cuma punya satu elemen anak. --}}
+        @livewireScripts
+        @filamentScripts(withCore: true)
+    </div>
 </body>
 </html>
