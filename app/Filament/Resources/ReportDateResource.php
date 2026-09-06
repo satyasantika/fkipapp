@@ -74,17 +74,26 @@ class ReportDateResource extends Resource
                 Tables\Columns\TextColumn::make('deskripsi'),
                 Tables\Columns\TextColumn::make('dibayar')
                     ->money('idr', divideBy: 1)
-                    ->description(function (ReportDate $record): string {
+                    ->description(function (ReportDate $record): \Illuminate\Support\HtmlString {
                         // total_honor adalah accessor (dihitung dari kolom honor_*/banyak_*),
                         // bukan kolom asli, jadi harus dijumlah di PHP lewat Collection::sum(),
                         // tidak bisa lewat SUM() SQL - sama seperti dibayar dihitung ulang di
                         // ExamPaymentReportService::store().
+                        //
+                        // Baris terpisah + warna lewat HtmlString (Blade {{ }} otomatis
+                        // memanggil ->toHtml() untuk Htmlable, jadi tidak di-escape) -
+                        // rgb(var(--x-600)) dipakai (bukan kelas Tailwind semacam
+                        // text-success-700) karena panel ini tidak punya build Tailwind
+                        // sendiri, lihat catatan panjang di student-card.blade.php.
                         $reports = ExamPaymentReport::where('report_date_id', $record->id)->get();
 
                         $asn = Number::currency($reports->where('status', 1)->sum('total_honor'), in: 'IDR', locale: 'id');
                         $nonAsn = Number::currency($reports->where('status', 0)->sum('total_honor'), in: 'IDR', locale: 'id');
 
-                        return "ASN: {$asn} · nonASN: {$nonAsn}";
+                        return new \Illuminate\Support\HtmlString(
+                            '<div style="color: rgb(var(--success-600))">ASN: '.e($asn).'</div>'
+                            .'<div style="color: rgb(var(--gray-600))">nonASN: '.e($nonAsn).'</div>'
+                        );
                     }),
             ])
             ->filters([
@@ -141,6 +150,19 @@ class ReportDateResource extends Resource
                     ]))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Tutup'),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('lecturerWorkload')
+                        ->label('Ujian by Dosen Penguji')
+                        ->icon('heroicon-o-user-group')
+                        ->slideOver()
+                        ->modalWidth('7xl')
+                        ->modalHeading(fn (ReportDate $record): string => 'Ujian by Dosen Penguji - '.\Illuminate\Support\Carbon::parse($record->tanggal)->format('Y-m-d'))
+                        ->modalContent(fn (ReportDate $record) => view('filament.resources.report-date-resource.tables.lecturer-workload-slideover', [
+                            'record' => $record,
+                        ]))
+                        ->modalSubmitAction(false)
+                        ->modalCancelActionLabel('Tutup'),
+                ]),
             ])
             ->bulkActions([
                 //

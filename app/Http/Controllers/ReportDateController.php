@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\ReportDate;
 use App\Models\ExamPayment;
+use App\Models\Lecture;
 use Illuminate\Http\Request;
 use App\Models\ExamRegistration;
 use App\Models\ExamPaymentReport;
@@ -152,6 +153,53 @@ class ReportDateController extends Controller
 
         $message = $toAdd->isEmpty()
             ? 'Tidak ada data ujian untuk mahasiswa ini.'
+            : 'Berhasil menambahkan '.$toAdd->count().' data ujian ke laporan.';
+
+        return redirect()->back()->with('success',$message);
+    }
+
+    /**
+     * Menambahkan semua ujian (mahasiswa manapun) yang belum pernah
+     * dilaporkan ke periode manapun DAN melibatkan $lecture di salah satu
+     * dari 5 peran (pembimbing1/2, penguji1/2/3), sekaligus ke periode
+     * $request->report_date_id - dipakai tombol "Daftarkan Semua" di
+     * slide-over "Ujian by Dosen Penguji". Sama polanya dengan
+     * confirmSidangCascade() di atas, cuma kuncinya kolom peran dosen,
+     * bukan student_id.
+     */
+    public function confirmLecturerCascade(Request $request, Lecture $lecture)
+    {
+        $report_date_id = $request->report_date_id;
+
+        if (empty($report_date_id)) {
+            return redirect()->back()->with('warning','Periode laporan tujuan tidak ditemukan.');
+        }
+
+        $toAdd = ExamRegistration::whereNull('report_date_id')
+            ->where(function ($q) use ($lecture) {
+                $q->where('pembimbing1_id', $lecture->id)
+                    ->orWhere('pembimbing2_id', $lecture->id)
+                    ->orWhere('penguji1_id', $lecture->id)
+                    ->orWhere('penguji2_id', $lecture->id)
+                    ->orWhere('penguji3_id', $lecture->id);
+            })
+            ->get();
+
+        foreach ($toAdd as $item) {
+            $item->update([
+                'report_date_id' => $report_date_id,
+                'dilaporkan' => 1,
+            ]);
+
+            try {
+                $this->_reportStore($item->id,$report_date_id);
+            } catch (\RuntimeException $e) {
+                return redirect()->back()->with('warning',$e->getMessage());
+            }
+        }
+
+        $message = $toAdd->isEmpty()
+            ? 'Tidak ada data ujian untuk dosen ini.'
             : 'Berhasil menambahkan '.$toAdd->count().' data ujian ke laporan.';
 
         return redirect()->back()->with('success',$message);

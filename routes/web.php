@@ -85,6 +85,7 @@ Route::middleware('auth')->group(function () {
         Route::get('exam/reportdates/not-reported-list/{report_date_id}', [App\Http\Controllers\ReportDateController::class,'notReportedList'])->name('reportdates.notreportedlist');
         Route::get('exam/reportdates/sidang-confirmed/{report_date_id}', [App\Http\Controllers\ReportDateController::class,'sidangConfirmedList'])->name('reportdates.sidangconfirmedlist');
         Route::put('exam/reportdates/confirm-sidang-cascade/{examregistration}', [App\Http\Controllers\ReportDateController::class,'confirmSidangCascade'])->name('reportdates.confirmsidangcascade');
+        Route::put('exam/reportdates/confirm-lecturer-cascade/{lecture}', [App\Http\Controllers\ReportDateController::class,'confirmLecturerCascade'])->name('reportdates.confirmlecturercascade');
         Route::resource('exam/reportdates', App\Http\Controllers\ReportDateController::class);
         Route::resource('exam/paymentreports', App\Http\Controllers\ExamPaymentReportController::class);
     });

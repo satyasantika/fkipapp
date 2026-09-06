@@ -30,6 +30,31 @@ class Lecture extends Model
         return $this->belongsTo(Departement::class, 'departement_id');
     }
 
+    public function pembimbing1Registrations(): HasMany
+    {
+        return $this->hasMany(ExamRegistration::class, 'pembimbing1_id');
+    }
+
+    public function pembimbing2Registrations(): HasMany
+    {
+        return $this->hasMany(ExamRegistration::class, 'pembimbing2_id');
+    }
+
+    public function penguji1Registrations(): HasMany
+    {
+        return $this->hasMany(ExamRegistration::class, 'penguji1_id');
+    }
+
+    public function penguji2Registrations(): HasMany
+    {
+        return $this->hasMany(ExamRegistration::class, 'penguji2_id');
+    }
+
+    public function penguji3Registrations(): HasMany
+    {
+        return $this->hasMany(ExamRegistration::class, 'penguji3_id');
+    }
+
     private const LECTURE_ROLE_COLUMNS = [
         'pembimbing1_id', 'pembimbing2_id',
         'penguji1_id', 'penguji2_id', 'penguji3_id',
