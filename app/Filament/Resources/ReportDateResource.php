@@ -103,14 +103,30 @@ class ReportDateResource extends Resource
                     ->icon('heroicon-o-banknotes')
                     ->color('success')
                     ->iconButton()
-                    ->url(fn (ReportDate $record): string => route('reports.section', ['pns' => 1, 'report_date_id' => $record->id])),
+                    ->slideOver()
+                    ->modalWidth('7xl')
+                    ->modalHeading(fn (ReportDate $record): string => 'Bayar ASN - '.\Illuminate\Support\Carbon::parse($record->tanggal)->format('Y-m-d'))
+                    ->modalContent(fn (ReportDate $record) => view('filament.resources.report-date-resource.tables.payment-section-slideover', [
+                        'record' => $record,
+                        'pns' => 1,
+                    ]))
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup'),
                 Tables\Actions\Action::make('reportSectionNonAsn')
                     ->label('List Bayar Non-ASN')
                     ->tooltip('List Bayar Non-ASN')
                     ->icon('heroicon-o-banknotes')
                     ->color('gray')
                     ->iconButton()
-                    ->url(fn (ReportDate $record): string => route('reports.section', ['pns' => 0, 'report_date_id' => $record->id])),
+                    ->slideOver()
+                    ->modalWidth('7xl')
+                    ->modalHeading(fn (ReportDate $record): string => 'Bayar Non-ASN - '.\Illuminate\Support\Carbon::parse($record->tanggal)->format('Y-m-d'))
+                    ->modalContent(fn (ReportDate $record) => view('filament.resources.report-date-resource.tables.payment-section-slideover', [
+                        'record' => $record,
+                        'pns' => 0,
+                    ]))
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup'),
             ])
             ->bulkActions([
                 //
