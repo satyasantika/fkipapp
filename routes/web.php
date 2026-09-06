@@ -21,7 +21,16 @@ Route::get('/', function () {
     return view('landing');
 });
 
-Route::get('/login', fn () => redirect(\Filament\Facades\Filament::getLoginUrl()));
+// Login sungguhan ada di sini (bukan cuma redirect ke /admin/login) - dipakai
+// langsung lewat halaman kustom App\Filament\Auth\Login (tetap tampilan/layout
+// Filament), plus middleware panel yang sama persis dipakai panel admin supaya
+// context Filament (guard, current panel, dst) tersedia di luar prefix /admin.
+// Route bernama "login" ini juga dibutuhkan supaya route('login') di
+// app/Http/Middleware/Authenticate.php (dipakai rute lama yang belum pindah ke
+// Filament, mis. /students) tidak error "Route [login] not defined".
+Route::get('/login', \App\Filament\Auth\Login::class)
+    ->middleware(\Filament\Facades\Filament::getPanel('admin')->getMiddleware())
+    ->name('login');
 
 Auth::routes(['register' => false, 'login' => false]);
 Route::middleware('auth')->group(function () {

@@ -26,7 +26,12 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login(\App\Filament\Auth\Login::class)
+            // Alamat asli login sekarang /login (lihat routes/web.php), bukan
+            // /admin/login - route login bawaan panel ini dibiarkan ada (banyak
+            // mekanisme internal Filament butuh hasLogin() bernilai true) tapi
+            // cuma jadi redirect tipis ke /login supaya /admin/login tidak jadi
+            // alamat kedua yang "ganda" dengan halaman yang sama.
+            ->login(fn () => redirect('/login'))
             ->authGuard('web')
             ->colors([
                 'primary' => Color::Amber,

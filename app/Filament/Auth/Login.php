@@ -11,10 +11,12 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * Login kustom - field "username" (bukan email) dengan deteksi email-vs-
- * username persis seperti LoginController::username() lama, plus tampilan
- * meniru persis resources/views/auth/login.blade.php (view kustom lewat
- * $view, bukan lewat {{ $this->form }} bawaan Filament - lihat
- * resources/views/filament/pages/auth/login.blade.php).
+ * username seperti LoginController lama (sudah dihapus), plus tampilan lewat
+ * $view kustom sendiri (bukan lewat {{ $this->form }} bawaan Filament - lihat
+ * resources/views/filament/pages/auth/login.blade.php). Didaftarkan di
+ * routes/web.php sebagai route bernama "login" di /login (bukan /admin/login),
+ * dengan middleware panel admin dipasang manual supaya context Filament tetap
+ * tersedia di luar prefix panel.
  *
  * Method/properti lain (getForms/form/getEmailFormComponent/dst) sengaja
  * TIDAK disentuh - dibiarkan warisan dari induk, tidak dipakai oleh view
