@@ -31,7 +31,7 @@ class ViewExamRegistrationsDataTable extends DataTable
         // belakangan, itu akan menimpa balik badge di bawah ini.
         $dataTable = $this->applyExamRegistrationNameColumns(new EloquentDataTable($query))
             ->addColumn('action', function($row){
-                $action = ' <a href="'.route('registrations.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
+                $action = ' <a href="'.route('registrations.edit',$row->id).'" class="btn btn-outline-primary btn-sm action" title="Ubah"><i class="bi bi-pencil-square"></i></a> ';
                 return $action;
             })
             ->editColumn('tanggal_ujian', function($row){

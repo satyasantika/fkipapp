@@ -36,7 +36,7 @@ class ViewExamPaymentReportsDataTable extends DataTable
 
         return (new EloquentDataTable($query))
             ->addColumn('action', function($row){
-                $action = ' <a href="'.route('paymentreports.edit',$row->id).'" class="btn btn-outline-primary btn-sm action">E</a> ';
+                $action = ' <a href="'.route('paymentreports.edit',$row->id).'" class="btn btn-outline-primary btn-sm action" title="Ubah"><i class="bi bi-pencil-square"></i></a> ';
                 return $action;
             })
             ->editColumn('dosen', fn ($row) => $row->dosen ?? '')
