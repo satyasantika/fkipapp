@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\GuardsDeletionWhenReferenced;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Student extends Model
 {
-    use HasFactory;
+    use HasFactory, GuardsDeletionWhenReferenced;
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -53,4 +54,14 @@ class Student extends Model
         return $this->belongsTo(Lecture::class, 'penguji3_id');
     }
 
+    public function deletionBlockReason(): ?string
+    {
+        $count = $this->examregistrations()->count();
+
+        if (! $count) {
+            return null;
+        }
+
+        return "Mahasiswa ini masih memiliki {$count} registrasi ujian. Hapus registrasi ujian tersebut terlebih dahulu.";
+    }
 }

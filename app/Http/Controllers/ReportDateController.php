@@ -85,7 +85,13 @@ class ReportDateController extends Controller
     public function destroy(ReportDate $reportdate)
     {
         $tanggal = Carbon::parse($reportdate->tanggal)->isoFormat('LL');
-        $reportdate->delete();
+
+        try {
+            $reportdate->delete();
+        } catch (\RuntimeException $e) {
+            return redirect()->back()->with('warning', $e->getMessage());
+        }
+
         return to_route('reportdates.index')->with('warning','penarikan laporan tanggal '.$tanggal.' telah dihapus');
     }
 

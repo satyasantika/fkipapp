@@ -81,7 +81,13 @@ class LectureController extends Controller
     public function destroy(Lecture $lecture)
     {
         $name = strtoupper($lecture->nama);
-        $lecture->delete();
+
+        try {
+            $lecture->delete();
+        } catch (\RuntimeException $e) {
+            return to_route('lectures.index')->with('warning', $e->getMessage());
+        }
+
         return to_route('lectures.index')->with('success','mahasiswa '.$name.' telah dihapus');
     }
 
