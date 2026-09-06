@@ -79,7 +79,13 @@ class StudentController extends Controller
     public function destroy(Student $student)
     {
         $name = strtoupper($student->name);
-        $student->delete();
+
+        try {
+            $student->delete();
+        } catch (\RuntimeException $e) {
+            return to_route('students.index')->with('warning', $e->getMessage());
+        }
+
         return to_route('students.index')->with('success','mahasiswa '.$name.' telah dihapus');
     }
 
