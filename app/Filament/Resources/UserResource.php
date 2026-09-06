@@ -98,7 +98,7 @@ class UserResource extends Resource
                     ->requiresConfirmation()
                     ->visible(fn (User $record): bool => $record->id !== auth()->id() && ! $record->hasRole('admin'))
                     ->action(fn (User $record) => app(ImpersonateController::class)->take($record))
-                    ->successRedirectUrl(fn () => route('home')),
+                    ->successRedirectUrl(fn () => \Filament\Facades\Filament::getUrl()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
