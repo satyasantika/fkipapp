@@ -59,11 +59,10 @@ class ReportDateController extends Controller
      */
     public function edit(ReportDate $reportdate)
     {
-        $ada_laporan = ExamRegistration::where('report_date_id',$reportdate->id)->exists();
         return view('forms.reportdate',array_merge(
             [
                 'reportdate' => $reportdate,
-                'ada_laporan' => $ada_laporan,
+                'deletionBlockReason' => $reportdate->deletionBlockReason(),
             ],
         ));
     }
