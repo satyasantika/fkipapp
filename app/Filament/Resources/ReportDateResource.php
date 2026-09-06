@@ -92,15 +92,25 @@ class ReportDateResource extends Resource
                         }
                     }),
                 Tables\Actions\Action::make('reportedList')
-                    ->label('L')
-                    ->tooltip('Daftar yang sudah dilaporkan')
+                    ->label('List Ujian Dilaporkan')
+                    ->tooltip('List Ujian Dilaporkan')
                     ->icon('heroicon-o-clipboard-document-check')
+                    ->iconButton()
                     ->url(fn (ReportDate $record): string => static::getUrl('reported-list', ['record' => $record])),
-                Tables\Actions\Action::make('freshByPeriode')
-                    ->label('R')
-                    ->tooltip('Rekap ulang')
-                    ->icon('heroicon-o-arrow-path')
-                    ->url(fn (ReportDate $record): string => route('reports.fresh.periode', $record->id)),
+                Tables\Actions\Action::make('reportSectionAsn')
+                    ->label('List Bayar ASN')
+                    ->tooltip('List Bayar ASN')
+                    ->icon('heroicon-o-banknotes')
+                    ->color('success')
+                    ->iconButton()
+                    ->url(fn (ReportDate $record): string => route('reports.section', ['pns' => 1, 'report_date_id' => $record->id])),
+                Tables\Actions\Action::make('reportSectionNonAsn')
+                    ->label('List Bayar Non-ASN')
+                    ->tooltip('List Bayar Non-ASN')
+                    ->icon('heroicon-o-banknotes')
+                    ->color('gray')
+                    ->iconButton()
+                    ->url(fn (ReportDate $record): string => route('reports.section', ['pns' => 0, 'report_date_id' => $record->id])),
             ])
             ->bulkActions([
                 //
