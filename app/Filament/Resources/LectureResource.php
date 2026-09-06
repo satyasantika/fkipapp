@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\LectureResource\Pages;
 use App\Filament\Resources\LectureResource\RelationManagers;
 use App\Filament\Concerns\GuardsBulkDeletion;
+use App\Filament\Concerns\ShowsDeletionBlockAlert;
 use App\Models\Lecture;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -17,7 +18,7 @@ use Illuminate\Support\Collection;
 
 class LectureResource extends Resource
 {
-    use GuardsBulkDeletion;
+    use GuardsBulkDeletion, ShowsDeletionBlockAlert;
 
     protected static ?string $model = Lecture::class;
 
@@ -63,6 +64,7 @@ class LectureResource extends Resource
     {
         return $form
             ->schema([
+                static::deletionBlockAlertField(),
                 Forms\Components\Select::make('departement_id')
                     ->label('Jurusan')
                     ->relationship('departement', 'nama')
@@ -132,7 +134,8 @@ class LectureResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

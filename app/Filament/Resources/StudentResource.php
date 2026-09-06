@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\StudentResource\Pages;
 use App\Filament\Resources\StudentResource\RelationManagers;
 use App\Filament\Concerns\GuardsBulkDeletion;
+use App\Filament\Concerns\ShowsDeletionBlockAlert;
 use App\Models\Lecture;
 use App\Models\Student;
 use Filament\Forms;
@@ -18,7 +19,7 @@ use Illuminate\Support\Collection;
 
 class StudentResource extends Resource
 {
-    use GuardsBulkDeletion;
+    use GuardsBulkDeletion, ShowsDeletionBlockAlert;
 
     protected static ?string $model = Student::class;
 
@@ -74,6 +75,7 @@ class StudentResource extends Resource
     {
         return $form
             ->schema([
+                static::deletionBlockAlertField(),
                 Forms\Components\TextInput::make('nim')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('nama')
@@ -178,7 +180,8 @@ class StudentResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->iconButton(),
                 Tables\Actions\Action::make('ujian')
                     ->label('Ujian')
                     ->icon('heroicon-o-academic-cap')

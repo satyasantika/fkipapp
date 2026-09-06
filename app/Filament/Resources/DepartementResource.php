@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DepartementResource\Pages;
 use App\Filament\Resources\DepartementResource\RelationManagers;
 use App\Filament\Concerns\GuardsBulkDeletion;
+use App\Filament\Concerns\ShowsDeletionBlockAlert;
 use App\Models\Departement;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -17,7 +18,7 @@ use Illuminate\Support\Collection;
 
 class DepartementResource extends Resource
 {
-    use GuardsBulkDeletion;
+    use GuardsBulkDeletion, ShowsDeletionBlockAlert;
 
     protected static ?string $model = Departement::class;
 
@@ -41,6 +42,7 @@ class DepartementResource extends Resource
     {
         return $form
             ->schema([
+                static::deletionBlockAlertField(),
                 Forms\Components\TextInput::make('nama')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('mapel')
@@ -65,7 +67,8 @@ class DepartementResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

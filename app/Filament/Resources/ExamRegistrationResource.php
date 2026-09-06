@@ -273,6 +273,7 @@ class ExamRegistrationResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
+                    ->iconButton()
                     ->visible(fn (): bool => $isJurusan),
             ])
             ->bulkActions([

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReportDateResource\Pages;
 use App\Filament\Resources\ReportDateResource\RelationManagers;
+use App\Filament\Concerns\ShowsDeletionBlockAlert;
 use App\Models\ExamRegistration;
 use App\Models\ReportDate;
 use Filament\Forms;
@@ -16,6 +17,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ReportDateResource extends Resource
 {
+    use ShowsDeletionBlockAlert;
+
     protected static ?string $model = ReportDate::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
@@ -43,6 +46,7 @@ class ReportDateResource extends Resource
     {
         return $form
             ->schema([
+                static::deletionBlockAlertField(),
                 Forms\Components\DatePicker::make('tanggal')
                     ->required(),
                 Forms\Components\Textarea::make('deskripsi')
@@ -70,7 +74,8 @@ class ReportDateResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->iconButton(),
                 Tables\Actions\Action::make('reportedList')
                     ->label('L')
                     ->tooltip('Daftar yang sudah dilaporkan')
