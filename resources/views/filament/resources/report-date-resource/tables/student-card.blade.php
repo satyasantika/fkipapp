@@ -27,7 +27,7 @@
 
 <div
     @class([
-        'flex w-full flex-col gap-3 rounded-xl border p-4',
+        'flex flex-col gap-3 rounded-xl border p-4',
         'border-danger-300 bg-danger-50 dark:border-danger-500/30 dark:bg-danger-500/10' => $isDanger,
         'border-success-300 bg-success-50 dark:border-success-500/30 dark:bg-success-500/10' => $isSuccess,
         'border-gray-200 dark:border-white/10' => (! $isDanger) && (! $isSuccess),

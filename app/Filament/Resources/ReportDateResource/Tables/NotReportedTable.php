@@ -117,9 +117,15 @@ class NotReportedTable extends Component implements Actions\Contracts\HasActions
     protected function getTableColumns(): array
     {
         return [
-            Tables\Columns\ViewColumn::make('card')
-                ->label('')
-                ->view('filament.resources.report-date-resource.tables.student-card'),
+            // Dibungkus Layout\Stack supaya Table::$hasColumnsLayout jadi true -
+            // tanpa itu ->contentGrid() diam-diam tidak berpengaruh sama sekali
+            // (index.blade.php Filament cuma memakai grid kalau ada minimal satu
+            // kolom Layout, kolom datar seperti ViewColumn saja tidak dihitung).
+            Tables\Columns\Layout\Stack::make([
+                Tables\Columns\ViewColumn::make('card')
+                    ->label('')
+                    ->view('filament.resources.report-date-resource.tables.student-card'),
+            ]),
         ];
     }
 
