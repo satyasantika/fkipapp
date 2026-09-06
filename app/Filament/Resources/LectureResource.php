@@ -9,7 +9,9 @@ use App\Filament\Concerns\ShowsDeletionBlockAlert;
 use App\Models\Lecture;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Exceptions\Halt;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -136,6 +138,17 @@ class LectureResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->iconButton(),
+                Tables\Actions\DeleteAction::make()
+                    ->iconButton()
+                    ->modalHeading('Hapus dosen ini?')
+                    ->modalDescription('Data dosen ini akan dihapus permanen.')
+                    ->before(function (Lecture $record) {
+                        if ($reason = $record->deletionBlockReason()) {
+                            Notification::make()->title($reason)->danger()->send();
+
+                            throw new Halt();
+                        }
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -158,8 +171,6 @@ class LectureResource extends Resource
     {
         return [
             'index' => Pages\ListLectures::route('/'),
-            'create' => Pages\CreateLecture::route('/create'),
-            'edit' => Pages\EditLecture::route('/{record}/edit'),
         ];
     }
 }

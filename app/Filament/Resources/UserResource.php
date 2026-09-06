@@ -115,6 +115,10 @@ class UserResource extends Resource
 
                         $action->redirect(\Filament\Facades\Filament::getUrl());
                     }),
+                Tables\Actions\DeleteAction::make()
+                    ->iconButton()
+                    ->modalHeading('Hapus pengguna ini?')
+                    ->modalDescription('Akun pengguna ini akan dihapus permanen dan tidak bisa login lagi. Tindakan ini tidak dapat dibatalkan.'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -136,8 +140,6 @@ class UserResource extends Resource
     {
         return [
             'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 }

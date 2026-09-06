@@ -9,7 +9,9 @@ use App\Filament\Concerns\ShowsDeletionBlockAlert;
 use App\Models\ExamType;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Exceptions\Halt;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -69,6 +71,17 @@ class ExamTypeResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->iconButton(),
+                Tables\Actions\DeleteAction::make()
+                    ->iconButton()
+                    ->modalHeading('Hapus jenis ujian ini?')
+                    ->modalDescription('Jenis ujian ini akan dihapus permanen dari daftar.')
+                    ->before(function (ExamType $record) {
+                        if ($reason = $record->deletionBlockReason()) {
+                            Notification::make()->title($reason)->danger()->send();
+
+                            throw new Halt();
+                        }
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -91,8 +104,6 @@ class ExamTypeResource extends Resource
     {
         return [
             'index' => Pages\ListExamTypes::route('/'),
-            'create' => Pages\CreateExamType::route('/create'),
-            'edit' => Pages\EditExamType::route('/{record}/edit'),
         ];
     }
 }
