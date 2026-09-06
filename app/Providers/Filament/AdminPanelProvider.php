@@ -26,12 +26,18 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            // Alamat asli login sekarang /login (lihat routes/web.php), bukan
-            // /admin/login - route login bawaan panel ini dibiarkan ada (banyak
-            // mekanisme internal Filament butuh hasLogin() bernilai true) tapi
-            // cuma jadi redirect tipis ke /login supaya /admin/login tidak jadi
-            // alamat kedua yang "ganda" dengan halaman yang sama.
-            ->login(fn () => redirect('/login'))
+            // Alamat utama login sekarang /login (lihat routes/web.php), tapi
+            // action di sini TETAP class Login (bukan closure redirect) -
+            // Filament cuma mendaftarkan sebuah Login page sebagai komponen
+            // Livewire (registerLivewireComponents() di HasComponents.php)
+            // kalau aksinya adalah class komponen sungguhan. Kalau diganti
+            // closure, pendaftaran itu tidak terjadi sama sekali, dan submit
+            // form di /login akan gagal dengan
+            // Livewire\Exceptions\ComponentNotFoundException (nama komponen
+            // "app.filament.auth.login" tidak pernah terdaftar). /admin/login
+            // jadi tetap berfungsi (duplikat harmless dari halaman yang sama)
+            // - lebih aman daripada mengorbankan pendaftaran komponennya.
+            ->login(\App\Filament\Auth\Login::class)
             ->authGuard('web')
             ->colors([
                 'primary' => Color::Amber,
