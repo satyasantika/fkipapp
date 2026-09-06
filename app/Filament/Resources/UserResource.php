@@ -18,7 +18,7 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
 
     protected static ?string $navigationLabel = 'User';
 
@@ -74,9 +74,9 @@ class UserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('username')
-                    ->searchable(),
+                    ->label('Pengguna')
+                    ->description(fn (User $record): string => '@'.$record->username)
+                    ->searchable(['name', 'username']),
                 Tables\Columns\TextColumn::make('departement.nama')
                     ->label('Jurusan')
                     ->searchable(),
@@ -88,11 +88,13 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->iconButton(),
                 Tables\Actions\Action::make('impersonate')
                     ->label('Impersonate')
                     ->icon('heroicon-o-user-circle')
                     ->color('warning')
+                    ->iconButton()
                     ->requiresConfirmation()
                     ->visible(fn (User $record): bool => $record->id !== auth()->id() && ! $record->hasRole('admin'))
                     ->action(fn (User $record) => app(ImpersonateController::class)->take($record))
@@ -100,7 +102,9 @@ class UserResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->modalHeading('Hapus pengguna yang dipilih?')
+                        ->modalDescription('Semua akun pengguna yang dipilih akan dihapus permanen dan tidak bisa login lagi.'),
                 ]),
             ]);
     }

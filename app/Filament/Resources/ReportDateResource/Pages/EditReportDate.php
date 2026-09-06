@@ -3,9 +3,10 @@
 namespace App\Filament\Resources\ReportDateResource\Pages;
 
 use App\Filament\Resources\ReportDateResource;
-use App\Models\ExamRegistration;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Exceptions\Halt;
 
 class EditReportDate extends EditRecord
 {
@@ -15,7 +16,16 @@ class EditReportDate extends EditRecord
     {
         return [
             Actions\DeleteAction::make()
-                ->visible(fn (): bool => ! ExamRegistration::where('report_date_id', $this->record->id)->exists()),
+                ->iconButton()
+                ->modalHeading('Hapus tanggal penarikan laporan ini?')
+                ->modalDescription('Tanggal penarikan laporan ini akan dihapus permanen.')
+                ->before(function () {
+                    if ($reason = $this->record->deletionBlockReason()) {
+                        Notification::make()->title($reason)->danger()->send();
+
+                        throw new Halt();
+                    }
+                }),
         ];
     }
 }

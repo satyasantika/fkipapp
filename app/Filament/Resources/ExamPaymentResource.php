@@ -17,7 +17,7 @@ class ExamPaymentResource extends Resource
 {
     protected static ?string $model = ExamPayment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
     protected static ?string $navigationLabel = 'Rate Honor';
 
@@ -71,7 +71,9 @@ class ExamPaymentResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->modalHeading('Hapus rate honor yang dipilih?')
+                        ->modalDescription('Semua rate honor yang dipilih akan dihapus permanen.'),
                 ]),
             ]);
     }

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ExamTypeResource\Pages;
 use App\Filament\Resources\ExamTypeResource\RelationManagers;
+use App\Filament\Concerns\GuardsBulkDeletion;
 use App\Models\ExamType;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -12,12 +13,15 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Collection;
 
 class ExamTypeResource extends Resource
 {
+    use GuardsBulkDeletion;
+
     protected static ?string $model = ExamType::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
 
     protected static ?string $navigationLabel = 'Jenis Ujian';
 
@@ -65,7 +69,10 @@ class ExamTypeResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->modalHeading('Hapus jenis ujian yang dipilih?')
+                        ->modalDescription('Semua jenis ujian yang dipilih akan dihapus permanen dari daftar.')
+                        ->before(fn (Collection $records) => static::haltIfAnyRecordIsReferenced($records)),
                 ]),
             ]);
     }

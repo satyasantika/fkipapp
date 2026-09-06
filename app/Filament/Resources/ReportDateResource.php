@@ -18,7 +18,7 @@ class ReportDateResource extends Resource
 {
     protected static ?string $model = ReportDate::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
 
     protected static ?string $navigationLabel = 'Penarikan Laporan';
 
