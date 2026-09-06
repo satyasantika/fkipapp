@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ReportDateResource\Tables;
 use App\Http\Controllers\ReportDateController;
 use App\Models\ExamRegistration;
 use App\Models\ReportDate;
+use App\Models\Student;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Infolists;
@@ -18,13 +19,23 @@ use Illuminate\Http\Request;
 use Livewire\Component;
 
 /**
- * Roster gabungan semua ujian yang belum dilaporkan ke periode manapun -
- * dulu terpisah jadi dua slide-over (satu untuk semua jenis ujian, satu
- * lagi khusus sidang dengan opsi tambah sekaligus sempro/semhas-nya).
- * Digabung jadi satu tabel: badge "+ jenis: tanggal" menambahkan hanya
- * baris itu, badge "+N semua ujian" (muncul kalau mahasiswa itu masih
- * punya lebih dari satu ujian pending) menambahkan semuanya sekaligus -
- * keduanya ditaruh di kolom Ujian supaya tidak perlu kolom tanggal terpisah.
+ * Roster mahasiswa (satu mahasiswa = satu kartu, bukan satu baris per
+ * ujian) yang punya minimal satu ujian belum dilaporkan ke periode
+ * manapun. Kartu menampilkan badge tiap jenis ujian yang masih pending
+ * (sempro/semhas/sidang, warna beda per jenis) - klik badge itu untuk
+ * menambahkan ujian itu saja ke laporan, atau badge "+N semua ujian"
+ * (muncul kalau mahasiswa itu punya >1 ujian pending) untuk menambahkan
+ * semuanya sekaligus - beserta nama pembimbing/penguji dari ujian
+ * terbarunya.
+ *
+ * Filter "Sudah Sidang" MENYARING MAHASISWA (siapa saja yang salah satu
+ * ujian pending-nya sidang), bukan menyaring badge ujian - sempro/semhas
+ * mahasiswa itu tetap ikut tampil di kartunya.
+ *
+ * Kartu diwarnai danger kalau mahasiswa itu sidangnya sudah pernah
+ * dilaporkan (report_date_id terisi) TAPI masih ada sempro/semhas yang
+ * baru muncul belum dilaporkan sama sekali - urutan yang janggal dan
+ * perlu perhatian staf keuangan.
  *
  * Kombinasi 4 interface+trait ini meniru persis Filament\Widgets\TableWidget
  * bawaan (lihat vendor/filament/widgets/src/TableWidget.php) - HasTable saja
@@ -45,47 +56,54 @@ class NotReportedTable extends Component implements Actions\Contracts\HasActions
     {
         return $table
             ->query($this->getTableQuery())
+            ->contentGrid(['md' => 2, 'xl' => 3])
             ->columns($this->getTableColumns())
             ->filters($this->getTableFilters())
-            ->defaultSort('tanggal_ujian', 'desc');
+            ->filtersLayout(Tables\Enums\FiltersLayout::AboveContent)
+            ->defaultSort('latest_ujian', 'desc');
     }
 
     protected function getTableQuery(): Builder
     {
-        $query = ExamRegistration::with([
-            'exam_type', 'student',
-            'student.examregistrations' => fn ($q) => $q->whereNull('report_date_id'),
-        ]);
-
-        if (auth()->user()?->hasRole('keuangan')) {
-            $query->whereNull('report_date_id');
-        }
-
-        return $query;
+        return Student::query()
+            ->whereHas('examregistrations', fn (Builder $q) => $q->whereNull('report_date_id'))
+            ->with([
+                'examregistrations' => fn ($q) => $q->whereNull('report_date_id')
+                    ->with(['exam_type', 'pembimbing1', 'pembimbing2', 'penguji1', 'penguji2', 'penguji3'])
+                    ->orderByDesc('tanggal_ujian'),
+            ])
+            ->withMax(['examregistrations as latest_ujian' => fn ($q) => $q->whereNull('report_date_id')], 'tanggal_ujian')
+            ->withExists(['examregistrations as has_reported_sidang' => fn ($q) => $q
+                ->where('exam_type_id', self::EXAM_TYPE_SIDANG)
+                ->whereNotNull('report_date_id'),
+            ]);
     }
 
     protected function getTableColumns(): array
     {
         return [
-            Tables\Columns\ViewColumn::make('ujian')
-                ->label('Ujian')
-                ->view('filament.resources.report-date-resource.tables.ujian-badge'),
-            Tables\Columns\TextColumn::make('student.nim')
-                ->label('NIM')
-                ->searchable(),
-            Tables\Columns\TextColumn::make('student.nama')
-                ->label('Mahasiswa')
-                ->searchable(),
+            Tables\Columns\ViewColumn::make('card')
+                ->label('')
+                ->view('filament.resources.report-date-resource.tables.student-card')
+                ->searchable(query: function (Builder $query, string $search): Builder {
+                    return $query->where(function (Builder $q) use ($search) {
+                        $q->where('nim', 'like', "%{$search}%")
+                            ->orWhere('nama', 'like', "%{$search}%");
+                    });
+                }),
         ];
     }
 
     protected function getTableFilters(): array
     {
         return [
-            Tables\Filters\Filter::make('sidangSaja')
-                ->label('Hanya sidang')
+            Tables\Filters\Filter::make('sudahSidang')
+                ->label('Sudah Sidang')
                 ->toggle()
-                ->query(fn (Builder $query): Builder => $query->where('exam_type_id', self::EXAM_TYPE_SIDANG)),
+                ->query(fn (Builder $query): Builder => $query->whereHas(
+                    'examregistrations',
+                    fn ($q) => $q->whereNull('report_date_id')->where('exam_type_id', self::EXAM_TYPE_SIDANG)
+                )),
         ];
     }
 
