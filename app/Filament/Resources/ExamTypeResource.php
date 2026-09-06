@@ -73,6 +73,7 @@ class ExamTypeResource extends Resource
                     ->iconButton(),
                 Tables\Actions\DeleteAction::make()
                     ->iconButton()
+                    ->visible(fn (ExamType $record): bool => ! $record->deletionBlockReason())
                     ->modalHeading('Hapus jenis ujian ini?')
                     ->modalDescription('Jenis ujian ini akan dihapus permanen dari daftar.')
                     ->before(function (ExamType $record) {

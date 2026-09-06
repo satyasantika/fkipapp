@@ -73,6 +73,7 @@ class DepartementResource extends Resource
                     ->iconButton(),
                 Tables\Actions\DeleteAction::make()
                     ->iconButton()
+                    ->visible(fn (Departement $record): bool => ! $record->deletionBlockReason())
                     ->modalHeading('Hapus jurusan ini?')
                     ->modalDescription('Data jurusan ini akan dihapus permanen.')
                     ->before(function (Departement $record) {

@@ -140,6 +140,7 @@ class LectureResource extends Resource
                     ->iconButton(),
                 Tables\Actions\DeleteAction::make()
                     ->iconButton()
+                    ->visible(fn (Lecture $record): bool => ! $record->deletionBlockReason())
                     ->modalHeading('Hapus dosen ini?')
                     ->modalDescription('Data dosen ini akan dihapus permanen.')
                     ->before(function (Lecture $record) {
