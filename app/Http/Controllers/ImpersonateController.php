@@ -22,8 +22,9 @@ class ImpersonateController extends Controller
         ]);
 
         session(['impersonator_id' => auth()->id()]);
+        // Tidak perlu session()->regenerate() manual - Auth::login() sudah
+        // memanggilnya sendiri (SessionGuard::updateSession() -> migrate(true)).
         Auth::login($user);
-        request()->session()->regenerate();
 
         return redirect(\Filament\Facades\Filament::getUrl())->with('success', 'Anda sekarang login sebagai '.$user->name);
     }
@@ -42,7 +43,6 @@ class ImpersonateController extends Controller
         ]);
 
         Auth::loginUsingId($impersonatorId);
-        request()->session()->regenerate();
 
         return redirect(\App\Filament\Resources\UserResource::getUrl())->with('success', 'Kembali ke akun admin.');
     }

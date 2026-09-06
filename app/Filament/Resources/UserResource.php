@@ -8,6 +8,7 @@ use App\Http\Controllers\ImpersonateController;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -97,8 +98,23 @@ class UserResource extends Resource
                     ->iconButton()
                     ->requiresConfirmation()
                     ->visible(fn (User $record): bool => $record->id !== auth()->id() && ! $record->hasRole('admin'))
-                    ->action(fn (User $record) => app(ImpersonateController::class)->take($record))
-                    ->successRedirectUrl(fn () => \Filament\Facades\Filament::getUrl()),
+                    // Custom Action::make() TIDAK pernah memanggil success() secara
+                    // otomatis (beda dari CreateAction/EditAction/DeleteAction bawaan),
+                    // jadi ->successRedirectUrl() TIDAK PERNAH terpicu di sini - itu
+                    // sebabnya redirect sebelumnya kadang mendarat di /admin/login
+                    // (auth state belum tentu konsisten saat Livewire "menebak" redirect
+                    // dari return value closure). $action->redirect() adalah API resmi
+                    // Livewire yang dijamin bekerja untuk action apa pun.
+                    ->action(function (User $record, Tables\Actions\Action $action) {
+                        app(ImpersonateController::class)->take($record);
+
+                        Notification::make()
+                            ->title('Anda sekarang login sebagai '.$record->name)
+                            ->success()
+                            ->send();
+
+                        $action->redirect(\Filament\Facades\Filament::getUrl());
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
