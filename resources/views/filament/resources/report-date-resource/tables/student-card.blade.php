@@ -44,7 +44,7 @@
         </p>
     @endif
 
-    <div class="flex flex-wrap gap-1">
+    <div class="flex flex-col items-start gap-1">
         @foreach ($pendingChrono as $examRegistration)
             @php
                 $type = $examRegistration->ujian ?? '';
