@@ -44,7 +44,22 @@ Route::get('/login', \App\Filament\Auth\Login::class)
     ])
     ->name('login');
 
-Auth::routes(['register' => false, 'login' => false]);
+// 'logout' TIDAK ikut dimatikan otomatis oleh opsi di atas (beda dari
+// 'login'/'register') - lihat vendor/laravel/ui/src/AuthRouteMethods.php,
+// defaultnya selalu true dan diarahkan ke Auth\LoginController@logout, yang
+// sudah dihapus bareng LoginController lama. Kalau tidak dimatikan di sini,
+// tombol "Logout" di layouts.app (dipakai /users, /students, /lectures, dst)
+// akan error "Target class [...LoginController] does not exist" saat diklik.
+Auth::routes(['register' => false, 'login' => false, 'logout' => false]);
+
+Route::post('/logout', function (\Illuminate\Http\Request $request) {
+    Auth::guard('web')->logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/login');
+})->name('logout');
+
 Route::middleware('auth')->group(function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::group(['middleware' => ['role:admin']], function () {
