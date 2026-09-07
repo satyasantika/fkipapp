@@ -85,16 +85,42 @@
         @endforeach
 
         <x-filament::dropdown.list.item
-            :action="$logoutItem?->getUrl() ?? filament()->getLogoutUrl()"
             :color="$logoutItem?->getColor()"
             :icon="$logoutItem?->getIcon() ?? \Filament\Support\Facades\FilamentIcon::resolve('panels::user-menu.logout-button') ?? 'heroicon-m-arrow-left-on-rectangle'"
-            method="post"
-            tag="form"
-            onclick="return confirm('Keluar dari akun ini?')"
+            tag="button"
+            x-on:click="$dispatch('open-modal', { id: 'confirm-logout' })"
         >
             {{ $logoutItem?->getLabel() ?? __('filament-panels::layout.actions.logout.label') }}
         </x-filament::dropdown.list.item>
     </x-filament::dropdown.list>
 </x-filament::dropdown>
+
+{{-- Modal konfirmasi logout (bukan browser confirm() biasa) - id dicocokkan
+    lewat event 'open-modal' yang di-dispatch tombol logout di atas, lihat
+    vendor/filament/support/resources/views/components/modal/index.blade.php
+    (listener x-on:{{ $openEventName }}.window mencocokkan $event.detail.id). --}}
+<x-filament::modal id="confirm-logout" width="sm" icon="heroicon-o-arrow-left-on-rectangle" icon-color="danger">
+    <x-slot name="heading">
+        Keluar dari akun ini?
+    </x-slot>
+
+    <p class="text-sm text-gray-500 dark:text-gray-400">
+        Anda perlu login kembali untuk mengakses panel ini.
+    </p>
+
+    <x-slot name="footerActions">
+        <x-filament::button color="gray" x-on:click="close">
+            Batal
+        </x-filament::button>
+
+        <form action="{{ $logoutItem?->getUrl() ?? filament()->getLogoutUrl() }}" method="post">
+            @csrf
+
+            <x-filament::button type="submit" color="danger">
+                Ya, keluar
+            </x-filament::button>
+        </form>
+    </x-slot>
+</x-filament::modal>
 
 {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::USER_MENU_AFTER) }}
