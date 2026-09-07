@@ -32,6 +32,11 @@ class ExamRegistration extends Model
         return $this->belongsTo(ExamType::class, 'exam_type_id');
     }
 
+    public function ketuapenguji()
+    {
+        return $this->belongsTo(Lecture::class, 'ketuapenguji_id');
+    }
+
     public function penguji1()
     {
         return $this->belongsTo(Lecture::class, 'penguji1_id');
