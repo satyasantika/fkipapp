@@ -42,7 +42,7 @@ class ExamRegistrationResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery()
-            ->with(['exam_type', 'student.departement', 'pembimbing1', 'pembimbing2', 'penguji1', 'penguji2', 'penguji3']);
+            ->with(['exam_type', 'student.departement', 'pembimbing1', 'pembimbing2', 'ketuapenguji', 'penguji1', 'penguji2', 'penguji3']);
 
         if (auth()->user()?->hasRole('jurusan')) {
             $query->where('departement_id', auth()->user()->departement_id);
@@ -241,7 +241,12 @@ class ExamRegistrationResource extends Resource
                 }),
             Tables\Columns\TextColumn::make('penguji')
                 ->label('Penguji')
+                // ketuapenguji ikut disertakan - dia genuinely orang ke-3
+                // (bukan penguji1/2/3 yang sama, sudah dicek langsung di data
+                // dev: ketuapenguji_id selalu berbeda dari penguji1/2/3_id).
+                // Tanpa ini "Penguji" cuma menunjukkan 2 dari 3 orang.
                 ->getStateUsing(fn (ExamRegistration $record): array => collect([
+                    $record->ketuapenguji?->nama,
                     $record->penguji1?->nama,
                     $record->penguji2?->nama,
                     $record->penguji3?->nama,
@@ -250,7 +255,8 @@ class ExamRegistrationResource extends Resource
                 ->bulleted()
                 ->searchable(query: function (Builder $query, string $search): Builder {
                     return $query->where(function (Builder $q) use ($search) {
-                        $q->orWhereHas('penguji1', fn (Builder $r) => $r->where('nama', 'like', "%{$search}%"))
+                        $q->orWhereHas('ketuapenguji', fn (Builder $r) => $r->where('nama', 'like', "%{$search}%"))
+                            ->orWhereHas('penguji1', fn (Builder $r) => $r->where('nama', 'like', "%{$search}%"))
                             ->orWhereHas('penguji2', fn (Builder $r) => $r->where('nama', 'like', "%{$search}%"))
                             ->orWhereHas('penguji3', fn (Builder $r) => $r->where('nama', 'like', "%{$search}%"));
                     });
