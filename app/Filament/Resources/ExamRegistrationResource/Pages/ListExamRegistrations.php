@@ -124,20 +124,49 @@ class ListExamRegistrations extends ListRecords
 
         FilamentView::registerRenderHook(
             PanelsRenderHook::RESOURCE_PAGES_LIST_RECORDS_TABLE_BEFORE,
-            fn (): string => view('filament.resources.exam-registration-resource.calendar', [
-                'month' => $this->calendarMonth,
-                'year' => $this->calendarYear,
-                'selectedDate' => $this->selectedDate,
-                'days' => $this->getCalendarDays(),
-                'canSync' => $this->canSync(),
-                'departements' => $this->canSync() ? Departement::orderBy('nama')->get() : collect(),
-                'syncStep' => $this->syncStep,
-                'syncPreview' => $this->syncPreview,
-                'syncDepartementId' => $this->syncDepartementId,
-                'isJurusan' => auth()->user()?->hasRole('jurusan') ?? false,
-            ])->render(),
+            function (): string {
+                $days = $this->getCalendarDays();
+
+                return view('filament.resources.exam-registration-resource.calendar', [
+                    'month' => $this->calendarMonth,
+                    'year' => $this->calendarYear,
+                    'selectedDate' => $this->selectedDate,
+                    'days' => $days,
+                    'legend' => $this->getLegendCounts($days),
+                    'canSync' => $this->canSync(),
+                    'departements' => $this->canSync() ? Departement::orderBy('nama')->get() : collect(),
+                    'syncStep' => $this->syncStep,
+                    'syncPreview' => $this->syncPreview,
+                    'syncDepartementId' => $this->syncDepartementId,
+                    'isJurusan' => auth()->user()?->hasRole('jurusan') ?? false,
+                ])->render();
+            },
             scopes: static::class,
         );
+    }
+
+    /**
+     * Angka yang ditampilkan di badge legenda kalender - jumlah untuk
+     * TANGGAL yang dipilih kalau ada, atau jumlah SEBULAN kalau belum
+     * pilih tanggal. Dinamis mengikuti $selectedDate, bukan angka tetap.
+     */
+    protected function getLegendCounts(array $days): array
+    {
+        $empty = ['total' => 0, 'sudah' => 0, 'belum' => 0, 'sempro' => 0, 'semhas' => 0, 'sidang' => 0];
+
+        if ($this->selectedDate) {
+            return $days[$this->selectedDate] ?? $empty;
+        }
+
+        $sum = $empty;
+
+        foreach ($days as $day) {
+            foreach ($sum as $key => $value) {
+                $sum[$key] += $day[$key] ?? 0;
+            }
+        }
+
+        return $sum;
     }
 
     /**

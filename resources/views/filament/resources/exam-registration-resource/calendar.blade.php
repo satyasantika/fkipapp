@@ -12,8 +12,6 @@
     $today = Carbon::today()->toDateString();
     $currentYear = now()->year;
     $years = range($currentYear - 5, $currentYear + 1);
-
-    $monthTotal = array_sum(array_column($days, 'total'));
 @endphp
 
 <div class="fi-section mb-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10">
@@ -74,25 +72,25 @@
         </div>
 
         <div class="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
-            <span>Total ujian bulan ini: <strong class="text-gray-900 dark:text-white">{{ $monthTotal }}</strong></span>
+            <span>
+                {{ $selectedDate ? Carbon::parse($selectedDate)->translatedFormat('d M Y') : 'Bulan ini' }}:
+            </span>
 
-            {{-- Ini keterangan warna (legenda), bukan angka sungguhan - dulu
-                 pakai <x-filament::badge> berisi "0" cuma untuk membentuk
-                 pil berwarna, tapi kelihatan seperti hitungan asli yang
-                 macet di nol. Diganti bulatan warna polos supaya jelas ini
-                 cuma kunci warna. --}}
+            {{-- Badge asli dengan angka sungguhan - dinamis mengikuti tanggal
+                 yang dipilih (kalau ada), atau sebulan penuh kalau belum
+                 pilih tanggal (lihat ListExamRegistrations::getLegendCounts()). --}}
             @if ($isJurusan)
-                <span class="flex items-center gap-3">
-                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full" style="background-color: rgb(var(--info-500))"></span> Total</span>
-                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-gray-400"></span> Sempro</span>
-                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full" style="background-color: rgb(var(--warning-500))"></span> Semhas</span>
-                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full" style="background-color: rgb(var(--success-500))"></span> Sidang</span>
+                <span class="flex items-center gap-1.5">
+                    <x-filament::badge color="info" size="sm">{{ $legend['total'] }} Total</x-filament::badge>
+                    <x-filament::badge color="gray" size="sm">{{ $legend['sempro'] }} Sempro</x-filament::badge>
+                    <x-filament::badge color="warning" size="sm">{{ $legend['semhas'] }} Semhas</x-filament::badge>
+                    <x-filament::badge color="success" size="sm">{{ $legend['sidang'] }} Sidang</x-filament::badge>
                 </span>
             @else
-                <span class="flex items-center gap-3">
-                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full" style="background-color: rgb(var(--info-500))"></span> Total</span>
-                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full" style="background-color: rgb(var(--warning-500))"></span> Belum</span>
-                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full" style="background-color: rgb(var(--success-500))"></span> Sudah</span>
+                <span class="flex items-center gap-1.5">
+                    <x-filament::badge color="info" size="sm">{{ $legend['total'] }} Total</x-filament::badge>
+                    <x-filament::badge color="warning" size="sm">{{ $legend['belum'] }} Belum</x-filament::badge>
+                    <x-filament::badge color="success" size="sm">{{ $legend['sudah'] }} Sudah</x-filament::badge>
                 </span>
             @endif
         </div>
