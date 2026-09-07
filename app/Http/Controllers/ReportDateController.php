@@ -133,6 +133,10 @@ class ReportDateController extends Controller
             return redirect()->back()->with('warning','Periode laporan tujuan tidak ditemukan.');
         }
 
+        if (ReportDate::find($report_date_id)?->is_locked) {
+            throw new \RuntimeException('Penarikan laporan ini sedang terkunci, tidak bisa ditambah/dikurangi.');
+        }
+
         $toAdd = ExamRegistration::where('student_id',$examregistration->student_id)
             ->whereIn('exam_type_id',[1,2,3])
             ->whereNull('report_date_id')
@@ -175,6 +179,10 @@ class ReportDateController extends Controller
             return redirect()->back()->with('warning','Periode laporan tujuan tidak ditemukan.');
         }
 
+        if (ReportDate::find($report_date_id)?->is_locked) {
+            throw new \RuntimeException('Penarikan laporan ini sedang terkunci, tidak bisa ditambah/dikurangi.');
+        }
+
         $toAdd = ExamRegistration::whereNull('report_date_id')
             ->where(function ($q) use ($lecture) {
                 $q->where('pembimbing1_id', $lecture->id)
@@ -211,6 +219,13 @@ class ReportDateController extends Controller
     public function setReportDate(Request $request, ExamRegistration $examregistration)
     {
         $report_date_id = empty($examregistration->report_date_id) ? $request->report_date_id : $examregistration->report_date_id;
+
+        // $report_date_id di sini adalah periode yang SEDANG dipakai (retract)
+        // ATAU periode TUJUAN (tambah) - jadi satu pengecekan ini menutup
+        // kedua arah "ditambah/dikurangi" sekaligus.
+        if ($report_date_id && ReportDate::find($report_date_id)?->is_locked) {
+            throw new \RuntimeException('Penarikan laporan ini sedang terkunci, tidak bisa ditambah/dikurangi.');
+        }
 
         $data = $request->all();
         $examregistration->fill($data)->save();
