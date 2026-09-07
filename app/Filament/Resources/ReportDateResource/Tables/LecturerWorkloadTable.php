@@ -106,6 +106,25 @@ class LecturerWorkloadTable extends Component implements Actions\Contracts\HasAc
         ])->flatten()->unique('id');
     }
 
+    /**
+     * Nama mahasiswa dari sekumpulan ExamRegistration, dipakai sebagai isi
+     * tooltip badge jumlah menguji/membimbing - null (bukan string kosong)
+     * kalau kosong supaya Filament tidak menampilkan tooltip sama sekali
+     * untuk badge yang angkanya 0.
+     */
+    protected static function studentNamesTooltip(Collection $registrations): ?string
+    {
+        if ($registrations->isEmpty()) {
+            return null;
+        }
+
+        return $registrations
+            ->map(fn ($registration) => $registration->student?->nama)
+            ->filter()
+            ->unique()
+            ->implode(', ');
+    }
+
     protected function getTableColumns(): array
     {
         return [
@@ -120,22 +139,26 @@ class LecturerWorkloadTable extends Component implements Actions\Contracts\HasAc
                     ->label('Total')
                     ->badge()
                     ->color('primary')
-                    ->getStateUsing(fn (Lecture $record) => static::pengujiRegistrations($record)->count()),
+                    ->getStateUsing(fn (Lecture $record) => static::pengujiRegistrations($record)->count())
+                    ->tooltip(fn (Lecture $record) => static::studentNamesTooltip(static::pengujiRegistrations($record))),
                 Tables\Columns\TextColumn::make('menguji_sempro')
                     ->label('Sempro')
                     ->badge()
                     ->color('gray')
-                    ->getStateUsing(fn (Lecture $record) => static::pengujiRegistrations($record)->where('ujian', 'sempro')->count()),
+                    ->getStateUsing(fn (Lecture $record) => static::pengujiRegistrations($record)->where('ujian', 'sempro')->count())
+                    ->tooltip(fn (Lecture $record) => static::studentNamesTooltip(static::pengujiRegistrations($record)->where('ujian', 'sempro'))),
                 Tables\Columns\TextColumn::make('menguji_semhas')
                     ->label('Semhas')
                     ->badge()
                     ->color('info')
-                    ->getStateUsing(fn (Lecture $record) => static::pengujiRegistrations($record)->where('ujian', 'semhas')->count()),
+                    ->getStateUsing(fn (Lecture $record) => static::pengujiRegistrations($record)->where('ujian', 'semhas')->count())
+                    ->tooltip(fn (Lecture $record) => static::studentNamesTooltip(static::pengujiRegistrations($record)->where('ujian', 'semhas'))),
                 Tables\Columns\TextColumn::make('menguji_sidang')
                     ->label('Sidang')
                     ->badge()
                     ->color('success')
-                    ->getStateUsing(fn (Lecture $record) => static::pengujiRegistrations($record)->where('ujian', 'sidang')->count()),
+                    ->getStateUsing(fn (Lecture $record) => static::pengujiRegistrations($record)->where('ujian', 'sidang')->count())
+                    ->tooltip(fn (Lecture $record) => static::studentNamesTooltip(static::pengujiRegistrations($record)->where('ujian', 'sidang'))),
             ]),
 
             Tables\Columns\ColumnGroup::make('Jumlah Membimbing', [
@@ -143,17 +166,22 @@ class LecturerWorkloadTable extends Component implements Actions\Contracts\HasAc
                     ->label('Total')
                     ->badge()
                     ->color('primary')
-                    ->getStateUsing(fn (Lecture $record) => $record->pembimbing1Registrations->count() + $record->pembimbing2Registrations->count()),
+                    ->getStateUsing(fn (Lecture $record) => $record->pembimbing1Registrations->count() + $record->pembimbing2Registrations->count())
+                    ->tooltip(fn (Lecture $record) => static::studentNamesTooltip(
+                        collect([$record->pembimbing1Registrations, $record->pembimbing2Registrations])->flatten()
+                    )),
                 Tables\Columns\TextColumn::make('membimbing_1')
-                    ->label('Pembimbing 1')
+                    ->label('Pemb 1')
                     ->badge()
                     ->color('warning')
-                    ->getStateUsing(fn (Lecture $record) => $record->pembimbing1Registrations->count()),
+                    ->getStateUsing(fn (Lecture $record) => $record->pembimbing1Registrations->count())
+                    ->tooltip(fn (Lecture $record) => static::studentNamesTooltip($record->pembimbing1Registrations)),
                 Tables\Columns\TextColumn::make('membimbing_2')
-                    ->label('Pembimbing 2')
+                    ->label('Pemb 2')
                     ->badge()
                     ->color('info')
-                    ->getStateUsing(fn (Lecture $record) => $record->pembimbing2Registrations->count()),
+                    ->getStateUsing(fn (Lecture $record) => $record->pembimbing2Registrations->count())
+                    ->tooltip(fn (Lecture $record) => static::studentNamesTooltip($record->pembimbing2Registrations)),
             ]),
         ];
     }
