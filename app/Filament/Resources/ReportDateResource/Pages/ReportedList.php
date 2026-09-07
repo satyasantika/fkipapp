@@ -84,7 +84,7 @@ class ReportedList extends Page implements HasTable
 
     protected function getTableQuery(): Builder
     {
-        $query = ExamRegistration::with(['exam_type', 'student', 'pembimbing1', 'pembimbing2', 'penguji1', 'penguji2', 'penguji3']);
+        $query = ExamRegistration::with(['exam_type', 'student.departement', 'pembimbing1', 'pembimbing2', 'penguji1', 'penguji2', 'penguji3']);
 
         if (auth()->user()?->hasRole('keuangan')) {
             $query->where('report_date_id', $this->record->id);
@@ -109,7 +109,9 @@ class ReportedList extends Page implements HasTable
                 ->date(),
             Tables\Columns\TextColumn::make('student.nama')
                 ->label('Mahasiswa')
-                ->description(fn (ExamRegistration $record): ?string => $record->student?->nim),
+                ->description(fn (ExamRegistration $record): ?string => $record->student
+                    ? $record->student->nim.' - '.($record->student->departement?->nama ?? '-')
+                    : null),
             Tables\Columns\TextColumn::make('pembimbing')
                 ->label('Pembimbing')
                 ->getStateUsing(fn (ExamRegistration $record): array => collect([
