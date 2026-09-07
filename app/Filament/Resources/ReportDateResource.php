@@ -177,6 +177,19 @@ class ReportDateResource extends Resource
                     ->icon('heroicon-o-clipboard-document-check')
                     ->iconButton()
                     ->url(fn (ReportDate $record): string => static::getUrl('reported-list', ['record' => $record])),
+                Tables\Actions\Action::make('verifikasiData')
+                    ->label('Verifikasi Data')
+                    ->tooltip('Verifikasi Data')
+                    ->icon('heroicon-o-scale')
+                    ->iconButton()
+                    ->slideOver()
+                    ->modalWidth('7xl')
+                    ->modalHeading(fn (ReportDate $record): string => 'Verifikasi Data - '.\Illuminate\Support\Carbon::parse($record->tanggal)->format('Y-m-d'))
+                    ->modalContent(fn (ReportDate $record) => view('filament.resources.report-date-resource.tables.verification-slideover', [
+                        'record' => $record,
+                    ]))
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup'),
                 Tables\Actions\Action::make('reportSectionAsn')
                     ->label('List Bayar ASN')
                     ->tooltip('List Bayar ASN')
