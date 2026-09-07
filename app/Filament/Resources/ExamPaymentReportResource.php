@@ -36,7 +36,7 @@ class ExamPaymentReportResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->hasRole('keuangan') ?? false;
+        return false;
     }
 
     public static function canViewAny(): bool
