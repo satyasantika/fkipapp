@@ -23,7 +23,7 @@
                 <div style="font-size: 2.25rem; line-height: 1; font-weight: 700; color: #111827;">{{ $total }}</div>
                 <div style="margin-top: 0.25rem; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.025em; color: #6b7280;">TOTAL UJIAN</div>
                 <div style="margin-top: 0.5rem; font-size: 0.875rem; font-weight: 600; color: #16a34a;">
-                    {{ $sudah }} Sudah Dilaporkan
+                    {{ $sudah }} Sudah Dibayarkan
                 </div>
             </div>
 
@@ -32,7 +32,7 @@
             >
                 <div style="width: 64px; height: 64px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #eff6ff;">
                     <span style="font-size: 1rem; font-weight: 700; color: #111827;">{{ $sudahPct }}%</span>
-                    <span style="font-size: 9px; font-weight: 600; letter-spacing: 0.025em; color: #9ca3af;">DILAPORKAN</span>
+                    <span style="font-size: 9px; font-weight: 600; letter-spacing: 0.025em; color: #9ca3af;">DIBAYARKAN</span>
                 </div>
             </div>
         </div>
@@ -44,7 +44,7 @@
             <div>
                 <div style="font-size: 2.25rem; line-height: 1; font-weight: 700; color: #111827;">{{ $belum }}</div>
                 <div style="margin-top: 0.25rem; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.025em; color: #6b7280;">
-                    BELUM DILAPORKAN
+                    BELUM DIBAYARKAN
                     <span style="font-weight: 700; color: #d97706;">{{ $belumPct }}%</span>
                 </div>
             </div>
