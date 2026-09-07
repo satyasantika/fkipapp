@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace App\Filament\Resources\ReportDateResource\Tables;
 
 use App\Models\ExamRegistration;
 use App\Models\Lecture;
@@ -11,61 +11,37 @@ use Filament\Actions;
 use Filament\Forms;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
-use Filament\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
+use Livewire\Component;
 
 /**
  * Bandingkan exam_payment_reports (List Bayar ASN+Non-ASN, satu tabel yang
- * sama) dengan hitungan fresh dari exam_registrations, per dosen per
- * periode - lihat ExamPaymentReconciliationService untuk logika
- * pembandingnya. Tombol "Sinkronisasi" muncul hanya kalau ada metrik yang
- * tidak cocok, memanggil ulang ExamPaymentReportService::store() (method
- * resmi yang juga dipakai alur "Laporkan Ujian" biasa) untuk SETIAP
- * registrasi ujian dosen itu di periode ini, supaya hasil akhirnya identik
- * dengan kalau ujian-ujian itu baru saja dilaporkan lewat alur normal.
+ * sama) dengan hitungan fresh dari exam_registrations, per dosen, untuk SATU
+ * periode ($this->record) - dipakai di slide-over "Verifikasi Data" pada
+ * baris ReportDateResource, di kanan tombol "List Ujian Dilaporkan".
+ * Sebelumnya ini halaman menu tersendiri (VerifikasiLaporanHonor) dengan
+ * selector periode manual - dipindah ke sini supaya periodenya otomatis
+ * dari record yang diklik, konsisten dengan NotReportedTable/
+ * PaymentSectionTable yang sudah ada.
+ *
+ * Lihat ExamPaymentReconciliationService untuk logika pembandingnya.
  */
-class VerifikasiLaporanHonor extends Page implements HasTable
+class VerificationTable extends Component implements Actions\Contracts\HasActions, Forms\Contracts\HasForms, Infolists\Contracts\HasInfolists, HasTable
 {
     use Actions\Concerns\InteractsWithActions;
     use Forms\Concerns\InteractsWithForms;
     use Infolists\Concerns\InteractsWithInfolists;
     use InteractsWithTable;
 
-    protected static ?string $navigationIcon = 'heroicon-o-scale';
+    public ReportDate $record;
 
-    protected static ?string $navigationLabel = 'Verifikasi Laporan Honor';
-
-    protected static ?string $title = 'Verifikasi Laporan Honor';
-
-    protected static string $view = 'filament.pages.verifikasi-laporan-honor';
-
-    public ?int $reportDateId = null;
-
-    public static function canAccess(): bool
+    public function render()
     {
-        return auth()->user()?->hasRole('keuangan') ?? false;
-    }
-
-    public function mount(): void
-    {
-        $this->reportDateId = ReportDate::orderByDesc('tanggal')->first()?->id;
-    }
-
-    public function getReportDateOptions(): array
-    {
-        return ReportDate::orderByDesc('tanggal')->get()->mapWithKeys(
-            fn (ReportDate $rd) => [$rd->id => Carbon::parse($rd->tanggal)->format('Y-m-d').($rd->deskripsi ? ' - '.$rd->deskripsi : '')]
-        )->all();
-    }
-
-    public function updatedReportDateId(): void
-    {
-        $this->resetTable();
+        return view('filament.resources.report-date-resource.tables.verification-embedded');
     }
 
     private function service(): ExamPaymentReconciliationService
@@ -84,26 +60,18 @@ class VerifikasiLaporanHonor extends Page implements HasTable
 
     protected function getTableQuery(): Builder
     {
-        if (! $this->reportDateId) {
-            return Lecture::query()->whereRaw('0 = 1');
-        }
-
-        $lectureIds = $this->service()->rosterLectureIds($this->reportDateId);
+        $lectureIds = $this->service()->rosterLectureIds($this->record->id);
 
         return Lecture::query()->whereIn('id', $lectureIds);
     }
 
     protected function summaryHeading(): string
     {
-        if (! $this->reportDateId) {
-            return 'Pilih periode terlebih dahulu';
-        }
-
-        $lectureIds = $this->service()->rosterLectureIds($this->reportDateId);
+        $lectureIds = $this->service()->rosterLectureIds($this->record->id);
         $mismatchCount = 0;
 
         foreach (Lecture::whereIn('id', $lectureIds)->get() as $lecture) {
-            if ($this->service()->hasMismatch($this->service()->compare($lecture, $this->reportDateId))) {
+            if ($this->service()->hasMismatch($this->service()->compare($lecture, $this->record->id))) {
                 $mismatchCount++;
             }
         }
@@ -121,12 +89,12 @@ class VerifikasiLaporanHonor extends Page implements HasTable
             ->label($label)
             ->badge()
             ->getStateUsing(function (Lecture $record) use ($key): string {
-                $metric = $this->service()->compare($record, $this->reportDateId)[$key];
+                $metric = $this->service()->compare($record, $this->record->id)[$key];
 
                 return "{$metric['stored']} / {$metric['expected']}";
             })
             ->color(function (Lecture $record) use ($key): string {
-                $metric = $this->service()->compare($record, $this->reportDateId)[$key];
+                $metric = $this->service()->compare($record, $this->record->id)[$key];
 
                 return $metric['match'] ? 'gray' : 'danger';
             });
@@ -146,10 +114,10 @@ class VerifikasiLaporanHonor extends Page implements HasTable
             Tables\Columns\TextColumn::make('status')
                 ->label('Status')
                 ->badge()
-                ->getStateUsing(fn (Lecture $record): string => $this->service()->hasMismatch($this->service()->compare($record, $this->reportDateId))
+                ->getStateUsing(fn (Lecture $record): string => $this->service()->hasMismatch($this->service()->compare($record, $this->record->id))
                     ? 'Tidak Sesuai'
                     : 'Sesuai')
-                ->color(fn (Lecture $record): string => $this->service()->hasMismatch($this->service()->compare($record, $this->reportDateId))
+                ->color(fn (Lecture $record): string => $this->service()->hasMismatch($this->service()->compare($record, $this->record->id))
                     ? 'danger'
                     : 'success'),
         ];
@@ -164,11 +132,11 @@ class VerifikasiLaporanHonor extends Page implements HasTable
                 ->icon('heroicon-o-arrow-path')
                 ->iconButton()
                 ->color('warning')
-                ->visible(fn (Lecture $record): bool => $this->service()->hasMismatch($this->service()->compare($record, $this->reportDateId)))
+                ->visible(fn (Lecture $record): bool => $this->service()->hasMismatch($this->service()->compare($record, $this->record->id)))
                 ->requiresConfirmation()
                 ->modalDescription('Hitung ulang & simpan List Bayar (ASN/Non-ASN) untuk dosen ini di periode ini, berdasarkan data registrasi ujian yang sebenarnya?')
                 ->action(function (Lecture $record): void {
-                    $registrations = ExamRegistration::where('report_date_id', $this->reportDateId)
+                    $registrations = ExamRegistration::where('report_date_id', $this->record->id)
                         ->where(function (Builder $query) use ($record) {
                             $query->where('pembimbing1_id', $record->id)
                                 ->orWhere('pembimbing2_id', $record->id)
@@ -181,7 +149,7 @@ class VerifikasiLaporanHonor extends Page implements HasTable
                     $service = app(ExamPaymentReportService::class);
 
                     foreach ($registrations as $registration) {
-                        $service->store($registration->id, $this->reportDateId);
+                        $service->store($registration->id, $this->record->id);
                     }
 
                     Notification::make()
