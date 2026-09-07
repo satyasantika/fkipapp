@@ -76,30 +76,24 @@
         <div class="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
             <span>Total ujian bulan ini: <strong class="text-gray-900 dark:text-white">{{ $monthTotal }}</strong></span>
 
+            {{-- Ini keterangan warna (legenda), bukan angka sungguhan - dulu
+                 pakai <x-filament::badge> berisi "0" cuma untuk membentuk
+                 pil berwarna, tapi kelihatan seperti hitungan asli yang
+                 macet di nol. Diganti bulatan warna polos supaya jelas ini
+                 cuma kunci warna. --}}
             @if ($isJurusan)
-                <span class="flex items-center gap-2">
-                    <x-filament::badge color="info" size="xs">0</x-filament::badge> Total
-                    <x-filament::badge color="gray" size="xs">0</x-filament::badge> Sempro
-                    <x-filament::badge color="warning" size="xs">0</x-filament::badge> Semhas
-                    <x-filament::badge color="success" size="xs">0</x-filament::badge> Sidang
+                <span class="flex items-center gap-3">
+                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full" style="background-color: rgb(var(--info-500))"></span> Total</span>
+                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full bg-gray-400"></span> Sempro</span>
+                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full" style="background-color: rgb(var(--warning-500))"></span> Semhas</span>
+                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full" style="background-color: rgb(var(--success-500))"></span> Sidang</span>
                 </span>
             @else
-                <span class="flex items-center gap-2">
-                    <x-filament::badge color="info" size="xs">0</x-filament::badge> Total
-                    <x-filament::badge color="warning" size="xs">0</x-filament::badge> Belum
-                    <x-filament::badge color="success" size="xs">0</x-filament::badge> Sudah
+                <span class="flex items-center gap-3">
+                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full" style="background-color: rgb(var(--info-500))"></span> Total</span>
+                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full" style="background-color: rgb(var(--warning-500))"></span> Belum</span>
+                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded-full" style="background-color: rgb(var(--success-500))"></span> Sudah</span>
                 </span>
-            @endif
-
-            @if ($selectedDate)
-                <button
-                    type="button"
-                    wire:click="clearSelectedDate"
-                    class="inline-flex items-center gap-1 rounded-full bg-primary-50 px-2 py-1 font-medium text-primary-700 hover:bg-primary-100 dark:bg-white/5 dark:text-primary-400"
-                >
-                    Hapus filter tanggal
-                    <x-filament::icon icon="heroicon-o-x-mark" class="h-3.5 w-3.5" />
-                </button>
             @endif
         </div>
     </div>
