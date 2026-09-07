@@ -4,10 +4,7 @@ namespace App\Filament\Resources\ExamRegistrationResource\Pages;
 
 use App\Filament\Resources\ExamRegistrationResource;
 use App\Models\Departement;
-use App\Models\ExamRegistration;
-use App\Models\Student;
 use App\Services\SintesysSyncService;
-use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Facades\FilamentView;
@@ -15,7 +12,6 @@ use Filament\Tables\Table;
 use Filament\Tables\View\TablesRenderHook;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 class ListExamRegistrations extends ListRecords
@@ -55,44 +51,6 @@ class ListExamRegistrations extends ListRecords
 
         $this->calendarMonth = now()->month;
         $this->calendarYear = now()->year;
-    }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\CreateAction::make()
-                ->label('Registrasi Ujian')
-                ->icon('heroicon-o-plus')
-                ->using(function (array $data): Model {
-                    $student = Student::findOrFail($data['student_id']);
-
-                    $record = ExamRegistration::updateOrCreate([
-                        'departement_id' => $student->departement_id,
-                        'student_id' => $data['student_id'],
-                        'exam_type_id' => $data['exam_type_id'] ?? null,
-                        'ujian_ke' => $data['ujian_ke'] ?? null,
-                    ], [
-                        'tanggal_ujian' => $data['tanggal_ujian'] ?? null,
-                        'waktu_mulai' => $data['waktu_mulai'] ?? null,
-                        'waktu_akhir' => $data['waktu_akhir'] ?? null,
-                        'ruangan' => $data['ruangan'] ?? null,
-                        'judul_penelitian' => $data['judul_penelitian'] ?? null,
-                        'ipk' => $data['ipk'] ?? null,
-                        'penguji1_id' => $student->penguji1_id,
-                        'penguji2_id' => $student->penguji2_id,
-                        'penguji3_id' => $student->penguji3_id,
-                        'pembimbing1_id' => $student->pembimbing1_id,
-                        'pembimbing2_id' => $student->pembimbing2_id,
-                        'ketuapenguji_id' => $student->ketuapenguji_id,
-                    ]);
-
-                    if ($dateColumn = ExamRegistrationResource::examTypeDateColumn($data['exam_type_id'] ?? null)) {
-                        $student->update([$dateColumn => $data['tanggal_ujian'] ?? null]);
-                    }
-
-                    return $record;
-                }),
-        ];
     }
 
     /**
@@ -189,22 +147,33 @@ class ListExamRegistrations extends ListRecords
      * supaya kalender tetap menunjukkan semua ujian bulan itu walau tabel
      * di bawahnya sedang difilter.
      */
+    /**
+     * jurusan melihat rincian jenis ujian (total/sempro/semhas/sidang) di
+     * kalender - mereka yang menjadwalkan mahasiswa lewat tahap-tahap itu.
+     * Role lain (keuangan/admin) melihat rincian sudah/belum dilaporkan -
+     * itu yang relevan untuk pemantauan pelaporan honor mereka.
+     */
     protected function getCalendarDays(): array
     {
         $start = Carbon::create($this->calendarYear, $this->calendarMonth, 1)->startOfMonth();
         $end = $start->copy()->endOfMonth();
 
         $rows = ExamRegistrationResource::getEloquentQuery()
-            ->whereBetween('tanggal_ujian', [$start->toDateString(), $end->toDateString()])
-            ->get(['tanggal_ujian', 'dilaporkan']);
+            ->join('exam_types', 'exam_types.id', '=', 'exam_registrations.exam_type_id')
+            ->whereBetween('exam_registrations.tanggal_ujian', [$start->toDateString(), $end->toDateString()])
+            ->get(['exam_registrations.tanggal_ujian', 'exam_registrations.dilaporkan', 'exam_types.singkat_ujian']);
 
         $days = [];
 
         foreach ($rows as $row) {
             $date = Carbon::parse($row->tanggal_ujian)->toDateString();
-            $days[$date] ??= ['total' => 0, 'sudah' => 0, 'belum' => 0];
+            $days[$date] ??= ['total' => 0, 'sudah' => 0, 'belum' => 0, 'sempro' => 0, 'semhas' => 0, 'sidang' => 0];
             $days[$date]['total']++;
             $days[$date][$row->dilaporkan ? 'sudah' : 'belum']++;
+
+            if (isset($days[$date][$row->singkat_ujian])) {
+                $days[$date][$row->singkat_ujian]++;
+            }
         }
 
         return $days;

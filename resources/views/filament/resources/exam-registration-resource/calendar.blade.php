@@ -76,11 +76,20 @@
         <div class="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
             <span>Total ujian bulan ini: <strong class="text-gray-900 dark:text-white">{{ $monthTotal }}</strong></span>
 
-            <span class="flex items-center gap-2">
-                <x-filament::badge color="info" size="xs">0</x-filament::badge> Total
-                <x-filament::badge color="warning" size="xs">0</x-filament::badge> Belum
-                <x-filament::badge color="success" size="xs">0</x-filament::badge> Sudah
-            </span>
+            @if ($isJurusan)
+                <span class="flex items-center gap-2">
+                    <x-filament::badge color="info" size="xs">0</x-filament::badge> Total
+                    <x-filament::badge color="gray" size="xs">0</x-filament::badge> Sempro
+                    <x-filament::badge color="warning" size="xs">0</x-filament::badge> Semhas
+                    <x-filament::badge color="success" size="xs">0</x-filament::badge> Sidang
+                </span>
+            @else
+                <span class="flex items-center gap-2">
+                    <x-filament::badge color="info" size="xs">0</x-filament::badge> Total
+                    <x-filament::badge color="warning" size="xs">0</x-filament::badge> Belum
+                    <x-filament::badge color="success" size="xs">0</x-filament::badge> Sudah
+                </span>
+            @endif
 
             @if ($selectedDate)
                 <button
@@ -117,9 +126,16 @@
                     $total = $info['total'] ?? 0;
                     $sudah = $info['sudah'] ?? 0;
                     $belum = $info['belum'] ?? 0;
+                    $sempro = $info['sempro'] ?? 0;
+                    $semhas = $info['semhas'] ?? 0;
+                    $sidang = $info['sidang'] ?? 0;
                     $isToday = $dateStr === $today;
                     $isSelected = $selectedDate === $dateStr;
-                    $tooltip = $cursor->translatedFormat('d M Y').($total ? ' - Total: '.$total.' (Sudah: '.$sudah.', Belum: '.$belum.')' : '');
+                    $tooltip = $cursor->translatedFormat('d M Y').($total
+                        ? ($isJurusan
+                            ? ' - Total: '.$total.' (Sempro: '.$sempro.', Semhas: '.$semhas.', Sidang: '.$sidang.')'
+                            : ' - Total: '.$total.' (Sudah: '.$sudah.', Belum: '.$belum.')')
+                        : '');
                 @endphp
                 <button
                     type="button"
@@ -143,15 +159,33 @@
                             <x-filament::badge color="info" size="xs" tooltip="Total ujian">
                                 {{ $total }}
                             </x-filament::badge>
-                            @if ($belum > 0)
-                                <x-filament::badge color="warning" size="xs" tooltip="Belum dilaporkan">
-                                    {{ $belum }}
-                                </x-filament::badge>
-                            @endif
-                            @if ($sudah > 0)
-                                <x-filament::badge color="success" size="xs" tooltip="Sudah dilaporkan">
-                                    {{ $sudah }}
-                                </x-filament::badge>
+                            @if ($isJurusan)
+                                @if ($sempro > 0)
+                                    <x-filament::badge color="gray" size="xs" tooltip="Sempro">
+                                        {{ $sempro }}
+                                    </x-filament::badge>
+                                @endif
+                                @if ($semhas > 0)
+                                    <x-filament::badge color="warning" size="xs" tooltip="Semhas">
+                                        {{ $semhas }}
+                                    </x-filament::badge>
+                                @endif
+                                @if ($sidang > 0)
+                                    <x-filament::badge color="success" size="xs" tooltip="Sidang">
+                                        {{ $sidang }}
+                                    </x-filament::badge>
+                                @endif
+                            @else
+                                @if ($belum > 0)
+                                    <x-filament::badge color="warning" size="xs" tooltip="Belum dilaporkan">
+                                        {{ $belum }}
+                                    </x-filament::badge>
+                                @endif
+                                @if ($sudah > 0)
+                                    <x-filament::badge color="success" size="xs" tooltip="Sudah dilaporkan">
+                                        {{ $sudah }}
+                                    </x-filament::badge>
+                                @endif
                             @endif
                         </span>
                     @endif
