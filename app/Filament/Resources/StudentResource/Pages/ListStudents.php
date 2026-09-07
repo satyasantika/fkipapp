@@ -14,7 +14,8 @@ class ListStudents extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('+ Mahasiswa'),
+                ->label('Mahasiswa')
+                ->icon('heroicon-o-plus'),
         ];
     }
 }

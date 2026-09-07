@@ -14,7 +14,8 @@ class ListReportDates extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('+ Penarikan Laporan'),
+                ->label('Penarikan Laporan')
+                ->icon('heroicon-o-plus'),
         ];
     }
 }

@@ -45,7 +45,7 @@ class ReportedList extends Page implements HasTable
                 ->color('gray')
                 ->url(fn () => ReportDateResource::getUrl()),
             Actions\Action::make('addFromNotReported')
-                ->label('+ data pelaporan')
+                ->label('data pelaporan')
                 ->icon('heroicon-o-plus-circle')
                 ->disabled(fn (): bool => $this->record->is_locked)
                 ->slideOver()

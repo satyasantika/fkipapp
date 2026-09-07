@@ -14,7 +14,8 @@ class ListLectures extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('+ Dosen'),
+                ->label('Dosen')
+                ->icon('heroicon-o-plus'),
         ];
     }
 }

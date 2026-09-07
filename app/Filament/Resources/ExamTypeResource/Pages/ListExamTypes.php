@@ -14,7 +14,8 @@ class ListExamTypes extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('+ Jenis Ujian'),
+                ->label('Jenis Ujian')
+                ->icon('heroicon-o-plus'),
         ];
     }
 }
