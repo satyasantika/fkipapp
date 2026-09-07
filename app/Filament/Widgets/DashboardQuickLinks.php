@@ -22,12 +22,12 @@ class DashboardQuickLinks extends Widget
 
     public static function canView(): bool
     {
-        // Blok jurusan di view ini sudah kosong (Mahasiswa/Dosen jadi KPI,
-        // Reg Ujian/Rekap Ujian dihapus - lihat JurusanExamKpiWidget) - kartu
-        // selamat datang + catatan "tampilan lama" tidak relevan lagi buat
-        // jurusan, sekarang dashboard-nya sudah punya susunan widget sendiri
-        // (donat status ujian, KPI Mahasiswa/Dosen) - jadi disembunyikan
-        // untuk role itu.
-        return ! (auth()->user()?->hasRole('jurusan') ?? false);
+        // Blok jurusan & keuangan di view ini sudah kosong (jurusan: Mahasiswa/
+        // Dosen jadi KPI, Reg Ujian/Rekap Ujian dihapus - lihat
+        // JurusanExamKpiWidget. keuangan: Dosen/Laporan Ujian/Reg Ujian
+        // diganti bento KeuanganMenuKpiWidget) - kartu selamat datang +
+        // catatan "tampilan lama" tidak relevan lagi buat kedua role itu,
+        // masing-masing sudah punya susunan widget sendiri sekarang.
+        return ! (auth()->user()?->hasAnyRole(['jurusan', 'keuangan']) ?? false);
     }
 }
