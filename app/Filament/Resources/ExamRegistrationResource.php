@@ -36,7 +36,11 @@ class ExamRegistrationResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->hasRole('jurusan') ?? false;
+        // Registrasi ujian sekarang masuk lewat sinkronisasi Sintesys
+        // (tombol "Sinkronisasi" di kalender), tidak perlu lagi diinput
+        // manual - jurusan yang sebelumnya satu-satunya role dengan akses
+        // create.
+        return false;
     }
 
     public static function getEloquentQuery(): Builder
@@ -280,17 +284,24 @@ class ExamRegistrationResource extends Resource
             })
             // Tanggal ujian digabung ke sini (format sama seperti kolom
             // Mahasiswa: label utama + description redup di bawahnya) -
-            // sebelumnya kolom tanggal_ujian terpisah sendiri.
-            ->description(fn (ExamRegistration $record): ?string => $record->tanggal_ujian?->format('d M Y'));
+            // untuk jurusan tanggal sudah pindah ke kolom "Waktu Ujian"
+            // (gabungan tanggal+waktu+ruang di bawah), jadi tidak diulang lagi
+            // di sini supaya tidak dobel.
+            ->description(fn (ExamRegistration $record): ?string => $isJurusan ? null : $record->tanggal_ujian?->format('d M Y'));
 
         $columns = $isJurusan ? [
             $statusColumn,
-            Tables\Columns\TextColumn::make('ruangan'),
-            Tables\Columns\TextColumn::make('waktu_mulai')
-                ->label('Waktu')
-                ->formatStateUsing(fn (ExamRegistration $record): string => $record->waktu_mulai
-                    ? substr($record->waktu_mulai, 0, 5).' - '.substr($record->waktu_akhir, 0, 5)
-                    : ''),
+            Tables\Columns\TextColumn::make('tanggal_ujian')
+                ->label('Waktu Ujian')
+                ->sortable()
+                ->formatStateUsing(fn (ExamRegistration $record): string => $record->tanggal_ujian?->format('d M Y') ?? '-')
+                ->description(function (ExamRegistration $record): ?string {
+                    $waktu = $record->waktu_mulai
+                        ? substr($record->waktu_mulai, 0, 5).' - '.substr($record->waktu_akhir ?? '', 0, 5)
+                        : null;
+
+                    return collect([$waktu, $record->ruangan])->filter()->implode(' · ') ?: null;
+                }),
             $examTypeColumn,
             ...$sharedColumns,
         ] : [
@@ -301,6 +312,7 @@ class ExamRegistrationResource extends Resource
 
         return $table
             ->columns($columns)
+            ->defaultSort('tanggal_ujian', 'desc')
             ->filters([
                 //
             ])
