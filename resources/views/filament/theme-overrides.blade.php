@@ -140,4 +140,16 @@
         flex-shrink: 0;
         margin-top: 0.125rem;
     }
+
+    /* Tombol filter Sudah/Belum/Semua aktif (/admin/exam-registrations,
+       dilaporkan-filter.blade.php) - sama polanya seperti .fi-filter-toggle-on
+       di atas. */
+    .fi-dilaporkan-filter-active {
+        background-color: rgb(var(--primary-600));
+        color: #fff;
+    }
+
+    .fi-dilaporkan-filter-active:hover {
+        background-color: rgb(var(--primary-500));
+    }
 </style>
