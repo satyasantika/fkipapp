@@ -1,69 +1,81 @@
 {{--
     Donat CSS conic-gradient murni (tanpa Chart.js) - warna pakai hex literal
-    langsung (bukan rgb(var(--x)) Filament) supaya dijamin tampil apa adanya
-    di browser manapun, tidak bergantung resolusi custom property tema.
+    langsung supaya dijamin tampil apa adanya di browser manapun.
+
+    PENTING: SEMUA properti struktural/dimensi di sini (grid 2-kolom, ukuran
+    lingkaran donat) sengaja pakai inline style, BUKAN kelas utilitas
+    Tailwind seperti lg:grid-cols-2/h-24/w-24/h-16/w-16 - kelas semacam itu
+    kelihatan masuk akal tapi TIDAK TERKOMPILASI di panel ini kalau Filament
+    sendiri tidak pernah memakainya di komponennya (panel ini tidak punya
+    build Tailwind sendiri, cuma CSS Filament yang sudah di-tree-shake).
+    Terbukti langsung: versi awal pakai class-class itu, hasilnya 2 kartu
+    malah numpuk selebar halaman (bukan 2 kolom) dan lingkaran donatnya
+    menyusut ikut ukuran lubangnya (tidak ada lebar cincin sama sekali,
+    conic-gradient jadi kelihatan kosong/nyaris tak terlihat).
 --}}
 <x-filament-widgets::widget>
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
         {{-- Kartu 1: Total ujian + donat sudah dilaporkan --}}
-        <div class="flex items-center justify-between gap-4 rounded-2xl p-5" style="background-color: #eff6ff">
+        <div
+            style="flex: 1 1 320px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-radius: 1rem; padding: 1.25rem; background-color: #eff6ff;"
+        >
             <div>
-                <div class="text-4xl font-bold text-gray-900">{{ $total }}</div>
-                <div class="mt-1 text-xs font-semibold tracking-wide text-gray-500">TOTAL UJIAN</div>
-                <div class="mt-2 text-sm font-semibold" style="color: #16a34a">
+                <div style="font-size: 2.25rem; line-height: 1; font-weight: 700; color: #111827;">{{ $total }}</div>
+                <div style="margin-top: 0.25rem; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.025em; color: #6b7280;">TOTAL UJIAN</div>
+                <div style="margin-top: 0.5rem; font-size: 0.875rem; font-weight: 600; color: #16a34a;">
                     {{ $sudah }} Sudah Dilaporkan
                 </div>
             </div>
 
             <div
-                class="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full"
-                style="background: conic-gradient(#16a34a {{ $sudahPct }}%, #e2e8f0 0)"
+                style="flex-shrink: 0; width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient(#16a34a {{ $sudahPct }}%, #e2e8f0 0);"
             >
-                <div class="flex h-16 w-16 flex-col items-center justify-center rounded-full" style="background-color: #eff6ff">
-                    <span class="text-base font-bold text-gray-900">{{ $sudahPct }}%</span>
-                    <span class="text-[9px] font-semibold tracking-wide text-gray-400">DILAPORKAN</span>
+                <div style="width: 64px; height: 64px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #eff6ff;">
+                    <span style="font-size: 1rem; font-weight: 700; color: #111827;">{{ $sudahPct }}%</span>
+                    <span style="font-size: 9px; font-weight: 600; letter-spacing: 0.025em; color: #9ca3af;">DILAPORKAN</span>
                 </div>
             </div>
         </div>
 
         {{-- Kartu 2: Belum dilaporkan + donat proporsi jenis ujian --}}
-        <div class="flex items-center justify-between gap-4 rounded-2xl p-5" style="background-color: #fffbeb">
+        <div
+            style="flex: 1 1 320px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-radius: 1rem; padding: 1.25rem; background-color: #fffbeb;"
+        >
             <div>
-                <div class="text-4xl font-bold text-gray-900">{{ $belum }}</div>
-                <div class="mt-1 text-xs font-semibold tracking-wide text-gray-500">
+                <div style="font-size: 2.25rem; line-height: 1; font-weight: 700; color: #111827;">{{ $belum }}</div>
+                <div style="margin-top: 0.25rem; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.025em; color: #6b7280;">
                     BELUM DILAPORKAN
-                    <span class="font-bold" style="color: #d97706">{{ $belumPct }}%</span>
+                    <span style="font-weight: 700; color: #d97706;">{{ $belumPct }}%</span>
                 </div>
             </div>
 
             <div
-                class="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full"
-                style="background: conic-gradient(#f59e0b 0%, #f59e0b {{ $stopSempro }}%, #2563eb {{ $stopSempro }}%, #2563eb {{ $stopSemhas }}%, #10b981 {{ $stopSemhas }}%, #10b981 100%)"
+                style="flex-shrink: 0; width: 96px; height: 96px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: conic-gradient(#f59e0b 0%, #f59e0b {{ $stopSempro }}%, #2563eb {{ $stopSempro }}%, #2563eb {{ $stopSemhas }}%, #10b981 {{ $stopSemhas }}%, #10b981 100%);"
             >
-                <div class="flex h-16 w-16 flex-col items-center justify-center rounded-full" style="background-color: #fffbeb">
-                    <span class="text-base font-bold text-gray-900">{{ $belum }}</span>
-                    <span class="text-[9px] font-semibold tracking-wide text-gray-400">UJIAN</span>
+                <div style="width: 64px; height: 64px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #fffbeb;">
+                    <span style="font-size: 1rem; font-weight: 700; color: #111827;">{{ $belum }}</span>
+                    <span style="font-size: 9px; font-weight: 600; letter-spacing: 0.025em; color: #9ca3af;">UJIAN</span>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-1.5 text-xs">
-                <div class="flex items-center gap-1.5">
-                    <span class="h-2 w-2 shrink-0 rounded-full" style="background-color: #f59e0b"></span>
-                    <span class="text-gray-600">Sempro</span>
-                    <span class="font-semibold text-gray-900">{{ $belumSempro }}</span>
-                    <span class="text-gray-400">({{ $pctSempro }}%)</span>
+            <div style="display: flex; flex-direction: column; gap: 0.375rem; font-size: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.375rem;">
+                    <span style="flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background-color: #f59e0b;"></span>
+                    <span style="color: #4b5563;">Sempro</span>
+                    <span style="font-weight: 600; color: #111827;">{{ $belumSempro }}</span>
+                    <span style="color: #9ca3af;">({{ $pctSempro }}%)</span>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="h-2 w-2 shrink-0 rounded-full" style="background-color: #2563eb"></span>
-                    <span class="text-gray-600">Semhas</span>
-                    <span class="font-semibold text-gray-900">{{ $belumSemhas }}</span>
-                    <span class="text-gray-400">({{ $pctSemhas }}%)</span>
+                <div style="display: flex; align-items: center; gap: 0.375rem;">
+                    <span style="flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background-color: #2563eb;"></span>
+                    <span style="color: #4b5563;">Semhas</span>
+                    <span style="font-weight: 600; color: #111827;">{{ $belumSemhas }}</span>
+                    <span style="color: #9ca3af;">({{ $pctSemhas }}%)</span>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <span class="h-2 w-2 shrink-0 rounded-full" style="background-color: #10b981"></span>
-                    <span class="text-gray-600">Sidang</span>
-                    <span class="font-semibold text-gray-900">{{ $belumSidang }}</span>
-                    <span class="text-gray-400">({{ $pctSidang }}%)</span>
+                <div style="display: flex; align-items: center; gap: 0.375rem;">
+                    <span style="flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background-color: #10b981;"></span>
+                    <span style="color: #4b5563;">Sidang</span>
+                    <span style="font-weight: 600; color: #111827;">{{ $belumSidang }}</span>
+                    <span style="color: #9ca3af;">({{ $pctSidang }}%)</span>
                 </div>
             </div>
         </div>
