@@ -65,9 +65,10 @@
         <div class="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
             <span>Total ujian bulan ini: <strong class="text-gray-900 dark:text-white">{{ $monthTotal }}</strong></span>
 
-            <span class="flex items-center gap-1">
-                <span class="h-2 w-2 rounded-full" style="background-color: rgb(var(--success-500))"></span> Sudah
-                <span class="ms-2 h-2 w-2 rounded-full bg-gray-400"></span> Belum
+            <span class="flex items-center gap-2">
+                <x-filament::badge color="primary" size="xs">0</x-filament::badge> Total
+                <x-filament::badge color="success" size="xs">0</x-filament::badge> Sudah
+                <x-filament::badge color="gray" size="xs">0</x-filament::badge> Belum
             </span>
 
             @if ($selectedDate)
@@ -109,25 +110,35 @@
                 @if (! $inMonth) disabled @endif
                 title="{{ $tooltip }}"
                 @class([
-                    'relative flex min-h-[3.25rem] flex-col items-center justify-center rounded-lg p-1.5 text-sm transition',
+                    'relative flex min-h-[4rem] flex-col items-center rounded-lg p-1 pt-1.5 text-sm transition',
                     'text-gray-300 dark:text-gray-700' => ! $inMonth,
                     'hover:bg-gray-100 dark:hover:bg-white/5' => $inMonth && ! $isSelected,
                     'fi-calendar-day-selected' => $isSelected,
                     'fi-calendar-day-today' => $isToday && ! $isSelected,
                 ])
             >
-                <span class="font-medium">{{ $cursor->day }}</span>
+                {{-- Angka tanggal dipisah jelas dari badge jumlah ujian (posisi
+                    pojok, ukuran & bobot beda) - sebelumnya angka tanggal dan
+                    angka total ujian sama-sama polos di tengah, gampang
+                    tertukar. --}}
+                <span class="self-start text-[0.7rem] leading-none {{ $isSelected ? 'text-white/80' : 'text-gray-400 dark:text-gray-500' }}">
+                    {{ $cursor->day }}
+                </span>
 
                 @if ($inMonth && $total > 0)
-                    <span class="mt-0.5 text-[0.65rem] font-semibold {{ $isSelected ? 'text-white' : 'text-gray-600 dark:text-gray-300' }}">
-                        {{ $total }}
-                    </span>
-                    <span class="mt-0.5 flex h-1 w-6 overflow-hidden rounded-full bg-gray-200 dark:bg-white/10">
+                    <span class="mt-1.5 flex flex-1 flex-wrap items-center justify-center gap-0.5">
+                        <x-filament::badge color="primary" size="xs" tooltip="Total ujian">
+                            {{ $total }}
+                        </x-filament::badge>
                         @if ($sudah > 0)
-                            <span style="width: {{ ($sudah / $total) * 100 }}%; background-color: rgb(var(--success-500))"></span>
+                            <x-filament::badge color="success" size="xs" tooltip="Sudah dilaporkan">
+                                {{ $sudah }}
+                            </x-filament::badge>
                         @endif
                         @if ($belum > 0)
-                            <span style="width: {{ ($belum / $total) * 100 }}%; background-color: rgb(var(--gray-400))"></span>
+                            <x-filament::badge color="gray" size="xs" tooltip="Belum dilaporkan">
+                                {{ $belum }}
+                            </x-filament::badge>
                         @endif
                     </span>
                 @endif
