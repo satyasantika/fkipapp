@@ -39,6 +39,11 @@ class ReportedList extends Page implements HasTable
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('backToReportDates')
+                ->label('Kembali ke Penarikan Laporan')
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url(fn () => ReportDateResource::getUrl()),
             Actions\Action::make('addFromNotReported')
                 ->label('+ data pelaporan')
                 ->icon('heroicon-o-plus-circle')
@@ -50,6 +55,19 @@ class ReportedList extends Page implements HasTable
                 ]))
                 ->modalSubmitAction(false)
                 ->modalCancelActionLabel('Tutup'),
+            Actions\ActionGroup::make([
+                Actions\Action::make('lecturerWorkload')
+                    ->label('Ujian by Dosen Penguji')
+                    ->icon('heroicon-o-user-group')
+                    ->slideOver()
+                    ->modalWidth('7xl')
+                    ->modalHeading('Ujian by Dosen Penguji - '.Carbon::parse($this->record->tanggal)->format('Y-m-d'))
+                    ->modalContent(fn () => view('filament.resources.report-date-resource.tables.lecturer-workload-slideover', [
+                        'record' => $this->record,
+                    ]))
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup'),
+            ]),
         ];
     }
 

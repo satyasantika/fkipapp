@@ -134,7 +134,7 @@ class ReportDateResource extends Resource
                         'pns' => 1,
                     ]))
                     ->modalSubmitAction(false)
-                    ->modalCancelActionLabel('Tutup'),
+                    ->modalCancelActionLabel('Kembali ke Penarikan Laporan'),
                 Tables\Actions\Action::make('reportSectionNonAsn')
                     ->label('List Bayar Non-ASN')
                     ->tooltip('List Bayar Non-ASN')
@@ -149,20 +149,7 @@ class ReportDateResource extends Resource
                         'pns' => 0,
                     ]))
                     ->modalSubmitAction(false)
-                    ->modalCancelActionLabel('Tutup'),
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('lecturerWorkload')
-                        ->label('Ujian by Dosen Penguji')
-                        ->icon('heroicon-o-user-group')
-                        ->slideOver()
-                        ->modalWidth('7xl')
-                        ->modalHeading(fn (ReportDate $record): string => 'Ujian by Dosen Penguji - '.\Illuminate\Support\Carbon::parse($record->tanggal)->format('Y-m-d'))
-                        ->modalContent(fn (ReportDate $record) => view('filament.resources.report-date-resource.tables.lecturer-workload-slideover', [
-                            'record' => $record,
-                        ]))
-                        ->modalSubmitAction(false)
-                        ->modalCancelActionLabel('Tutup'),
-                ]),
+                    ->modalCancelActionLabel('Kembali ke Penarikan Laporan'),
             ])
             ->bulkActions([
                 //
