@@ -119,6 +119,12 @@ class ExamPaymentReportService
                 'id' => $report_date_id,
             ], [
                 'dibayar' => ExamPaymentReport::where('report_date_id', $report_date_id)->get()->sum('total_honor'),
+                // Satu-satunya titik bersama semua alur tambah/cabut ujian
+                // (setReportDate, confirmSidangCascade, confirmLecturerCascade
+                // semua berujung ke sini) - dipakai sebagai "terakhir ditarik",
+                // sengaja terpisah dari updated_at bawaan (lihat migrasi
+                // add_lock_columns_to_report_dates_table).
+                'last_pulled_at' => now(),
             ]);
         }
     }

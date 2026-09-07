@@ -11,6 +11,11 @@ class ReportDate extends Model
 {
     use HasFactory, GuardsDeletionWhenReferenced;
     protected $guarded = ['id'];
+    protected $casts = [
+        'is_locked' => 'bool',
+        'locked_at' => 'datetime',
+        'last_pulled_at' => 'datetime',
+    ];
 
     public function examiners(): HasMany
     {

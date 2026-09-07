@@ -70,7 +70,26 @@ class ReportDateResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('tanggal')
-                    ->date(),
+                    ->date()
+                    ->description(function (ReportDate $record): \Illuminate\Support\HtmlString {
+                        // HtmlString supaya baris terpisah beneran ({{ }} Blade
+                        // otomatis panggil ->toHtml() untuk Htmlable) - string
+                        // biasa dengan \n akan dirender jadi satu baris saja.
+                        $lastPulled = $record->last_pulled_at
+                            ? $record->last_pulled_at->format('d M Y, H:i')
+                            : '-';
+
+                        if (! $record->locked_at) {
+                            $lockInfo = '-';
+                        } else {
+                            $lockInfo = $record->locked_at->format('d M Y, H:i').($record->is_locked ? ' (dikunci)' : ' (dibuka)');
+                        }
+
+                        return new \Illuminate\Support\HtmlString(
+                            '<div>Terakhir ditarik: '.e($lastPulled).'</div>'
+                            .'<div>Kunci/buka terakhir: '.e($lockInfo).'</div>'
+                        );
+                    }),
                 Tables\Columns\TextColumn::make('deskripsi'),
                 Tables\Columns\TextColumn::make('dibayar')
                     ->money('idr', divideBy: 1)
@@ -113,6 +132,27 @@ class ReportDateResource extends Resource
 
                             throw new Halt();
                         }
+                    }),
+                Tables\Actions\Action::make('toggleLock')
+                    ->label(fn (ReportDate $record): string => $record->is_locked ? 'Buka Kunci' : 'Kunci')
+                    ->tooltip(fn (ReportDate $record): string => $record->is_locked ? 'Buka Kunci' : 'Kunci')
+                    ->icon(fn (ReportDate $record): string => $record->is_locked ? 'heroicon-o-lock-closed' : 'heroicon-o-lock-open')
+                    ->color(fn (ReportDate $record): string => $record->is_locked ? 'danger' : 'gray')
+                    ->iconButton()
+                    ->requiresConfirmation()
+                    ->modalDescription(fn (ReportDate $record): string => $record->is_locked
+                        ? 'Buka kunci penarikan laporan ini? Data bisa ditambah/dikurangi lagi setelah dibuka.'
+                        : 'Kunci penarikan laporan ini? Data tidak bisa ditambah/dikurangi lagi selama terkunci.')
+                    ->action(function (ReportDate $record): void {
+                        $record->update([
+                            'is_locked' => ! $record->is_locked,
+                            'locked_at' => now(),
+                        ]);
+
+                        Notification::make()
+                            ->title($record->is_locked ? 'Penarikan laporan dikunci' : 'Penarikan laporan dibuka kembali')
+                            ->success()
+                            ->send();
                     }),
                 Tables\Actions\Action::make('reportedList')
                     ->label('List Ujian Dilaporkan')

@@ -115,4 +115,29 @@
     .fi-filter-toggle-on:hover {
         background-color: rgb(var(--success-500));
     }
+
+    /* Banner "penarikan laporan ini terkunci" (halaman Sudah Dilaporkan) -
+       sama alasannya seperti catatan panjang di atas: bg-warning-50/
+       text-warning-700 semacam itu tidak pernah benar-benar terkompilasi
+       di panel ini, jadi dipakai rgb(var(--warning-*)) yang dijamin ada. */
+    .fi-locked-banner {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        background-color: color-mix(in srgb, rgb(var(--warning-500)) 10%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, rgb(var(--warning-500)) 30%, transparent);
+        color: rgb(var(--warning-700));
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+
+    .fi-locked-banner svg {
+        color: rgb(var(--warning-600));
+        width: 1.25rem;
+        height: 1.25rem;
+        flex-shrink: 0;
+        margin-top: 0.125rem;
+    }
 </style>
