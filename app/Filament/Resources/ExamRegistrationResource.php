@@ -42,7 +42,7 @@ class ExamRegistrationResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery()
-            ->with(['exam_type', 'student', 'pembimbing1', 'pembimbing2', 'penguji1', 'penguji2', 'penguji3']);
+            ->with(['exam_type', 'student.departement', 'pembimbing1', 'pembimbing2', 'penguji1', 'penguji2', 'penguji3']);
 
         if (auth()->user()?->hasRole('jurusan')) {
             $query->where('departement_id', auth()->user()->departement_id);
@@ -204,7 +204,9 @@ class ExamRegistrationResource extends Resource
         $sharedColumns = [
             Tables\Columns\TextColumn::make('student.nama')
                 ->label('Mahasiswa')
-                ->description(fn (ExamRegistration $record): ?string => $record->student?->nim)
+                ->description(fn (ExamRegistration $record): ?string => $record->student
+                    ? $record->student->nim.' · '.($record->student->departement?->nama ?? '-')
+                    : null)
                 // Nama BARE (bukan 'student.nim'/'student.nama') - kolom ini
                 // sendiri sudah dot-path ('student.nama'), jadi Filament SUDAH
                 // otomatis mendeteksi relasi 'student' dan membungkus pencarian
@@ -269,12 +271,14 @@ class ExamRegistrationResource extends Resource
                 'semhas' => 'info',
                 'sidang' => 'primary',
                 default => 'gray',
-            });
+            })
+            // Tanggal ujian digabung ke sini (format sama seperti kolom
+            // Mahasiswa: label utama + description redup di bawahnya) -
+            // sebelumnya kolom tanggal_ujian terpisah sendiri.
+            ->description(fn (ExamRegistration $record): ?string => $record->tanggal_ujian?->format('d M Y'));
 
         $columns = $isJurusan ? [
             $statusColumn,
-            Tables\Columns\TextColumn::make('tanggal_ujian')
-                ->date(),
             Tables\Columns\TextColumn::make('ruangan'),
             Tables\Columns\TextColumn::make('waktu_mulai')
                 ->label('Waktu')
@@ -285,9 +289,6 @@ class ExamRegistrationResource extends Resource
             ...$sharedColumns,
         ] : [
             $examTypeColumn,
-            Tables\Columns\TextColumn::make('tanggal_ujian')
-                ->label('Diujiankan')
-                ->date(),
             $statusColumn,
             ...$sharedColumns,
         ];
