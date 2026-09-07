@@ -138,6 +138,7 @@ class ReportedList extends Page implements HasTable
                 ->icon('heroicon-o-arrow-uturn-left')
                 ->iconButton()
                 ->color('danger')
+                ->visible(fn (): bool => ! $this->record->is_locked)
                 ->requiresConfirmation()
                 ->modalDescription('Batalkan laporan ujian ini? Status dibayar tiap pembimbing/penguji akan direset (mengikuti perilaku form lama).')
                 ->action(function (ExamRegistration $record): void {
