@@ -11,10 +11,12 @@ use Filament\Actions;
 use Filament\Forms;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
+use Filament\Support\Facades\FilamentView;
 use Filament\Tables;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Filament\Tables\View\TablesRenderHook;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 
@@ -39,6 +41,10 @@ class VerificationTable extends Component implements Actions\Contracts\HasAction
 
     public ReportDate $record;
 
+    public bool $belumSesuaiOnly = false;
+
+    private bool $filterHookRegistered = false;
+
     public function render()
     {
         return view('filament.resources.report-date-resource.tables.verification-embedded');
@@ -51,6 +57,8 @@ class VerificationTable extends Component implements Actions\Contracts\HasAction
 
     public function table(Table $table): Table
     {
+        $this->registerFilterHook();
+
         return $table
             ->query($this->getTableQuery())
             ->columns($this->getTableColumns())
@@ -58,9 +66,49 @@ class VerificationTable extends Component implements Actions\Contracts\HasAction
             ->heading(fn (): string => $this->summaryHeading());
     }
 
+    /**
+     * Tombol icon "Tidak Sesuai saja" ditaruh persis di sebelah kotak
+     * pencarian bawaan Filament (TOOLBAR_SEARCH_BEFORE) - pola sama yang
+     * sudah dipakai ListExamRegistrations::registerDilaporkanFilterHook()
+     * (dan sudah dibuktikan aman untuk komponen Livewire embedded seperti
+     * ini, bukan cuma untuk halaman resource penuh - scopes: static::class
+     * benar-benar resolve ke instance komponen ini saat render Livewire).
+     */
+    protected function registerFilterHook(): void
+    {
+        if ($this->filterHookRegistered) {
+            return;
+        }
+
+        $this->filterHookRegistered = true;
+
+        FilamentView::registerRenderHook(
+            TablesRenderHook::TOOLBAR_SEARCH_BEFORE,
+            fn (): string => view('filament.resources.report-date-resource.tables.verification-filter-button', [
+                'active' => $this->belumSesuaiOnly,
+            ])->render(),
+            scopes: static::class,
+        );
+    }
+
+    public function toggleBelumSesuaiOnly(): void
+    {
+        $this->belumSesuaiOnly = ! $this->belumSesuaiOnly;
+        $this->resetTable();
+    }
+
     protected function getTableQuery(): Builder
     {
         $lectureIds = $this->service()->rosterLectureIds($this->record->id);
+
+        if ($this->belumSesuaiOnly) {
+            $lectureIds = collect($lectureIds)
+                ->filter(fn (int $id) => $this->service()->hasMismatch(
+                    $this->service()->compare(Lecture::find($id), $this->record->id)
+                ))
+                ->values()
+                ->all();
+        }
 
         return Lecture::query()->whereIn('id', $lectureIds);
     }
