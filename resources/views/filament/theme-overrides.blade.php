@@ -152,4 +152,20 @@
     .fi-dilaporkan-filter-active:hover {
         background-color: rgb(var(--primary-500));
     }
+
+    /* Kalender ujian (/admin/exam-registrations, calendar.blade.php) - sel
+       tanggal terpilih (solid, sama pola warna dengan .fi-dilaporkan-filter-
+       active) dan cincin tipis penanda "hari ini". */
+    .fi-calendar-day-selected {
+        background-color: rgb(var(--primary-600));
+        color: #fff;
+    }
+
+    .fi-calendar-day-selected:hover {
+        background-color: rgb(var(--primary-500));
+    }
+
+    .fi-calendar-day-today {
+        box-shadow: inset 0 0 0 1.5px rgb(var(--primary-400));
+    }
 </style>

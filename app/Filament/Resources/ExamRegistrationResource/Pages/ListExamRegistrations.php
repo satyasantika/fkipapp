@@ -10,8 +10,10 @@ use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Table;
 use Filament\Tables\View\TablesRenderHook;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class ListExamRegistrations extends ListRecords
 {
@@ -22,7 +24,23 @@ class ListExamRegistrations extends ListRecords
      */
     public string $dilaporkanFilter = 'semua';
 
+    public int $calendarMonth;
+
+    public int $calendarYear;
+
+    public ?string $selectedDate = null;
+
     private bool $dilaporkanFilterHookRegistered = false;
+
+    private bool $calendarHookRegistered = false;
+
+    public function mount(): void
+    {
+        parent::mount();
+
+        $this->calendarMonth = now()->month;
+        $this->calendarYear = now()->year;
+    }
 
     protected function getHeaderActions(): array
     {
@@ -78,13 +96,17 @@ class ListExamRegistrations extends ListRecords
     public function table(Table $table): Table
     {
         $this->registerDilaporkanFilterHook();
+        $this->registerCalendarHook();
 
         return parent::table($table)
             ->modifyQueryUsing(fn (Builder $query): Builder => match ($this->dilaporkanFilter) {
                 'sudah' => $query->where('dilaporkan', true),
                 'belum' => $query->where('dilaporkan', false),
                 default => $query,
-            });
+            })
+            ->modifyQueryUsing(fn (Builder $query): Builder => $this->selectedDate
+                ? $query->whereDate('tanggal_ujian', $this->selectedDate)
+                : $query);
     }
 
     protected function registerDilaporkanFilterHook(): void
@@ -107,6 +129,95 @@ class ListExamRegistrations extends ListRecords
     public function setDilaporkanFilter(string $value): void
     {
         $this->dilaporkanFilter = $value;
+        $this->resetTable();
+    }
+
+    /**
+     * Kalender jumlah ujian per tanggal, ditaruh via render hook resmi
+     * Filament (RESOURCE_PAGES_LIST_RECORDS_TABLE_BEFORE - dirender oleh
+     * template standar list-records.blade.php tepat sebelum {{ $this->table }},
+     * lihat vendor/filament/filament/resources/views/resources/pages/
+     * list-records.blade.php) supaya tidak perlu override seluruh view
+     * halaman. scopes: static::class aman di sini dengan alasan yang sama
+     * seperti registerDilaporkanFilterHook() di atas.
+     */
+    protected function registerCalendarHook(): void
+    {
+        if ($this->calendarHookRegistered) {
+            return;
+        }
+
+        $this->calendarHookRegistered = true;
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::RESOURCE_PAGES_LIST_RECORDS_TABLE_BEFORE,
+            fn (): string => view('filament.resources.exam-registration-resource.calendar', [
+                'month' => $this->calendarMonth,
+                'year' => $this->calendarYear,
+                'selectedDate' => $this->selectedDate,
+                'days' => $this->getCalendarDays(),
+            ])->render(),
+            scopes: static::class,
+        );
+    }
+
+    /**
+     * Hitung total/sudah/belum per tanggal untuk bulan+tahun kalender saat
+     * ini, dari query dasar resource yang sama (supaya scope jurusan tetap
+     * dihormati) - BUKAN dari query tabel yang sudah difilter status/tanggal,
+     * supaya kalender tetap menunjukkan semua ujian bulan itu walau tabel
+     * di bawahnya sedang difilter.
+     */
+    protected function getCalendarDays(): array
+    {
+        $start = Carbon::create($this->calendarYear, $this->calendarMonth, 1)->startOfMonth();
+        $end = $start->copy()->endOfMonth();
+
+        $rows = ExamRegistrationResource::getEloquentQuery()
+            ->whereBetween('tanggal_ujian', [$start->toDateString(), $end->toDateString()])
+            ->get(['tanggal_ujian', 'dilaporkan']);
+
+        $days = [];
+
+        foreach ($rows as $row) {
+            $date = Carbon::parse($row->tanggal_ujian)->toDateString();
+            $days[$date] ??= ['total' => 0, 'sudah' => 0, 'belum' => 0];
+            $days[$date]['total']++;
+            $days[$date][$row->dilaporkan ? 'sudah' : 'belum']++;
+        }
+
+        return $days;
+    }
+
+    public function goToPreviousMonth(): void
+    {
+        $date = Carbon::create($this->calendarYear, $this->calendarMonth, 1)->subMonth();
+        $this->calendarMonth = $date->month;
+        $this->calendarYear = $date->year;
+    }
+
+    public function goToNextMonth(): void
+    {
+        $date = Carbon::create($this->calendarYear, $this->calendarMonth, 1)->addMonth();
+        $this->calendarMonth = $date->month;
+        $this->calendarYear = $date->year;
+    }
+
+    public function goToCurrentMonth(): void
+    {
+        $this->calendarMonth = now()->month;
+        $this->calendarYear = now()->year;
+    }
+
+    public function selectCalendarDate(string $date): void
+    {
+        $this->selectedDate = $this->selectedDate === $date ? null : $date;
+        $this->resetTable();
+    }
+
+    public function clearSelectedDate(): void
+    {
+        $this->selectedDate = null;
         $this->resetTable();
     }
 }
