@@ -66,9 +66,9 @@
             <span>Total ujian bulan ini: <strong class="text-gray-900 dark:text-white">{{ $monthTotal }}</strong></span>
 
             <span class="flex items-center gap-2">
-                <x-filament::badge color="primary" size="xs">0</x-filament::badge> Total
+                <x-filament::badge color="info" size="xs">0</x-filament::badge> Total
+                <x-filament::badge color="warning" size="xs">0</x-filament::badge> Belum
                 <x-filament::badge color="success" size="xs">0</x-filament::badge> Sudah
-                <x-filament::badge color="gray" size="xs">0</x-filament::badge> Belum
             </span>
 
             @if ($selectedDate)
@@ -90,60 +90,64 @@
         @endforeach
     </div>
 
-    <div class="grid grid-cols-7 gap-1">
-        @php $cursor = $gridStart->copy(); @endphp
-        @while ($cursor->lte($gridEnd))
-            @php
-                $dateStr = $cursor->toDateString();
-                $inMonth = $cursor->month === (int) $month;
-                $info = $days[$dateStr] ?? null;
-                $total = $info['total'] ?? 0;
-                $sudah = $info['sudah'] ?? 0;
-                $belum = $info['belum'] ?? 0;
-                $isToday = $dateStr === $today;
-                $isSelected = $selectedDate === $dateStr;
-                $tooltip = $cursor->translatedFormat('d M Y').($total ? ' - Total: '.$total.' (Sudah: '.$sudah.', Belum: '.$belum.')' : '');
-            @endphp
-            <button
-                type="button"
-                wire:click="selectCalendarDate('{{ $dateStr }}')"
-                @if (! $inMonth) disabled @endif
-                title="{{ $tooltip }}"
-                @class([
-                    'relative flex min-h-[4rem] flex-col items-center rounded-lg p-1 pt-1.5 text-sm transition',
-                    'text-gray-300 dark:text-gray-700' => ! $inMonth,
-                    'hover:bg-gray-100 dark:hover:bg-white/5' => $inMonth && ! $isSelected,
-                    'fi-calendar-day-selected' => $isSelected,
-                    'fi-calendar-day-today' => $isToday && ! $isSelected,
-                ])
-            >
-                {{-- Angka tanggal dipisah jelas dari badge jumlah ujian (posisi
-                    pojok, ukuran & bobot beda) - sebelumnya angka tanggal dan
-                    angka total ujian sama-sama polos di tengah, gampang
-                    tertukar. --}}
-                <span class="self-start text-[0.7rem] leading-none {{ $isSelected ? 'text-white/80' : 'text-gray-400 dark:text-gray-500' }}">
-                    {{ $cursor->day }}
-                </span>
-
-                @if ($inMonth && $total > 0)
-                    <span class="mt-1.5 flex flex-1 flex-wrap items-center justify-center gap-0.5">
-                        <x-filament::badge color="primary" size="xs" tooltip="Total ujian">
-                            {{ $total }}
-                        </x-filament::badge>
-                        @if ($sudah > 0)
-                            <x-filament::badge color="success" size="xs" tooltip="Sudah dilaporkan">
-                                {{ $sudah }}
-                            </x-filament::badge>
-                        @endif
-                        @if ($belum > 0)
-                            <x-filament::badge color="gray" size="xs" tooltip="Belum dilaporkan">
-                                {{ $belum }}
-                            </x-filament::badge>
-                        @endif
+    @php $cursor = $gridStart->copy(); $weekIndex = 0; @endphp
+    @while ($cursor->lte($gridEnd))
+        <div
+            @class([
+                'grid grid-cols-7 gap-1',
+                'mt-1 border-t border-gray-100 pt-1 dark:border-white/10' => $weekIndex > 0,
+            ])
+        >
+            @for ($i = 0; $i < 7; $i++)
+                @php
+                    $dateStr = $cursor->toDateString();
+                    $inMonth = $cursor->month === (int) $month;
+                    $info = $days[$dateStr] ?? null;
+                    $total = $info['total'] ?? 0;
+                    $sudah = $info['sudah'] ?? 0;
+                    $belum = $info['belum'] ?? 0;
+                    $isToday = $dateStr === $today;
+                    $isSelected = $selectedDate === $dateStr;
+                    $tooltip = $cursor->translatedFormat('d M Y').($total ? ' - Total: '.$total.' (Sudah: '.$sudah.', Belum: '.$belum.')' : '');
+                @endphp
+                <button
+                    type="button"
+                    wire:click="selectCalendarDate('{{ $dateStr }}')"
+                    @if (! $inMonth) disabled @endif
+                    title="{{ $tooltip }}"
+                    @class([
+                        'relative flex min-h-[4rem] flex-col items-center gap-1 rounded-lg p-1 pt-1.5 text-sm transition',
+                        'text-gray-300 dark:text-gray-700' => ! $inMonth,
+                        'hover:bg-gray-100 dark:hover:bg-white/5' => $inMonth && ! $isSelected,
+                        'fi-calendar-day-selected' => $isSelected,
+                        'fi-calendar-day-today' => $isToday && ! $isSelected,
+                    ])
+                >
+                    <span class="text-base font-semibold leading-none {{ $isSelected ? 'text-white' : 'text-gray-700 dark:text-gray-200' }}">
+                        {{ $cursor->day }}
                     </span>
-                @endif
-            </button>
-            @php $cursor->addDay(); @endphp
-        @endwhile
-    </div>
+
+                    @if ($inMonth && $total > 0)
+                        <span class="flex flex-wrap items-center justify-center gap-0.5">
+                            <x-filament::badge color="info" size="xs" tooltip="Total ujian">
+                                {{ $total }}
+                            </x-filament::badge>
+                            @if ($belum > 0)
+                                <x-filament::badge color="warning" size="xs" tooltip="Belum dilaporkan">
+                                    {{ $belum }}
+                                </x-filament::badge>
+                            @endif
+                            @if ($sudah > 0)
+                                <x-filament::badge color="success" size="xs" tooltip="Sudah dilaporkan">
+                                    {{ $sudah }}
+                                </x-filament::badge>
+                            @endif
+                        </span>
+                    @endif
+                </button>
+                @php $cursor->addDay(); @endphp
+            @endfor
+        </div>
+        @php $weekIndex++; @endphp
+    @endwhile
 </div>
