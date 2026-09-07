@@ -129,7 +129,13 @@ class ExamPaymentReportService
         }
     }
 
-    private function getCountOfExaminer($exam_type_id, $report_date_id, $guide_cek, $guide_order, $guide_id): int
+    /**
+     * Public (bukan private) supaya bisa dipakai ulang oleh
+     * ExamPaymentReconciliationService untuk menghitung ulang nilai
+     * "expected" saat verifikasi - murni method baca, tidak ada efek
+     * samping, aman dipakai di luar store().
+     */
+    public function getCountOfExaminer($exam_type_id, $report_date_id, $guide_cek, $guide_order, $guide_id): int
     {
         return ExamRegistration::where('exam_type_id', $exam_type_id)
             ->where('report_date_id', $report_date_id)
