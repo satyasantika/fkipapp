@@ -105,13 +105,27 @@
     </x-slot>
 
     <p class="text-sm text-gray-500 dark:text-gray-400">
-        Anda perlu login kembali untuk mengakses panel ini.
+        @if (session()->has('impersonator_id'))
+            Anda sedang masuk sebagai pengguna lain (impersonate). Anda bisa kembali ke akun admin saja, atau keluar sepenuhnya dari kedua akun.
+        @else
+            Anda perlu login kembali untuk mengakses panel ini.
+        @endif
     </p>
 
     <x-slot name="footerActions">
         <x-filament::button color="gray" x-on:click="close">
             Batal
         </x-filament::button>
+
+        @if (session()->has('impersonator_id'))
+            <form action="{{ route('impersonate.leave') }}" method="post">
+                @csrf
+
+                <x-filament::button type="submit" color="warning">
+                    Kembali ke akun admin
+                </x-filament::button>
+            </form>
+        @endif
 
         <form action="{{ $logoutItem?->getUrl() ?? filament()->getLogoutUrl() }}" method="post">
             @csrf
