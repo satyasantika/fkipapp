@@ -168,4 +168,20 @@
     .fi-calendar-day-today {
         box-shadow: inset 0 0 0 1.5px rgb(var(--primary-400));
     }
+
+    /* Grid kartu "Akan Dilaporkan" (slide-over dari /admin/report-dates/
+       {record}/reported, NotReportedTable::contentGrid()) - Filament cuma
+       menyediakan grid-cols per breakpoint TETAP (sm/md/lg/xl/2xl), jadi
+       banyaknya kartu per baris melompat di titik breakpoint tertentu, tidak
+       benar-benar mengikuti lebar yang tersedia. auto-fill+minmax dipakai di
+       sini supaya jumlah kolom dihitung ulang secara mulus dari lebar
+       kontainer sebenarnya (termasuk saat slide-over dilebarkan/panel
+       berubah), bukan cuma dari lebar viewport per breakpoint Tailwind.
+       !important perlu untuk menang melawan kelas grid-cols-* bawaan
+       (mis. sm:grid-cols-2) yang tetap ikut ter-render di elemen ini.
+       Baru satu-satunya pemakai ->contentGrid() di aplikasi ini - aman
+       menyasar kelas globalnya langsung, cek lagi kalau ada pemakai baru. */
+    .fi-ta-content-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+    }
 </style>

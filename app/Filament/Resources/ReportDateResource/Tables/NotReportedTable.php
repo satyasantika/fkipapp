@@ -69,6 +69,12 @@ class NotReportedTable extends Component implements Actions\Contracts\HasActions
     {
         return $table
             ->query($this->getTableQuery())
+            // Angka breakpoint di sini cuma untuk memicu mode grid Filament
+            // (butuh nilai truthy supaya kelas fi-ta-content-grid dipasang) -
+            // jumlah kolom SEBENARNYA dikendalikan oleh auto-fill di
+            // .fi-ta-content-grid (theme-overrides.blade.php), supaya
+            // mengikuti lebar kontainer secara mulus, bukan cuma melompat
+            // di breakpoint tertentu.
             ->contentGrid(['sm' => 2, 'md' => 3, 'xl' => 4])
             ->columns($this->getTableColumns())
             ->recordClasses(function (Student $record): array {
