@@ -60,6 +60,17 @@
             >
                 Hari ini
             </button>
+
+            @if ($canSync)
+                <button
+                    type="button"
+                    wire:click="openSyncModal"
+                    class="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-medium text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-white/5"
+                >
+                    <x-filament::icon icon="heroicon-o-arrow-path" class="h-4 w-4" />
+                    Sinkronisasi
+                </button>
+            @endif
         </div>
 
         <div class="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
@@ -151,3 +162,132 @@
         @php $weekIndex++; @endphp
     @endwhile
 </div>
+
+{{-- Modal sinkronisasi Sintesys, 2 langkah (pilih jurusan -> preview -> tarik
+    & simpan). Sama pola dgn modal logout/leave-impersonate: id dicocokkan
+    lewat event open-modal/close-modal, trigger tombol "Sinkronisasi" di atas. --}}
+@if ($canSync)
+    <x-filament::modal id="sync-exams" width="3xl" icon="heroicon-o-arrow-path" icon-color="primary">
+        <x-slot name="heading">
+            Sinkronisasi Ujian - {{ $monthNames[$month] }} {{ $year }}
+        </x-slot>
+
+        @if ($syncStep === 'pick')
+            <div class="space-y-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Data ujian bulan {{ $monthNames[$month] }} {{ $year }} akan ditarik dari Sintesys dan dicocokkan
+                    dengan data lokal. Ujian yang sudah dilaporkan tidak akan diubah.
+                </p>
+
+                @if ($isJurusan)
+                    <div>
+                        <label class="text-sm font-medium text-gray-700 dark:text-gray-200">Jurusan</label>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            {{ $departements->firstWhere('id', $syncDepartementId)?->nama ?? '-' }}
+                        </p>
+                    </div>
+                @else
+                    <div>
+                        <label for="sync-departement" class="text-sm font-medium text-gray-700 dark:text-gray-200">
+                            Jurusan
+                        </label>
+                        <select
+                            id="sync-departement"
+                            wire:model="syncDepartementId"
+                            class="mt-1 block w-full rounded-lg border-0 bg-white py-1.5 text-sm text-gray-700 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-primary-600 dark:bg-white/5 dark:text-gray-200 dark:ring-white/10"
+                        >
+                            <option value="">Pilih jurusan...</option>
+                            @foreach ($departements as $departement)
+                                <option value="{{ $departement->id }}">{{ $departement->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
+            </div>
+
+            <x-slot name="footerActions">
+                <x-filament::button color="gray" x-on:click="close">
+                    Batal
+                </x-filament::button>
+
+                <x-filament::button wire:click="loadSyncPreview" color="primary">
+                    Tampilkan Preview
+                </x-filament::button>
+            </x-slot>
+        @else
+            <div class="space-y-4">
+                @php $summary = $syncPreview['summary'] ?? []; @endphp
+                <div class="flex flex-wrap items-center gap-2 text-sm">
+                    <x-filament::badge color="gray">Total: {{ $summary['total'] ?? 0 }}</x-filament::badge>
+                    <x-filament::badge color="success">Dibuat: {{ $summary['dibuat'] ?? 0 }}</x-filament::badge>
+                    <x-filament::badge color="info">Diperbarui: {{ $summary['diperbarui'] ?? 0 }}</x-filament::badge>
+                    <x-filament::badge color="warning">Dilewati: {{ $summary['dilewati_jenis_tidak_dikenal'] ?? 0 }}</x-filament::badge>
+                    @if (($summary['mahasiswa_baru'] ?? 0) > 0)
+                        <x-filament::badge color="danger">Mahasiswa baru: {{ $summary['mahasiswa_baru'] }}</x-filament::badge>
+                    @endif
+                    @if (($summary['dosen_baru'] ?? 0) > 0)
+                        <x-filament::badge color="danger">Dosen baru: {{ $summary['dosen_baru'] }}</x-filament::badge>
+                    @endif
+                </div>
+
+                <div class="max-h-96 overflow-y-auto overflow-x-auto rounded-lg ring-1 ring-gray-200 dark:ring-white/10">
+                    <table class="w-full text-start text-sm">
+                        <thead class="bg-gray-50 text-xs font-medium text-gray-500 dark:bg-white/5 dark:text-gray-400">
+                            <tr>
+                                <th class="px-3 py-2 text-start">Mahasiswa</th>
+                                <th class="px-3 py-2 text-start">Jenis Ujian</th>
+                                <th class="px-3 py-2 text-start">Tanggal</th>
+                                <th class="px-3 py-2 text-start">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 dark:divide-white/5">
+                            @forelse ($syncPreview['items'] ?? [] as $item)
+                                <tr>
+                                    <td class="px-3 py-2">
+                                        {{ $item['nama'] ?? '-' }}
+                                        <div class="text-xs text-gray-400">{{ $item['nim'] ?? '-' }}</div>
+                                        @if ($item['student_baru'] ?? false)
+                                            <x-filament::badge color="danger" size="xs">Mahasiswa baru</x-filament::badge>
+                                        @endif
+                                        @if (! empty($item['dosen_baru']))
+                                            <x-filament::badge color="danger" size="xs">
+                                                {{ count($item['dosen_baru']) }} dosen baru
+                                            </x-filament::badge>
+                                        @endif
+                                    </td>
+                                    <td class="px-3 py-2">{{ $item['jenis_ujian'] }}</td>
+                                    <td class="px-3 py-2">{{ $item['tanggal_ujian'] ?? '-' }}</td>
+                                    <td class="px-3 py-2">
+                                        @if ($item['status'] === 'dibuat')
+                                            <x-filament::badge color="success">Baru</x-filament::badge>
+                                        @elseif ($item['status'] === 'diperbarui')
+                                            <x-filament::badge color="info">Perbarui</x-filament::badge>
+                                        @else
+                                            <x-filament::badge color="warning" tooltip="{{ $item['alasan'] }}">Dilewati</x-filament::badge>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="px-3 py-4 text-center text-gray-400">
+                                        Tidak ada data ujian dari Sintesys untuk bulan ini.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <x-slot name="footerActions">
+                <x-filament::button color="gray" wire:click="backToSyncPick">
+                    Kembali
+                </x-filament::button>
+
+                <x-filament::button wire:click="confirmSync" color="success" :disabled="empty($syncPreview['items'])">
+                    Tarik &amp; Simpan
+                </x-filament::button>
+            </x-slot>
+        @endif
+    </x-filament::modal>
+@endif

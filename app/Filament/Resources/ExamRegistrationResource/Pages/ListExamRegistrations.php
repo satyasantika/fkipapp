@@ -3,9 +3,12 @@
 namespace App\Filament\Resources\ExamRegistrationResource\Pages;
 
 use App\Filament\Resources\ExamRegistrationResource;
+use App\Models\Departement;
 use App\Models\ExamRegistration;
 use App\Models\Student;
+use App\Services\SintesysSyncService;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Table;
@@ -29,6 +32,18 @@ class ListExamRegistrations extends ListRecords
     public int $calendarYear;
 
     public ?string $selectedDate = null;
+
+    public ?int $syncDepartementId = null;
+
+    /**
+     * @var array{items?: array<int, array<string, mixed>>, summary?: array<string, int>}
+     */
+    public array $syncPreview = [];
+
+    /**
+     * 'pick' | 'preview'.
+     */
+    public string $syncStep = 'pick';
 
     private bool $dilaporkanFilterHookRegistered = false;
 
@@ -156,6 +171,12 @@ class ListExamRegistrations extends ListRecords
                 'year' => $this->calendarYear,
                 'selectedDate' => $this->selectedDate,
                 'days' => $this->getCalendarDays(),
+                'canSync' => $this->canSync(),
+                'departements' => $this->canSync() ? Departement::orderBy('nama')->get() : collect(),
+                'syncStep' => $this->syncStep,
+                'syncPreview' => $this->syncPreview,
+                'syncDepartementId' => $this->syncDepartementId,
+                'isJurusan' => auth()->user()?->hasRole('jurusan') ?? false,
             ])->render(),
             scopes: static::class,
         );
@@ -218,6 +239,83 @@ class ListExamRegistrations extends ListRecords
     public function clearSelectedDate(): void
     {
         $this->selectedDate = null;
+        $this->resetTable();
+    }
+
+    /**
+     * Hanya jurusan (kode_prodi = departemen sendiri) dan keuangan (pilih
+     * departemen lewat dropdown) yang boleh menyinkronkan data dari
+     * Sintesys - keputusan eksplisit dari pemilik aplikasi.
+     */
+    public function canSync(): bool
+    {
+        return auth()->user()?->hasRole(['jurusan', 'keuangan']) ?? false;
+    }
+
+    public function openSyncModal(): void
+    {
+        $this->syncStep = 'pick';
+        $this->syncPreview = [];
+        $this->syncDepartementId = auth()->user()?->hasRole('jurusan')
+            ? auth()->user()->departement_id
+            : null;
+
+        $this->dispatch('open-modal', id: 'sync-exams');
+    }
+
+    /**
+     * Tarik data Sintesys untuk bulan/tahun kalender yang sedang tampil +
+     * departemen yang dipilih, lalu analisis (belum menulis ke DB sama
+     * sekali - lihat SintesysSyncService::analyze()). Hasilnya disimpan di
+     * $syncPreview supaya confirmSync() tidak perlu fetch API dua kali.
+     */
+    public function loadSyncPreview(): void
+    {
+        if (! $this->canSync()) {
+            return;
+        }
+
+        if (! $this->syncDepartementId) {
+            Notification::make()->title('Pilih jurusan yang akan disinkronkan terlebih dahulu.')->warning()->send();
+
+            return;
+        }
+
+        $start = Carbon::create($this->calendarYear, $this->calendarMonth, 1)->startOfMonth();
+        $end = $start->copy()->endOfMonth();
+
+        try {
+            $service = app(SintesysSyncService::class);
+            $rows = $service->fetchExams((string) $this->syncDepartementId, $start->toDateString(), $end->toDateString());
+            $this->syncPreview = $service->analyze($rows, $this->syncDepartementId);
+            $this->syncStep = 'preview';
+        } catch (\Throwable $e) {
+            Notification::make()->title($e->getMessage())->danger()->send();
+        }
+    }
+
+    public function backToSyncPick(): void
+    {
+        $this->syncStep = 'pick';
+    }
+
+    public function confirmSync(): void
+    {
+        if (! $this->canSync() || ! $this->syncDepartementId || empty($this->syncPreview['items'])) {
+            return;
+        }
+
+        $summary = app(SintesysSyncService::class)->commit($this->syncPreview['items'], $this->syncDepartementId);
+
+        Notification::make()
+            ->title('Sinkronisasi selesai')
+            ->body("Dibuat: {$summary['dibuat']}, diperbarui: {$summary['diperbarui']}, mahasiswa baru: {$summary['mahasiswa_baru']}, dosen baru: {$summary['dosen_baru']}, dilewati: {$summary['dilewati_jenis_tidak_dikenal']}.")
+            ->success()
+            ->send();
+
+        $this->syncStep = 'pick';
+        $this->syncPreview = [];
+        $this->dispatch('close-modal', id: 'sync-exams');
         $this->resetTable();
     }
 }

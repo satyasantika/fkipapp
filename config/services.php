@@ -31,4 +31,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'sintesys' => [
+        'url' => env('SINTESYS_API_URL', 'https://api-sintesys.unsil.io'),
+        'token' => env('SINTESYS_API_TOKEN'),
+    ],
+
 ];
