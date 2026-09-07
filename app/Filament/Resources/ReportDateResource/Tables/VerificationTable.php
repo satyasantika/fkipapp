@@ -41,7 +41,7 @@ class VerificationTable extends Component implements Actions\Contracts\HasAction
 
     public ReportDate $record;
 
-    public bool $belumSesuaiOnly = false;
+    public bool $belumSesuaiOnly = true;
 
     private bool $filterHookRegistered = false;
 
