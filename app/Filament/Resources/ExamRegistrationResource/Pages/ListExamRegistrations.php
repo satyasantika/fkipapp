@@ -264,20 +264,19 @@ class ListExamRegistrations extends ListRecords
     }
 
     /**
-     * Tarik data Sintesys untuk bulan/tahun kalender yang sedang tampil +
-     * departemen yang dipilih, lalu analisis (belum menulis ke DB sama
-     * sekali - lihat SintesysSyncService::analyze()). Hasilnya disimpan di
-     * $syncPreview supaya confirmSync() tidak perlu fetch API dua kali.
+     * Tarik data Sintesys untuk bulan/tahun kalender yang sedang tampil,
+     * lalu analisis (belum menulis ke DB sama sekali - lihat
+     * SintesysSyncService::analyze()/analyzeAllDepartments()). Hasilnya
+     * disimpan di $syncPreview supaya confirmSync() tidak perlu fetch API
+     * dua kali.
+     *
+     * jurusan -> satu departemen (miliknya sendiri). keuangan -> SEMUA
+     * jurusan sekaligus (tidak perlu pilih), karena keuangan tidak terikat
+     * satu departemen.
      */
     public function loadSyncPreview(): void
     {
         if (! $this->canSync()) {
-            return;
-        }
-
-        if (! $this->syncDepartementId) {
-            Notification::make()->title('Pilih jurusan yang akan disinkronkan terlebih dahulu.')->warning()->send();
-
             return;
         }
 
@@ -286,8 +285,14 @@ class ListExamRegistrations extends ListRecords
 
         try {
             $service = app(SintesysSyncService::class);
-            $rows = $service->fetchExams((string) $this->syncDepartementId, $start->toDateString(), $end->toDateString());
-            $this->syncPreview = $service->analyze($rows, $this->syncDepartementId);
+
+            if (auth()->user()?->hasRole('jurusan')) {
+                $rows = $service->fetchExams((string) $this->syncDepartementId, $start->toDateString(), $end->toDateString());
+                $this->syncPreview = $service->analyze($rows, $this->syncDepartementId);
+            } else {
+                $this->syncPreview = $service->analyzeAllDepartments($start->toDateString(), $end->toDateString());
+            }
+
             $this->syncStep = 'preview';
         } catch (\Throwable $e) {
             Notification::make()->title($e->getMessage())->danger()->send();
@@ -301,11 +306,11 @@ class ListExamRegistrations extends ListRecords
 
     public function confirmSync(): void
     {
-        if (! $this->canSync() || ! $this->syncDepartementId || empty($this->syncPreview['items'])) {
+        if (! $this->canSync() || empty($this->syncPreview['items'])) {
             return;
         }
 
-        $summary = app(SintesysSyncService::class)->commit($this->syncPreview['items'], $this->syncDepartementId);
+        $summary = app(SintesysSyncService::class)->commit($this->syncPreview['items']);
 
         Notification::make()
             ->title('Sinkronisasi selesai')

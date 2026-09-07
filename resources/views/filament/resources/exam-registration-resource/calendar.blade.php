@@ -187,21 +187,9 @@
                         </p>
                     </div>
                 @else
-                    <div>
-                        <label for="sync-departement" class="text-sm font-medium text-gray-700 dark:text-gray-200">
-                            Jurusan
-                        </label>
-                        <select
-                            id="sync-departement"
-                            wire:model="syncDepartementId"
-                            class="mt-1 block w-full rounded-lg border-0 bg-white py-1.5 text-sm text-gray-700 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-primary-600 dark:bg-white/5 dark:text-gray-200 dark:ring-white/10"
-                        >
-                            <option value="">Pilih jurusan...</option>
-                            @foreach ($departements as $departement)
-                                <option value="{{ $departement->id }}">{{ $departement->nama }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Semua jurusan akan diperiksa sekaligus (bisa beberapa saat, tergantung jumlah jurusan).
+                    </p>
                 @endif
             </div>
 
@@ -229,6 +217,12 @@
                         <x-filament::badge color="danger">Dosen baru: {{ $summary['dosen_baru'] }}</x-filament::badge>
                     @endif
                 </div>
+
+                @if (! empty($summary['gagal_jurusan']))
+                    <p class="text-sm" style="color: rgb(var(--danger-600))">
+                        Gagal ditarik dari: {{ implode(', ', $summary['gagal_jurusan']) }}. Jurusan lain tetap berhasil diproses.
+                    </p>
+                @endif
 
                 <div class="max-h-96 overflow-y-auto overflow-x-auto rounded-lg ring-1 ring-gray-200 dark:ring-white/10">
                     <table class="w-full text-start text-sm">

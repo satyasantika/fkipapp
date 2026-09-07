@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Departement;
 use App\Models\ExamRegistration;
 use App\Models\ExamType;
 use App\Models\Lecture;
@@ -195,13 +196,61 @@ class SintesysSyncService
     }
 
     /**
-     * Simpan hasil analyze() ke DB. $items harus berasal dari analyze()
-     * (item ber-status 'dilewati' otomatis diabaikan di sini juga).
+     * Sama seperti analyze(), tapi untuk SEMUA jurusan sekaligus - dipakai
+     * role keuangan supaya tidak perlu memilih satu jurusan dulu (Sintesys
+     * mewajibkan kode_prodi tunggal per request, jadi di sini di-loop satu
+     * request per jurusan). Kalau satu jurusan gagal ditarik (mis. timeout),
+     * jurusan itu dilewati (dicatat di summary['gagal_jurusan']) tanpa
+     * menggagalkan jurusan lain.
+     *
+     * @return array{items: array<int, array<string, mixed>>, summary: array<string, mixed>}
+     */
+    public function analyzeAllDepartments(string $tanggalMulai, string $tanggalSelesai): array
+    {
+        $items = [];
+        $summary = [
+            'total' => 0,
+            'dibuat' => 0,
+            'diperbarui' => 0,
+            'dilewati_jenis_tidak_dikenal' => 0,
+            'mahasiswa_baru' => 0,
+            'dosen_baru' => 0,
+            'gagal_jurusan' => [],
+        ];
+
+        foreach (Departement::all() as $departement) {
+            try {
+                $rows = $this->fetchExams((string) $departement->id, $tanggalMulai, $tanggalSelesai);
+            } catch (\Throwable $e) {
+                $summary['gagal_jurusan'][] = $departement->nama;
+
+                continue;
+            }
+
+            $result = $this->analyze($rows, $departement->id);
+
+            $items = array_merge($items, $result['items']);
+
+            foreach (['total', 'dibuat', 'diperbarui', 'dilewati_jenis_tidak_dikenal', 'mahasiswa_baru', 'dosen_baru'] as $key) {
+                $summary[$key] += $result['summary'][$key];
+            }
+        }
+
+        return ['items' => $items, 'summary' => $summary];
+    }
+
+    /**
+     * Simpan hasil analyze()/analyzeAllDepartments() ke DB. $items harus
+     * berasal dari salah satu method itu (item ber-status 'dilewati'
+     * otomatis diabaikan di sini juga). departement_id diambil dari
+     * masing-masing item (bukan satu parameter global) - supaya jalur
+     * "semua jurusan" (analyzeAllDepartments) menyimpan setiap baris ke
+     * jurusan asalnya masing-masing, tidak tercampur ke satu jurusan.
      *
      * @param  array<int, array<string, mixed>>  $items
      * @return array<string, int> ringkasan final (bentuk sama seperti summary analyze())
      */
-    public function commit(array $items, int $departementId): array
+    public function commit(array $items): array
     {
         $summary = [
             'dibuat' => 0,
@@ -211,13 +260,15 @@ class SintesysSyncService
             'dosen_baru' => 0,
         ];
 
-        DB::transaction(function () use ($items, $departementId, &$summary) {
+        DB::transaction(function () use ($items, &$summary) {
             foreach ($items as $item) {
                 if ($item['status'] === 'dilewati') {
                     $summary['dilewati_jenis_tidak_dikenal']++;
 
                     continue;
                 }
+
+                $departementId = $item['departement_id'];
 
                 $student = Student::firstOrCreate(
                     ['nim' => $item['student_nim']],
