@@ -78,6 +78,8 @@ class SintesysSyncService
      */
     public function analyze(array $rows, int $departementId): array
     {
+        $departementNama = Departement::find($departementId)?->nama;
+
         $items = [];
         $summary = [
             'total' => count($rows),
@@ -101,6 +103,7 @@ class SintesysSyncService
                     'tanggal_ujian' => $row['tanggal_ujian'] ?? null,
                     'status' => 'dilewati',
                     'alasan' => 'Jenis ujian "'.($row['jenis_ujian'] ?? '-').'" tidak dikenali (bukan Proposal/Hasil Penelitian/Sidang Akhir).',
+                    'departement_nama' => $departementNama,
                     'raw' => $row,
                 ];
 
@@ -179,6 +182,7 @@ class SintesysSyncService
                 'student_baru' => $studentBaru,
                 'dosen_baru' => $dosenBaruNama,
                 'departement_id' => $departementId,
+                'departement_nama' => $departementNama,
                 'exam_type_id' => $examType?->id,
                 'student_nim' => $row['nim'] ?? null,
                 'student_nama' => $row['nama'] ?? null,
