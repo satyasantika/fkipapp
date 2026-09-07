@@ -123,7 +123,13 @@ class ExamPaymentReportResource extends Resource
                 ->label('Departemen'),
             Tables\Columns\TextColumn::make('dosen')
                 ->label('Dosen')
-                ->searchable(),
+                // 'dosen' adalah accessor PHP (lihat ExamPaymentReport::dosen()),
+                // bukan kolom asli - ->searchable() bawaan mencoba WHERE dosen
+                // LIKE ... langsung ke SQL dan gagal (Unknown column 'dosen').
+                // Dicari lewat relasi lecture.nama sebagai gantinya.
+                ->searchable(query: function (Builder $query, string $search): Builder {
+                    return $query->whereHas('lecture', fn (Builder $q) => $q->where('nama', 'like', "%{$search}%"));
+                }),
             ...($includeStatus ? [
                 Tables\Columns\TextColumn::make('status_nama')
                     ->label('Status'),

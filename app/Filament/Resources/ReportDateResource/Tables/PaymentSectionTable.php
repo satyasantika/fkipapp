@@ -13,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 
 /**
@@ -112,7 +113,13 @@ class PaymentSectionTable extends Component implements Actions\Contracts\HasActi
                 ->label('Departemen Id'),
             Tables\Columns\TextColumn::make('dosen')
                 ->label('Dosen')
-                ->searchable(),
+                // 'dosen' adalah accessor PHP (lihat ExamPaymentReport::dosen()),
+                // bukan kolom asli - ->searchable() bawaan mencoba WHERE dosen
+                // LIKE ... langsung ke SQL dan gagal (Unknown column 'dosen').
+                // Dicari lewat relasi lecture.nama sebagai gantinya.
+                ->searchable(query: function (Builder $query, string $search): Builder {
+                    return $query->whereHas('lecture', fn (Builder $q) => $q->where('nama', 'like', "%{$search}%"));
+                }),
             Tables\Columns\TextColumn::make('status_nama')
                 ->label('status'),
             Tables\Columns\TextColumn::make('golongan_nama')
