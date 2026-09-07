@@ -55,6 +55,11 @@ class Lecture extends Model
         return $this->hasMany(ExamRegistration::class, 'penguji3_id');
     }
 
+    public function examPaymentReports(): HasMany
+    {
+        return $this->hasMany(ExamPaymentReport::class, 'lecture_id');
+    }
+
     private const LECTURE_ROLE_COLUMNS = [
         'pembimbing1_id', 'pembimbing2_id',
         'penguji1_id', 'penguji2_id', 'penguji3_id',
