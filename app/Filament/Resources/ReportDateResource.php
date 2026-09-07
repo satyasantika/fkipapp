@@ -12,6 +12,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Filament\Support\Exceptions\Halt;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -70,7 +71,9 @@ class ReportDateResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('tanggal')
-                    ->date()
+                    ->date('l, d M Y')
+                    ->icon('heroicon-o-calendar-days')
+                    ->weight(FontWeight::SemiBold)
                     ->description(function (ReportDate $record): \Illuminate\Support\HtmlString {
                         // HtmlString supaya baris terpisah beneran ({{ }} Blade
                         // otomatis panggil ->toHtml() untuk Htmlable) - string
@@ -90,28 +93,42 @@ class ReportDateResource extends Resource
                             .'<div>Kunci/buka terakhir: '.e($lockInfo).'</div>'
                         );
                     }),
-                Tables\Columns\TextColumn::make('deskripsi'),
+                Tables\Columns\TextColumn::make('is_locked')
+                    ->label('Status')
+                    ->badge()
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'Terkunci' : 'Terbuka')
+                    ->icon(fn (bool $state): string => $state ? 'heroicon-o-lock-closed' : 'heroicon-o-lock-open')
+                    ->color(fn (bool $state): string => $state ? 'danger' : 'success'),
+                Tables\Columns\TextColumn::make('deskripsi')
+                    ->placeholder('Tidak ada catatan')
+                    ->color('gray')
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('dibayar')
                     ->money('idr', divideBy: 1)
+                    ->weight(FontWeight::Bold)
                     ->description(function (ReportDate $record): \Illuminate\Support\HtmlString {
                         // total_honor adalah accessor (dihitung dari kolom honor_*/banyak_*),
                         // bukan kolom asli, jadi harus dijumlah di PHP lewat Collection::sum(),
                         // tidak bisa lewat SUM() SQL - sama seperti dibayar dihitung ulang di
                         // ExamPaymentReportService::store().
                         //
-                        // Baris terpisah + warna lewat HtmlString (Blade {{ }} otomatis
-                        // memanggil ->toHtml() untuk Htmlable, jadi tidak di-escape) -
-                        // rgb(var(--x-600)) dipakai (bukan kelas Tailwind semacam
-                        // text-success-700) karena panel ini tidak punya build Tailwind
-                        // sendiri, lihat catatan panjang di student-card.blade.php.
+                        // Dirender lewat view (bukan HtmlString manual) supaya benar-benar
+                        // memakai <x-filament::badge> asli - warna non-gray Filament
+                        // ditentukan lewat inline style dari get_color_css_variables(),
+                        // bukan kelas Tailwind semacam bg-success-50 yang kelihatan
+                        // masuk akal tapi tidak pernah dikompilasi di panel ini (tidak
+                        // ada build Tailwind sendiri, lihat catatan di student-card.blade.php),
+                        // jadi badge warna itu tidak bisa ditiru manual lewat HtmlString.
                         $reports = ExamPaymentReport::where('report_date_id', $record->id)->get();
 
                         $asn = Number::currency($reports->where('status', 1)->sum('total_honor'), in: 'IDR', locale: 'id');
                         $nonAsn = Number::currency($reports->where('status', 0)->sum('total_honor'), in: 'IDR', locale: 'id');
 
                         return new \Illuminate\Support\HtmlString(
-                            '<div style="color: rgb(var(--success-600))">ASN: '.e($asn).'</div>'
-                            .'<div style="color: rgb(var(--gray-600))">nonASN: '.e($nonAsn).'</div>'
+                            view('filament.resources.report-date-resource.tables.dibayar-badges', [
+                                'asn' => $asn,
+                                'nonAsn' => $nonAsn,
+                            ])->render()
                         );
                     }),
             ])
