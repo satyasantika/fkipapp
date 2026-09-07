@@ -2,10 +2,10 @@
     {{-- Mahasiswa & Dosen sebagai KPI yang bisa diklik (menggantikan tombol
          "Mahasiswa"/"Dosen" di widget quick-links) - tetap menuju resource
          masing-masing, cuma bentuknya kartu angka, bukan tombol polos. --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div class="flex flex-wrap gap-4">
         <a
             href="{{ $studentUrl }}"
-            class="flex items-center gap-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5 transition hover:ring-primary-300 dark:bg-gray-900 dark:ring-white/10 dark:hover:ring-primary-500"
+            class="inline-flex w-fit items-center gap-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5 transition hover:ring-primary-300 dark:bg-gray-900 dark:ring-white/10 dark:hover:ring-primary-500"
         >
             <span
                 class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg"
@@ -21,7 +21,7 @@
 
         <a
             href="{{ $lectureUrl }}"
-            class="flex items-center gap-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5 transition hover:ring-primary-300 dark:bg-gray-900 dark:ring-white/10 dark:hover:ring-primary-500"
+            class="inline-flex w-fit items-center gap-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5 transition hover:ring-primary-300 dark:bg-gray-900 dark:ring-white/10 dark:hover:ring-primary-500"
         >
             <span
                 class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg"
