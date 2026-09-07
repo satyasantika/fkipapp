@@ -49,6 +49,13 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Teal,
                 'success' => Color::Emerald,
             ])
+            // Logo default Filament cuma teks nama app ("fkipapp") - diganti
+            // ikon+teks yang lebih representatif (topi wisuda + "FKIP UNSIL",
+            // konsisten dengan identitas fakultas, bukan cuma nama teknis
+            // aplikasi). Htmlable (View) di sini bikin logo.blade.php Filament
+            // merender kontennya mentah-mentah - lihat brand-logo.blade.php.
+            ->brandLogo(fn () => view('filament.components.brand-logo'))
+            ->brandLogoHeight('2rem')
             ->font('Manrope')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
