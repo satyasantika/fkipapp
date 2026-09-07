@@ -36,7 +36,7 @@
         </a>
     </div>
 
-    <div class="mt-4">
+    <div style="margin-top: 1.5rem;">
         <x-filament::button tag="a" :href="$examRegistrationUrl" icon="heroicon-o-clipboard-document-list" color="primary">
             Kelola Laporan Ujian
         </x-filament::button>
