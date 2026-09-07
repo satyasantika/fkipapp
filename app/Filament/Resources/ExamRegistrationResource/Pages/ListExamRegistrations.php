@@ -205,12 +205,6 @@ class ListExamRegistrations extends ListRecords
         $this->resetTable();
     }
 
-    public function clearSelectedDate(): void
-    {
-        $this->selectedDate = null;
-        $this->resetTable();
-    }
-
     /**
      * Hanya jurusan (kode_prodi = departemen sendiri) dan keuangan (pilih
      * departemen lewat dropdown) yang boleh menyinkronkan data dari
