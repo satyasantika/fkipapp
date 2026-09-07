@@ -75,9 +75,6 @@ class ReportDateResource extends Resource
                     ->icon('heroicon-o-calendar-days')
                     ->weight(FontWeight::SemiBold)
                     ->description(function (ReportDate $record): \Illuminate\Support\HtmlString {
-                        // HtmlString supaya baris terpisah beneran ({{ }} Blade
-                        // otomatis panggil ->toHtml() untuk Htmlable) - string
-                        // biasa dengan \n akan dirender jadi satu baris saja.
                         $lastPulled = $record->last_pulled_at
                             ? $record->last_pulled_at->format('d M Y, H:i')
                             : '-';
@@ -89,8 +86,11 @@ class ReportDateResource extends Resource
                         }
 
                         return new \Illuminate\Support\HtmlString(
-                            '<div>Terakhir ditarik: '.e($lastPulled).'</div>'
-                            .'<div>Kunci/buka terakhir: '.e($lockInfo).'</div>'
+                            view('filament.resources.report-date-resource.tables.tanggal-info', [
+                                'lastPulled' => $lastPulled,
+                                'lockInfo' => $lockInfo,
+                                'lockIcon' => $record->is_locked ? 'heroicon-o-lock-closed' : 'heroicon-o-lock-open',
+                            ])->render()
                         );
                     }),
                 Tables\Columns\TextColumn::make('is_locked')
