@@ -5,8 +5,12 @@ namespace App\Exports;
 use App\Models\ExamPaymentReport;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder;
 
 /**
  * Dipakai oleh tombol "Export Excel" di slide-over "List Bayar ASN"/"List
@@ -15,12 +19,33 @@ use Maatwebsite\Excel\Concerns\WithMapping;
  * yang sendirinya sengaja disamakan dengan halaman lama
  * /exam/reports/{pns}/{report_date_id} (ViewExamPaymentReportsDataTable).
  */
-class PaymentSectionExport implements FromCollection, WithHeadings, WithMapping
+class PaymentSectionExport extends DefaultValueBinder implements FromCollection, WithCustomValueBinder, WithHeadings, WithMapping
 {
+    /**
+     * Kolom (huruf, sesuai posisi di headings()/map() - F=Npwp, G=Rekening)
+     * yang harus dipaksa jadi teks. Tanpa ini, PhpSpreadsheet men-deteksi
+     * NPWP/nomor rekening sebagai angka (DefaultValueBinder::bindValue()
+     * memanggil is_numeric()) - Excel lalu menampilkannya dalam notasi
+     * ilmiah atau membuang nol di depan, karena keduanya angka panjang,
+     * bukan nilai matematis.
+     */
+    private const TEXT_COLUMNS = ['F', 'G'];
+
     public function __construct(
         protected int $reportDateId,
         protected int $pns,
     ) {}
+
+    public function bindValue(Cell $cell, $value): bool
+    {
+        if (in_array($cell->getColumn(), self::TEXT_COLUMNS, true)) {
+            $cell->setValueExplicit((string) $value, DataType::TYPE_STRING);
+
+            return true;
+        }
+
+        return parent::bindValue($cell, $value);
+    }
 
     public function collection(): Collection
     {
@@ -77,11 +102,11 @@ class PaymentSectionExport implements FromCollection, WithHeadings, WithMapping
             $report->honor_penguji_skripsi,
             $report->honor_penguji_proposal,
             $report->honor_penguji_seminar,
-            $report->banyak_membimbing1,
-            $report->banyak_membimbing2,
-            $report->banyak_menguji_skripsi,
-            $report->banyak_menguji_proposal,
-            $report->banyak_menguji_seminar,
+            $report->banyak_membimbing1 ?? 0,
+            $report->banyak_membimbing2 ?? 0,
+            $report->banyak_menguji_skripsi ?? 0,
+            $report->banyak_menguji_proposal ?? 0,
+            $report->banyak_menguji_seminar ?? 0,
             $report->jumlah_honor_pembimbing,
             $report->jumlah_honor_penguji_skripsi,
             $report->jumlah_honor_penguji_proposal,
