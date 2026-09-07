@@ -19,4 +19,13 @@ class DashboardQuickLinks extends Widget
     protected static ?int $sort = -2;
 
     protected static bool $isLazy = false;
+
+    public static function canView(): bool
+    {
+        // Blok jurusan di view ini sudah kosong (Mahasiswa/Dosen jadi KPI,
+        // Reg Ujian/Rekap Ujian dihapus - lihat JurusanExamKpiWidget) -
+        // kartu selamat datang + catatan "tampilan lama" jadi tidak relevan
+        // lagi buat jurusan, jadi widget ini disembunyikan untuk role itu.
+        return ! (auth()->user()?->hasRole('jurusan') ?? false);
+    }
 }
