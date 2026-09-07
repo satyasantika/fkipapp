@@ -104,9 +104,8 @@ class ReportedList extends Page implements HasTable
                     'semhas' => 'info',
                     'sidang' => 'success',
                     default => 'gray',
-                }),
-            Tables\Columns\TextColumn::make('tanggal_ujian')
-                ->date(),
+                })
+                ->description(fn (ExamRegistration $record): ?string => $record->tanggal_ujian?->format('d M Y')),
             Tables\Columns\TextColumn::make('student.nama')
                 ->label('Mahasiswa')
                 ->description(fn (ExamRegistration $record): ?string => $record->student
