@@ -76,6 +76,10 @@ class NotReportedTable extends Component implements Actions\Contracts\HasActions
             // mengikuti lebar kontainer secara mulus, bukan cuma melompat
             // di breakpoint tertentu.
             ->contentGrid(['sm' => 2, 'md' => 3, 'xl' => 4])
+            // Preset yang dituju not-reported-table.blade.php (recalcPerPage())
+            // saat menghitung otomatis dari ukuran layar sungguhan - dijaga
+            // sinkron manual dengan array `presets` di JS itu.
+            ->paginationPageOptions([12, 24, 48, 96, 'all'])
             ->columns($this->getTableColumns())
             ->recordClasses(function (Student $record): array {
                 $state = self::cardState($record);
