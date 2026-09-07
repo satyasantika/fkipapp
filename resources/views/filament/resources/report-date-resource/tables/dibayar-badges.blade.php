@@ -2,7 +2,7 @@
     <x-filament::badge color="success" size="sm">
         ASN: {{ $asn }}
     </x-filament::badge>
-    <x-filament::badge color="gray" size="sm">
+    <x-filament::badge color="primary" size="sm">
         nonASN: {{ $nonAsn }}
     </x-filament::badge>
 </div>
