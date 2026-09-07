@@ -77,7 +77,7 @@
                     wire:click="clearSelectedDate"
                     class="inline-flex items-center gap-1 rounded-full bg-primary-50 px-2 py-1 font-medium text-primary-700 hover:bg-primary-100 dark:bg-white/5 dark:text-primary-400"
                 >
-                    Tanggal: {{ Carbon::parse($selectedDate)->translatedFormat('d M Y') }}
+                    Hapus filter tanggal
                     <x-filament::icon icon="heroicon-o-x-mark" class="h-3.5 w-3.5" />
                 </button>
             @endif
