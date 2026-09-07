@@ -4,7 +4,7 @@
     di browser manapun, tidak bergantung resolusi custom property tema.
 --}}
 <x-filament-widgets::widget>
-    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {{-- Kartu 1: Total ujian + donat sudah dilaporkan --}}
         <div class="flex items-center justify-between gap-4 rounded-2xl p-5" style="background-color: #eff6ff">
             <div>
