@@ -6,6 +6,7 @@ use App\Filament\Resources\ExamPaymentReportResource\Pages;
 use App\Filament\Resources\ExamPaymentReportResource\RelationManagers;
 use App\Models\ExamPayment;
 use App\Models\ExamPaymentReport;
+use App\Models\Lecture;
 use App\Models\ReportDate;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -174,6 +175,32 @@ class ExamPaymentReportResource extends Resource
         $data['status'] = $data['pns'] ?? false ? 1 : 0;
         $data['honor_pembimbing'] = $examPayment->honor;
         unset($data['pns']);
+
+        // Field-field ini properti dosennya (bukan cuma milik baris laporan
+        // ini) - ikut ditulis balik ke Lecture supaya koreksi di sini juga
+        // kepakai di tabel dosen & laporan-laporan berikutnya, bukan cuma
+        // "menempel" di satu baris laporan lama.
+        //
+        // golongan KHUSUS: Lecture.golongan menyimpan sub-golongan penuh
+        // (mis. "3d", "4b" - dicek langsung di data dev), sedangkan pilihan
+        // di form ini cuma digit utamanya ('3'/'4', lihat GOLONGANS - sama
+        // seperti yang disimpan di exam_payment_reports.golongan lewat
+        // substr($golongan, 0, 1) di ExamPaymentReportService::store()).
+        // Assign langsung akan menimpa "3d" jadi "3" (hilang sub-golongannya)
+        // - jadi cuma karakter PERTAMA yang diganti, sisanya dipertahankan.
+        $lecture = Lecture::find($record->lecture_id);
+        $golonganBaru = isset($data['golongan'])
+            ? $data['golongan'].substr((string) $lecture?->golongan, 1)
+            : $lecture?->golongan;
+
+        $lecture?->update([
+            'pns' => (bool) $data['status'],
+            'golongan' => $golonganBaru,
+            'jabatan_akademik' => $data['jabatan_akademik'] ?? null,
+            'pendidikan' => $data['pendidikan'] ?? null,
+            'npwp' => $data['npwp'] ?? null,
+            'rekening' => $data['rekening'] ?? null,
+        ]);
 
         $record->update($data);
 
