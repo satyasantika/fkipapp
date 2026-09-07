@@ -21,21 +21,6 @@
                 </x-filament::button>
             @endrole
 
-            @role('jurusan')
-                <x-filament::button tag="a" href="{{ \App\Filament\Resources\StudentResource::getUrl() }}" color="primary">
-                    Mahasiswa
-                </x-filament::button>
-                <x-filament::button tag="a" href="{{ \App\Filament\Resources\LectureResource::getUrl() }}" color="primary">
-                    Dosen
-                </x-filament::button>
-                <x-filament::button tag="a" href="{{ \App\Filament\Resources\ExamRegistrationResource::getUrl() }}" color="primary">
-                    Reg Ujian
-                </x-filament::button>
-                <x-filament::button tag="a" href="{{ route('reports.by.departement') }}" color="gray">
-                    Rekap Ujian
-                </x-filament::button>
-            @endrole
-
             @role('keuangan')
                 <x-filament::button tag="a" href="{{ \App\Filament\Resources\LectureResource::getUrl() }}" color="primary">
                     Dosen
