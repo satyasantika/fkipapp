@@ -229,6 +229,9 @@
                         <thead class="bg-gray-50 text-xs font-medium text-gray-500 dark:bg-white/5 dark:text-gray-400">
                             <tr>
                                 <th class="px-3 py-2 text-start">Mahasiswa</th>
+                                @if (! $isJurusan)
+                                    <th class="px-3 py-2 text-start">Jurusan</th>
+                                @endif
                                 <th class="px-3 py-2 text-start">Jenis Ujian</th>
                                 <th class="px-3 py-2 text-start">Status</th>
                             </tr>
@@ -248,6 +251,9 @@
                                             </x-filament::badge>
                                         @endif
                                     </td>
+                                    @if (! $isJurusan)
+                                        <td class="px-3 py-2">{{ $item['departement_nama'] ?? '-' }}</td>
+                                    @endif
                                     <td class="px-3 py-2">
                                         {{ $item['jenis_ujian'] }}
                                         <div class="text-xs text-gray-400">{{ $item['tanggal_ujian'] ?? '-' }}</div>
@@ -264,7 +270,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="px-3 py-4 text-center text-gray-400">
+                                    <td colspan="{{ $isJurusan ? 3 : 4 }}" class="px-3 py-4 text-center text-gray-400">
                                         Tidak ada data ujian dari Sintesys untuk bulan ini.
                                     </td>
                                 </tr>
