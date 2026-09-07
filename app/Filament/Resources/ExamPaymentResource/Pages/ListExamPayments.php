@@ -14,7 +14,8 @@ class ListExamPayments extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('+ Rate Honor'),
+                ->label('Rate Honor')
+                ->icon('heroicon-o-plus'),
         ];
     }
 }

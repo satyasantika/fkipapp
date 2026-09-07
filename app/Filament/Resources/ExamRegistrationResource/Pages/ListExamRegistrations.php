@@ -17,7 +17,8 @@ class ListExamRegistrations extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('+ Registrasi Ujian')
+                ->label('Registrasi Ujian')
+                ->icon('heroicon-o-plus')
                 ->using(function (array $data): Model {
                     $student = Student::findOrFail($data['student_id']);
 

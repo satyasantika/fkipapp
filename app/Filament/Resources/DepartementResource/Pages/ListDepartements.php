@@ -14,7 +14,8 @@ class ListDepartements extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('+ Jurusan'),
+                ->label('Jurusan')
+                ->icon('heroicon-o-plus'),
         ];
     }
 }
