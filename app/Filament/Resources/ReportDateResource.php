@@ -69,6 +69,7 @@ class ReportDateResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('tanggal', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('tanggal')
                     ->date('l, d M Y')
