@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\ExamRegistration;
 use App\Models\ExamPaymentReport;
 use App\Exports\PaymentSectionExport;
+use App\Exports\PaymentSectionStudentsExport;
 use App\Services\ExamPaymentReportService;
 use App\DataTables\ViewExamPaymentReportsDataTable;
 use Maatwebsite\Excel\Facades\Excel;
@@ -139,6 +140,22 @@ class ExamPaymentReportController extends Controller
         return Excel::download(
             new PaymentSectionExport((int) $report_date_id, (int) $pns),
             "bayar-{$statusLabel}-{$tanggal}.xlsx"
+        );
+    }
+
+    /**
+     * Dipakai oleh tombol "Export Mahasiswa" di baris Penarikan Laporan
+     * (ReportDateResource) — daftar mahasiswa yang ujian di periode itu,
+     * bukan daftar honor dosen. Hanya muncul jika periode sudah dikunci.
+     */
+    public function exportSectionStudents($report_date_id)
+    {
+        $reportDate = ReportDate::findOrFail($report_date_id);
+        $tanggal = Carbon::parse($reportDate->tanggal)->format('Y-m-d');
+
+        return Excel::download(
+            new PaymentSectionStudentsExport((int) $report_date_id),
+            "mahasiswa-ujian-{$tanggal}.xlsx"
         );
     }
 

@@ -19,6 +19,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Number;
+use Livewire\Component;
 
 class ReportDateResource extends Resource
 {
@@ -225,6 +226,29 @@ class ReportDateResource extends Resource
                     ]))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Kembali ke Penarikan Laporan'),
+                Tables\Actions\Action::make('exportMahasiswa')
+                    ->label('Export Mahasiswa')
+                    ->tooltip('Export Mahasiswa')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('primary')
+                    ->iconButton()
+                    ->visible(fn (ReportDate $record): bool => $record->is_locked)
+                    ->requiresConfirmation()
+                    ->modalHeading('Export daftar mahasiswa?')
+                    ->modalDescription(fn (ReportDate $record): string => 'Unduh data mahasiswa yang ujian pada penarikan laporan '.\Illuminate\Support\Carbon::parse($record->tanggal)->format('Y-m-d').' ke Excel?')
+                    ->modalSubmitActionLabel('Export')
+                    ->action(function (ReportDate $record, Component $livewire): void {
+                        // Tidak pakai ->url(): Filament merender itu sebagai
+                        // <a>, jadi modal konfirmasi dilewati. Tidak return
+                        // redirect() dari table action: Livewire tidak
+                        // men-stream unduhan Excel-nya. Setelah konfirmasi,
+                        // assign URL rute unduhan yang sudah ada.
+                        $url = route('reportdates.students.export', [
+                            'report_date_id' => $record->id,
+                        ]);
+
+                        $livewire->js('window.location.assign('.json_encode($url).')');
+                    }),
             ])
             ->bulkActions([
                 //

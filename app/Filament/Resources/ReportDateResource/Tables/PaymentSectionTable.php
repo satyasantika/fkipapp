@@ -38,10 +38,10 @@ use Livewire\Component;
  * resource asli, bukan di komponen Livewire polos seperti ini.
  *
  * Tombol "Export Excel" (header action) mengarah ke rute
- * reports.section.export (ExamPaymentReportController::exportSection(),
- * pakai Maatwebsite\Excel - sudah terpasang di composer.json tapi belum
- * pernah dipakai sebelum ini) - bukan komponen exports bawaan Filament
- * (Filament\Actions\Exports\Exporter) supaya tidak perlu infrastruktur
+ * reports.section.export (ExamPaymentReportController::exportSection())
+ * — daftar honor dosen, kolomnya sama dengan tabel ini. Pakai
+ * Maatwebsite\Excel, bukan komponen exports bawaan Filament
+ * (Filament\Actions\Exports\Exporter), supaya tidak perlu infrastruktur
  * queue/migrasi tambahan untuk kebutuhan sesederhana ini.
  *
  * Kombinasi 4 interface+trait ini meniru persis Filament\Widgets\TableWidget
