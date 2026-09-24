@@ -245,16 +245,9 @@ class ExamRegistrationResource extends Resource
                 }),
             Tables\Columns\TextColumn::make('penguji')
                 ->label('Penguji')
-                // ketuapenguji ikut disertakan - dia genuinely orang ke-3
-                // (bukan penguji1/2/3 yang sama, sudah dicek langsung di data
-                // dev: ketuapenguji_id selalu berbeda dari penguji1/2/3_id).
-                // Tanpa ini "Penguji" cuma menunjukkan 2 dari 3 orang.
-                ->getStateUsing(fn (ExamRegistration $record): array => collect([
-                    $record->ketuapenguji?->nama,
-                    $record->penguji1?->nama,
-                    $record->penguji2?->nama,
-                    $record->penguji3?->nama,
-                ])->filter()->values()->all())
+                // ketua penguji paling atas, kecuali ketuanya pembimbing
+                // (lihat ExamRegistration::pengujiBerurutan()).
+                ->getStateUsing(fn (ExamRegistration $record): array => $record->pengujiBerurutan()->pluck('nama')->all())
                 ->listWithLineBreaks()
                 ->bulleted()
                 ->searchable(query: function (Builder $query, string $search): Builder {

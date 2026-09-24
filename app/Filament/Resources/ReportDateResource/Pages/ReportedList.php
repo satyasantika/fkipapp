@@ -121,15 +121,9 @@ class ReportedList extends Page implements HasTable
                 ->bulleted(),
             Tables\Columns\TextColumn::make('penguji')
                 ->label('Penguji')
-                // ketuapenguji disertakan - orang ke-3 yang genuinely berbeda
-                // dari penguji1/2/3 (dicek langsung di data dev), tanpa ini
-                // kolom Penguji cuma menunjukkan 2 dari 3 orang.
-                ->getStateUsing(fn (ExamRegistration $record): array => collect([
-                    $record->ketuapenguji?->nama,
-                    $record->penguji1?->nama,
-                    $record->penguji2?->nama,
-                    $record->penguji3?->nama,
-                ])->filter()->values()->all())
+                // ketua penguji paling atas, kecuali ketuanya pembimbing
+                // (lihat ExamRegistration::pengujiBerurutan()).
+                ->getStateUsing(fn (ExamRegistration $record): array => $record->pengujiBerurutan()->pluck('nama')->all())
                 ->listWithLineBreaks()
                 ->bulleted(),
         ];
