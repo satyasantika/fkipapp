@@ -49,6 +49,7 @@ class PaymentSectionStudentsExport extends DefaultValueBinder implements FromCol
         return ExamRegistration::with([
             'student',
             'exam_type',
+            'ketuapenguji',
             'penguji1',
             'penguji2',
             'penguji3',
@@ -78,14 +79,16 @@ class PaymentSectionStudentsExport extends DefaultValueBinder implements FromCol
 
     public function map($registration): array
     {
+        $penguji = $registration->pengujiBerurutan();
+
         return [
             $registration->student?->nim ?? '',
             $registration->student?->nama ?? '',
             $registration->ujian ?? '',
             $registration->tanggal_ujian?->format('Y-m-d') ?? '',
-            $registration->penguji1?->nama ?? '',
-            $registration->penguji2?->nama ?? '',
-            $registration->penguji3?->nama ?? '',
+            $penguji->get(0)?->nama ?? '',
+            $penguji->get(1)?->nama ?? '',
+            $penguji->get(2)?->nama ?? '',
             $registration->pembimbing1?->nama ?? '',
             $registration->pembimbing2?->nama ?? '',
         ];

@@ -88,4 +88,47 @@ class PaymentSectionStudentsExportTest extends TestCase
         $this->assertNull($sheet->getCell('A3')->getValue());
         $this->assertSame('s', $sheet->getCell('A2')->getDataType());
     }
+
+    public function test_ketua_penguji_comes_first_unless_ketua_is_a_pembimbing(): void
+    {
+        $departement = $this->makeDepartement();
+        $examType = $this->makeExamType('sidang');
+        $ketua = $this->makeLecture($departement, ['nama' => 'Ketua Penguji']);
+        $penguji1 = $this->makeLecture($departement, ['nama' => 'Penguji Satu']);
+        $penguji2 = $this->makeLecture($departement, ['nama' => 'Penguji Dua']);
+        $pembimbing1 = $this->makeLecture($departement, ['nama' => 'Pembimbing Satu']);
+        $pembimbing2 = $this->makeLecture($departement, ['nama' => 'Pembimbing Dua']);
+
+        $reportDate = ReportDate::create(['tanggal' => '2026-07-14']);
+
+        $this->makeExamRegistration($departement, $this->makeStudent($departement, ['nim' => '172103001']), $examType, [
+            'report_date_id' => $reportDate->id,
+            'tanggal_ujian' => '2026-07-10',
+            'ketuapenguji_id' => $ketua->id,
+            'penguji1_id' => $penguji1->id,
+            'penguji2_id' => $penguji2->id,
+            'pembimbing1_id' => $pembimbing1->id,
+            'pembimbing2_id' => $pembimbing2->id,
+        ]);
+        // prodi yang menjadikan pembimbing 1 sebagai ketua penguji
+        $this->makeExamRegistration($departement, $this->makeStudent($departement, ['nim' => '172103002']), $examType, [
+            'report_date_id' => $reportDate->id,
+            'tanggal_ujian' => '2026-07-11',
+            'ketuapenguji_id' => $pembimbing1->id,
+            'penguji1_id' => $penguji1->id,
+            'penguji2_id' => $penguji2->id,
+            'pembimbing1_id' => $pembimbing1->id,
+            'pembimbing2_id' => $pembimbing2->id,
+        ]);
+
+        $response = $this->actingAs($this->makeUserWithRole('keuangan'))->get(route('reportdates.students.export', [
+            'report_date_id' => $reportDate->id,
+        ]));
+
+        $response->assertOk();
+        $sheet = IOFactory::load($response->baseResponse->getFile()->getPathname())->getActiveSheet();
+
+        $this->assertSame(['Ketua Penguji', 'Penguji Satu', 'Penguji Dua'], $sheet->rangeToArray('E2:G2')[0]);
+        $this->assertSame(['Penguji Satu', 'Penguji Dua', null], $sheet->rangeToArray('E3:G3')[0]);
+    }
 }

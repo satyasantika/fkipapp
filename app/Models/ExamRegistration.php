@@ -128,4 +128,24 @@ class ExamRegistration extends Model
     {
         return Attribute::make(get: fn () => $this->penguji3?->nama);
     }
+
+    /**
+     * Daftar penguji berurutan: ketua penguji dulu, lalu penguji1/2/3.
+     * Ada prodi yang menjadikan pembimbing sebagai ketua - dalam kasus itu
+     * ketua dilewati supaya pembimbing tidak ikut terhitung sebagai penguji.
+     *
+     * @return \Illuminate\Support\Collection<int, Lecture>
+     */
+    public function pengujiBerurutan(): \Illuminate\Support\Collection
+    {
+        $ketuaAdalahPembimbing = $this->ketuapenguji_id
+            && in_array($this->ketuapenguji_id, [$this->pembimbing1_id, $this->pembimbing2_id]);
+
+        return collect([
+            $ketuaAdalahPembimbing ? null : $this->ketuapenguji,
+            $this->penguji1,
+            $this->penguji2,
+            $this->penguji3,
+        ])->filter()->unique('id')->values();
+    }
 }
