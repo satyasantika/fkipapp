@@ -82,6 +82,10 @@ class LectureResource extends Resource
                     ->label('ASN'),
                 Forms\Components\TextInput::make('nidn')
                     ->maxLength(255),
+                Forms\Components\TextInput::make('nuptk')
+                    ->label('NUPTK')
+                    ->unique(ignoreRecord: true)
+                    ->maxLength(255),
                 Forms\Components\TextInput::make('nip')
                     ->maxLength(255),
                 Forms\Components\Select::make('jabatan_akademik')
@@ -120,6 +124,15 @@ class LectureResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('departement_id')
                     ->label('Kode'),
+                Tables\Columns\TextColumn::make('nidn')
+                    ->label('NIDN')
+                    ->searchable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('nuptk')
+                    ->label('NUPTK')
+                    ->placeholder('-')
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\IconColumn::make('pns')
                     ->label('Status')
                     ->boolean()
@@ -134,7 +147,9 @@ class LectureResource extends Resource
                 Tables\Columns\TextColumn::make('rekening'),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('nuptk_kosong')
+                    ->label('NUPTK kosong')
+                    ->query(fn (Builder $query): Builder => $query->where(fn (Builder $q) => $q->whereNull('nuptk')->orWhere('nuptk', ''))),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()

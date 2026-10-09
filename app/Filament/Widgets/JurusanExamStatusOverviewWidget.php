@@ -32,8 +32,7 @@ class JurusanExamStatusOverviewWidget extends Widget
 
     protected function getViewData(): array
     {
-        // Ujian ulang (tidak dibayar lagi) tidak ikut dihitung sama sekali.
-        $query = ExamRegistrationResource::getEloquentQuery()->tanpaUjianUlang();
+        $query = ExamRegistrationResource::getEloquentQuery();
 
         $total = (clone $query)->count();
         $sudah = (clone $query)->where('dilaporkan', true)->count();

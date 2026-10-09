@@ -7,6 +7,7 @@ use App\Models\ExamRegistration;
 use App\Models\ExamType;
 use App\Models\Lecture;
 use App\Models\Student;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -87,8 +88,10 @@ class SintesysSyncService
             'diperbarui' => 0,
             'dilewati_jenis_tidak_dikenal' => 0,
             'dilewati_sudah_dilaporkan' => 0,
+            'dobel_dihapus' => 0,
             'mahasiswa_baru' => 0,
             'dosen_baru' => 0,
+            'nuptk_diisi' => 0,
         ];
 
         foreach ($rows as $row) {
@@ -104,6 +107,7 @@ class SintesysSyncService
                     'tanggal_ujian' => $row['tanggal_ujian'] ?? null,
                     'status' => 'dilewati',
                     'alasan' => 'Jenis ujian "'.($row['jenis_ujian'] ?? '-').'" tidak dikenali (bukan Proposal/Hasil Penelitian/Sidang Akhir).',
+                    'departement_id' => $departementId,
                     'departement_nama' => $departementNama,
                     'raw' => $row,
                 ];
@@ -117,6 +121,7 @@ class SintesysSyncService
 
             $lectureSlots = [];
             $dosenBaruNama = [];
+            $dosenIsiNuptkNama = [];
 
             foreach ($row['penguji'] ?? [] as $penguji) {
                 $urutan = (int) ($penguji['urutan'] ?? 0);
@@ -126,24 +131,42 @@ class SintesysSyncService
                     continue;
                 }
 
-                $lecture = Lecture::where('nidn', $penguji['nidn'] ?? null)->first();
+                // Dosen dicocokkan lewat NUPTK. Kalau tidak ketemu, dicari
+                // lewat NIDN di antara dosen yang NUPTK-nya MASIH KOSONG (dosen
+                // lama) - NUPTK-nya lalu diisi di commit(), supaya tidak
+                // tercipta dosen dobel. NUPTK yang sudah terisi tidak ditimpa.
+                $nuptk = filled($penguji['nuptk'] ?? null) ? (string) $penguji['nuptk'] : null;
+                $nidn = filled($penguji['nidn'] ?? null) ? (string) $penguji['nidn'] : null;
+                $lecture = $nuptk ? Lecture::where('nuptk', $nuptk)->first() : null;
+                $isiNuptk = false;
+
+                if (! $lecture && $nuptk && $nidn) {
+                    $lecture = Lecture::where('nidn', $nidn)
+                        ->where(fn ($q) => $q->whereNull('nuptk')->orWhere('nuptk', ''))
+                        ->first();
+                    $isiNuptk = (bool) $lecture;
+                }
 
                 if (! $lecture) {
-                    $dosenBaruNama[] = $penguji['nama'] ?? $penguji['nidn'] ?? '-';
+                    $dosenBaruNama[] = $penguji['nama'] ?? $nuptk ?? '-';
+                } elseif ($isiNuptk) {
+                    $dosenIsiNuptkNama[] = $lecture->nama ?? $penguji['nama'] ?? $nidn;
                 }
 
                 $lectureSlots[$kolom] = [
-                    'nidn' => $penguji['nidn'] ?? null,
+                    'nuptk' => $nuptk,
+                    'nidn' => $nidn,
                     'nama' => $penguji['nama'] ?? null,
                     'existing_id' => $lecture?->id,
+                    'isi_nuptk' => $isiNuptk,
                 ];
             }
 
             $tanggalUjian = Carbon::parse($row['tanggal_ujian']);
 
             // Kalau ujian ini (student, exam_type, tanggal sama) SUDAH
-            // dilaporkan -> lewati, supaya tidak muncul lagi sebagai baris
-            // duplikat yang belum dilaporkan. Selain itu, cari baris
+            // dilaporkan -> lewati (dobel yang belum dilaporkan dibersihkan
+            // di commit() lewat hapusDobel()). Selain itu, cari baris
             // exam_registrations yang BELUM dilaporkan untuk pasangan
             // (student, exam_type) ini -> update. Kalau tidak ada (belum pernah
             // ada, atau yang ada semua sudah dilaporkan di tanggal lain = ujian
@@ -171,6 +194,7 @@ class SintesysSyncService
                         'status' => 'dilewati',
                         'sudah_dilaporkan' => true,
                         'alasan' => 'Ujian ini sudah dilaporkan (tanggal sama), tidak disinkronkan ulang.',
+                        'departement_id' => $departementId,
                         'departement_nama' => $departementNama,
                         'raw' => $row,
                     ];
@@ -201,6 +225,8 @@ class SintesysSyncService
                 $summary['dosen_baru'] += count($dosenBaruNama);
             }
 
+            $summary['nuptk_diisi'] += count($dosenIsiNuptkNama);
+
             $items[] = [
                 'nim' => $row['nim'] ?? null,
                 'nama' => $row['nama'] ?? null,
@@ -210,6 +236,7 @@ class SintesysSyncService
                 'alasan' => null,
                 'student_baru' => $studentBaru,
                 'dosen_baru' => $dosenBaruNama,
+                'dosen_isi_nuptk' => $dosenIsiNuptkNama,
                 'departement_id' => $departementId,
                 'departement_nama' => $departementNama,
                 'exam_type_id' => $examType?->id,
@@ -223,6 +250,10 @@ class SintesysSyncService
                 'judul_penelitian' => $row['judul_unformated'] ?? null,
                 'lecture_slots' => $lectureSlots,
             ];
+        }
+
+        if ($rows) {
+            $summary['dobel_dihapus'] = $this->dobelQuery([$departementId])->count();
         }
 
         return ['items' => $items, 'summary' => $summary];
@@ -247,8 +278,10 @@ class SintesysSyncService
             'diperbarui' => 0,
             'dilewati_jenis_tidak_dikenal' => 0,
             'dilewati_sudah_dilaporkan' => 0,
+            'dobel_dihapus' => 0,
             'mahasiswa_baru' => 0,
             'dosen_baru' => 0,
+            'nuptk_diisi' => 0,
             'gagal_jurusan' => [],
         ];
 
@@ -265,7 +298,7 @@ class SintesysSyncService
 
             $items = array_merge($items, $result['items']);
 
-            foreach (['total', 'dibuat', 'diperbarui', 'dilewati_jenis_tidak_dikenal', 'dilewati_sudah_dilaporkan', 'mahasiswa_baru', 'dosen_baru'] as $key) {
+            foreach (['total', 'dibuat', 'diperbarui', 'dilewati_jenis_tidak_dikenal', 'dilewati_sudah_dilaporkan', 'dobel_dihapus', 'mahasiswa_baru', 'dosen_baru', 'nuptk_diisi'] as $key) {
                 $summary[$key] += $result['summary'][$key];
             }
         }
@@ -291,8 +324,10 @@ class SintesysSyncService
             'diperbarui' => 0,
             'dilewati_jenis_tidak_dikenal' => 0,
             'dilewati_sudah_dilaporkan' => 0,
+            'dobel_dihapus' => 0,
             'mahasiswa_baru' => 0,
             'dosen_baru' => 0,
+            'nuptk_diisi' => 0,
         ];
 
         DB::transaction(function () use ($items, &$summary) {
@@ -317,13 +352,24 @@ class SintesysSyncService
                 $lectureIds = [];
 
                 foreach ($item['lecture_slots'] as $kolom => $slot) {
-                    if (! $slot['nidn']) {
+                    if (! $slot['nuptk']) {
                         continue;
                     }
 
-                    $lecture = Lecture::firstOrCreate(
-                        ['nidn' => $slot['nidn']],
-                        ['nama' => $slot['nama'], 'departement_id' => $departementId],
+                    $lecture = null;
+
+                    if ($slot['isi_nuptk'] ?? false) {
+                        $lecture = Lecture::find($slot['existing_id']);
+
+                        if ($lecture && blank($lecture->nuptk)) {
+                            $lecture->update(['nuptk' => $slot['nuptk']]);
+                            $summary['nuptk_diisi']++;
+                        }
+                    }
+
+                    $lecture ??= Lecture::firstOrCreate(
+                        ['nuptk' => $slot['nuptk']],
+                        ['nama' => $slot['nama'], 'nidn' => $slot['nidn'], 'departement_id' => $departementId],
                     );
 
                     if ($lecture->wasRecentlyCreated) {
@@ -353,8 +399,52 @@ class SintesysSyncService
                     $summary['dibuat']++;
                 }
             }
+
+            $departementIds = collect($items)->pluck('departement_id')->filter()->unique()->values()->all();
+
+            if ($departementIds) {
+                $summary['dobel_dihapus'] = $this->hapusDobel($departementIds);
+            }
         });
 
         return $summary;
+    }
+
+    /**
+     * Ujian dobel (mahasiswa, jenis, tanggal sama) yang BELUM dilaporkan dan
+     * perlu dihapus: (1) ada kembaran yang sudah dilaporkan, atau (2) ada
+     * kembaran lain yang juga belum dilaporkan dengan id lebih kecil - yang
+     * id terkecil disisakan. Baris yang sudah dilaporkan tidak pernah
+     * termasuk. Dipakai juga oleh perintah exam:hapus-dobel-sinkron.
+     *
+     * @param  array<int, int|string>|null  $departementIds  null = semua jurusan
+     */
+    public function dobelQuery(?array $departementIds = null): QueryBuilder
+    {
+        return DB::table('exam_registrations as u')
+            ->where('u.dilaporkan', false)
+            ->when($departementIds !== null, fn ($q) => $q->whereIn('u.departement_id', $departementIds))
+            ->whereExists(fn ($q) => $q->selectRaw('1')
+                ->from('exam_registrations as r')
+                ->whereColumn('r.student_id', 'u.student_id')
+                ->whereColumn('r.exam_type_id', 'u.exam_type_id')
+                ->whereRaw('DATE(r.tanggal_ujian) = DATE(u.tanggal_ujian)')
+                ->whereColumn('r.id', '<>', 'u.id')
+                ->where(fn ($q) => $q->where('r.dilaporkan', true)->orWhereColumn('r.id', '<', 'u.id')));
+    }
+
+    /**
+     * @param  array<int, int|string>|null  $departementIds  null = semua jurusan
+     */
+    public function hapusDobel(?array $departementIds = null): int
+    {
+        // MySQL tidak boleh DELETE dengan subquery ke tabel yang sama -
+        // ambil id-nya dulu. Syarat dilaporkan = false diulang sebagai
+        // pengaman supaya baris yang sudah dilaporkan tidak mungkin terhapus.
+        $ids = $this->dobelQuery($departementIds)->pluck('u.id')->all();
+
+        return $ids
+            ? ExamRegistration::whereIn('id', $ids)->where('dilaporkan', false)->delete()
+            : 0;
     }
 }

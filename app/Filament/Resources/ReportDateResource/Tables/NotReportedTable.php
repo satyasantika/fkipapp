@@ -114,13 +114,13 @@ class NotReportedTable extends Component implements Actions\Contracts\HasActions
     protected function getTableQuery(): Builder
     {
         $query = Student::query()
-            ->whereHas('examregistrations', fn (Builder $q) => $q->whereNull('report_date_id')->tanpaUjianUlang())
+            ->whereHas('examregistrations', fn (Builder $q) => $q->whereNull('report_date_id'))
             ->with([
-                'examregistrations' => fn ($q) => $q->whereNull('report_date_id')->tanpaUjianUlang()
+                'examregistrations' => fn ($q) => $q->whereNull('report_date_id')
                     ->with('exam_type')
                     ->orderByDesc('tanggal_ujian'),
             ])
-            ->withMax(['examregistrations as latest_ujian' => fn ($q) => $q->whereNull('report_date_id')->tanpaUjianUlang()], 'tanggal_ujian')
+            ->withMax(['examregistrations as latest_ujian' => fn ($q) => $q->whereNull('report_date_id')], 'tanggal_ujian')
             ->withExists(['examregistrations as has_reported_sidang' => fn ($q) => $q
                 ->where('exam_type_id', self::EXAM_TYPE_SIDANG)
                 ->whereNotNull('report_date_id'),
@@ -129,7 +129,7 @@ class NotReportedTable extends Component implements Actions\Contracts\HasActions
         if ($this->sudahSidangOnly) {
             $query->whereHas(
                 'examregistrations',
-                fn ($q) => $q->whereNull('report_date_id')->tanpaUjianUlang()->where('exam_type_id', self::EXAM_TYPE_SIDANG)
+                fn ($q) => $q->whereNull('report_date_id')->where('exam_type_id', self::EXAM_TYPE_SIDANG)
             );
         }
 
@@ -140,7 +140,7 @@ class NotReportedTable extends Component implements Actions\Contracts\HasActions
                 $q->where('nim', 'like', "%{$search}%")
                     ->orWhere('nama', 'like', "%{$search}%")
                     ->orWhereHas('examregistrations', function (Builder $eq) use ($search) {
-                        $eq->whereNull('report_date_id')->tanpaUjianUlang()->where(function (Builder $lecturerQuery) use ($search) {
+                        $eq->whereNull('report_date_id')->where(function (Builder $lecturerQuery) use ($search) {
                             $lecturerQuery->whereHas('pembimbing1', fn ($pq) => $pq->where('nama', 'like', "%{$search}%"))
                                 ->orWhereHas('pembimbing2', fn ($pq) => $pq->where('nama', 'like', "%{$search}%"))
                                 ->orWhereHas('penguji1', fn ($pq) => $pq->where('nama', 'like', "%{$search}%"))

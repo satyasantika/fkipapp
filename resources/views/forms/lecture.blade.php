@@ -66,6 +66,13 @@
                 <input type="text" value="{{ $lecture->nidn }}" name="nidn" class="form-control" id="nidn">
             </div>
         </div>
+        {{-- nuptk --}}
+        <div class="row mb-3">
+        <label for="nuptk" class="col-md-4 col-form-label text-md-end">nuptk</label>
+            <div class="col-md-8">
+                <input type="text" value="{{ $lecture->nuptk }}" name="nuptk" class="form-control" id="nuptk">
+            </div>
+        </div>
         {{-- nip --}}
         <div class="row mb-3">
         <label for="nip" class="col-md-4 col-form-label text-md-end">nip</label>

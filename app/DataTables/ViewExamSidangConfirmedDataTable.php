@@ -143,10 +143,9 @@ class ViewExamSidangConfirmedDataTable extends DataTable
     public function query(ExamRegistration $model): QueryBuilder
     {
         $query = $this->eagerLoadExamRegistrationNames($model)
-            ->with(['student.examregistrations' => fn ($q) => $q->whereIn('exam_type_id', [1, 2, self::EXAM_TYPE_SIDANG])->tanpaUjianUlang()])
+            ->with(['student.examregistrations' => fn ($q) => $q->whereIn('exam_type_id', [1, 2, self::EXAM_TYPE_SIDANG])])
             ->where('exam_type_id', self::EXAM_TYPE_SIDANG)
-            ->whereNull('report_date_id')
-            ->tanpaUjianUlang();
+            ->whereNull('report_date_id');
 
         return $query->newQuery();
     }
