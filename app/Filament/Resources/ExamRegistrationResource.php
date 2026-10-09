@@ -306,6 +306,7 @@ class ExamRegistrationResource extends Resource
         return $table
             ->columns($columns)
             ->defaultSort('tanggal_ujian', 'desc')
+            ->paginationPageOptions([10, 25, 50, 100])
             ->filters([
                 //
             ])

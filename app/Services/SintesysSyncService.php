@@ -86,6 +86,7 @@ class SintesysSyncService
             'dibuat' => 0,
             'diperbarui' => 0,
             'dilewati_jenis_tidak_dikenal' => 0,
+            'dilewati_sudah_dilaporkan' => 0,
             'mahasiswa_baru' => 0,
             'dosen_baru' => 0,
         ];
@@ -140,15 +141,43 @@ class SintesysSyncService
 
             $tanggalUjian = Carbon::parse($row['tanggal_ujian']);
 
-            // Cari baris exam_registrations target: yang BELUM dilaporkan untuk
-            // pasangan (student, exam_type) ini -> update. Kalau tidak ada
-            // (belum pernah ada, atau yang ada semua sudah dilaporkan) -> buat
-            // baru, ujian_ke = jumlah baris existing + 1. Data yang sudah
-            // dilaporkan/dikunci TIDAK PERNAH disentuh oleh sinkronisasi ini.
+            // Kalau ujian ini (student, exam_type, tanggal sama) SUDAH
+            // dilaporkan -> lewati, supaya tidak muncul lagi sebagai baris
+            // duplikat yang belum dilaporkan. Selain itu, cari baris
+            // exam_registrations yang BELUM dilaporkan untuk pasangan
+            // (student, exam_type) ini -> update. Kalau tidak ada (belum pernah
+            // ada, atau yang ada semua sudah dilaporkan di tanggal lain = ujian
+            // ulang) -> buat baru, ujian_ke = jumlah baris existing + 1. Data
+            // yang sudah dilaporkan/dikunci TIDAK PERNAH disentuh oleh
+            // sinkronisasi ini.
             $existingUnreported = null;
             $ujianKeBaru = 1;
 
             if ($student && $examType) {
+                $sudahDilaporkan = ExamRegistration::where('student_id', $student->id)
+                    ->where('exam_type_id', $examType->id)
+                    ->where('dilaporkan', true)
+                    ->whereDate('tanggal_ujian', $tanggalUjian->toDateString())
+                    ->exists();
+
+                if ($sudahDilaporkan) {
+                    $summary['dilewati_sudah_dilaporkan']++;
+
+                    $items[] = [
+                        'nim' => $row['nim'] ?? null,
+                        'nama' => $row['nama'] ?? null,
+                        'jenis_ujian' => $row['jenis_ujian'],
+                        'tanggal_ujian' => $tanggalUjian->toDateTimeString(),
+                        'status' => 'dilewati',
+                        'sudah_dilaporkan' => true,
+                        'alasan' => 'Ujian ini sudah dilaporkan (tanggal sama), tidak disinkronkan ulang.',
+                        'departement_nama' => $departementNama,
+                        'raw' => $row,
+                    ];
+
+                    continue;
+                }
+
                 $existingUnreported = ExamRegistration::where('student_id', $student->id)
                     ->where('exam_type_id', $examType->id)
                     ->where('dilaporkan', false)
@@ -217,6 +246,7 @@ class SintesysSyncService
             'dibuat' => 0,
             'diperbarui' => 0,
             'dilewati_jenis_tidak_dikenal' => 0,
+            'dilewati_sudah_dilaporkan' => 0,
             'mahasiswa_baru' => 0,
             'dosen_baru' => 0,
             'gagal_jurusan' => [],
@@ -235,7 +265,7 @@ class SintesysSyncService
 
             $items = array_merge($items, $result['items']);
 
-            foreach (['total', 'dibuat', 'diperbarui', 'dilewati_jenis_tidak_dikenal', 'mahasiswa_baru', 'dosen_baru'] as $key) {
+            foreach (['total', 'dibuat', 'diperbarui', 'dilewati_jenis_tidak_dikenal', 'dilewati_sudah_dilaporkan', 'mahasiswa_baru', 'dosen_baru'] as $key) {
                 $summary[$key] += $result['summary'][$key];
             }
         }
@@ -260,6 +290,7 @@ class SintesysSyncService
             'dibuat' => 0,
             'diperbarui' => 0,
             'dilewati_jenis_tidak_dikenal' => 0,
+            'dilewati_sudah_dilaporkan' => 0,
             'mahasiswa_baru' => 0,
             'dosen_baru' => 0,
         ];
@@ -267,7 +298,7 @@ class SintesysSyncService
         DB::transaction(function () use ($items, &$summary) {
             foreach ($items as $item) {
                 if ($item['status'] === 'dilewati') {
-                    $summary['dilewati_jenis_tidak_dikenal']++;
+                    $summary[($item['sudah_dilaporkan'] ?? false) ? 'dilewati_sudah_dilaporkan' : 'dilewati_jenis_tidak_dikenal']++;
 
                     continue;
                 }
