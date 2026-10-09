@@ -72,9 +72,6 @@ class ListExamRegistrations extends ListRecords
         $this->registerCalendarHook();
 
         return parent::table($table)
-            // Ujian ulang (jenis sama yang lebih lama/sudah dibayar) hanya
-            // tampil di menu "Ujian Ulang", tidak di daftar utama.
-            ->modifyQueryUsing(fn (Builder $query): Builder => $query->tanpaUjianUlang())
             ->modifyQueryUsing(fn (Builder $query): Builder => match ($this->dilaporkanFilter) {
                 'sudah' => $query->where('dilaporkan', true),
                 'belum' => $query->where('dilaporkan', false),
@@ -191,7 +188,6 @@ class ListExamRegistrations extends ListRecords
         $end = $start->copy()->endOfMonth();
 
         $rows = ExamRegistrationResource::getEloquentQuery()
-            ->tanpaUjianUlang()
             ->join('exam_types', 'exam_types.id', '=', 'exam_registrations.exam_type_id')
             ->whereBetween('exam_registrations.tanggal_ujian', [$start->toDateString(), $end->toDateString()])
             ->get(['exam_registrations.tanggal_ujian', 'exam_registrations.dilaporkan', 'exam_types.singkat_ujian']);
@@ -310,7 +306,7 @@ class ListExamRegistrations extends ListRecords
 
         Notification::make()
             ->title('Sinkronisasi selesai')
-            ->body("Dibuat: {$summary['dibuat']}, diperbarui: {$summary['diperbarui']}, mahasiswa baru: {$summary['mahasiswa_baru']}, dosen baru: {$summary['dosen_baru']}, dilewati: {$summary['dilewati_jenis_tidak_dikenal']}, sudah dilaporkan: {$summary['dilewati_sudah_dilaporkan']}.")
+            ->body("Dibuat: {$summary['dibuat']}, diperbarui: {$summary['diperbarui']}, mahasiswa baru: {$summary['mahasiswa_baru']}, dosen baru: {$summary['dosen_baru']}, NUPTK diisi: {$summary['nuptk_diisi']}, dilewati: {$summary['dilewati_jenis_tidak_dikenal']}, sudah dilaporkan: {$summary['dilewati_sudah_dilaporkan']}, dobel dihapus: {$summary['dobel_dihapus']}.")
             ->success()
             ->send();
 

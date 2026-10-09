@@ -26,6 +26,7 @@ class HapusUjianDobelSinkronTest extends TestCase
         $dobel = $this->makeStudent($departement, ['nim' => '111']);
         $ulang = $this->makeStudent($departement, ['nim' => '222']);
         $tunggal = $this->makeStudent($departement, ['nim' => '333']);
+        $duaBelum = $this->makeStudent($departement, ['nim' => '444']);
 
         $this->ids = [
             'dilaporkan' => $this->makeExamRegistration($departement, $dobel, $examType, ['tanggal_ujian' => '2026-07-14', 'dilaporkan' => 1])->id,
@@ -33,6 +34,8 @@ class HapusUjianDobelSinkronTest extends TestCase
             'ulang_lama' => $this->makeExamRegistration($departement, $ulang, $examType, ['tanggal_ujian' => '2026-06-01', 'dilaporkan' => 1])->id,
             'ulang_baru' => $this->makeExamRegistration($departement, $ulang, $examType, ['tanggal_ujian' => '2026-07-14', 'ujian_ke' => 2])->id,
             'tunggal' => $this->makeExamRegistration($departement, $tunggal, $examType, ['tanggal_ujian' => '2026-07-14'])->id,
+            'belum_pertama' => $this->makeExamRegistration($departement, $duaBelum, $examType, ['tanggal_ujian' => '2026-07-14'])->id,
+            'belum_kedua' => $this->makeExamRegistration($departement, $duaBelum, $examType, ['tanggal_ujian' => '2026-07-14'])->id,
         ];
     }
 
@@ -40,16 +43,17 @@ class HapusUjianDobelSinkronTest extends TestCase
     {
         $this->artisan('exam:hapus-dobel-sinkron')->assertSuccessful();
 
-        $this->assertSame(5, ExamRegistration::count());
+        $this->assertSame(7, ExamRegistration::count());
     }
 
-    public function test_force_deletes_only_unreported_same_date_duplicate(): void
+    public function test_force_deletes_only_unreported_same_date_duplicates(): void
     {
         $this->artisan('exam:hapus-dobel-sinkron', ['--force' => true, '--no-interaction' => true])->assertSuccessful();
 
         $this->assertDatabaseMissing('exam_registrations', ['id' => $this->ids['dobel']]);
+        $this->assertDatabaseMissing('exam_registrations', ['id' => $this->ids['belum_kedua']]);
 
-        foreach (['dilaporkan', 'ulang_lama', 'ulang_baru', 'tunggal'] as $key) {
+        foreach (['dilaporkan', 'ulang_lama', 'ulang_baru', 'tunggal', 'belum_pertama'] as $key) {
             $this->assertDatabaseHas('exam_registrations', ['id' => $this->ids[$key]]);
         }
 
@@ -57,6 +61,9 @@ class HapusUjianDobelSinkronTest extends TestCase
 
         $files = Storage::disk('local')->files('backup');
         $this->assertCount(1, $files);
-        $this->assertSame([$this->ids['dobel']], array_column(json_decode(Storage::disk('local')->get($files[0]), true), 'id'));
+        $this->assertEqualsCanonicalizing(
+            [$this->ids['dobel'], $this->ids['belum_kedua']],
+            array_column(json_decode(Storage::disk('local')->get($files[0]), true), 'id'),
+        );
     }
 }

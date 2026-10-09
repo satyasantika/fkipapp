@@ -140,7 +140,6 @@ class ReportDateController extends Controller
         $toAdd = ExamRegistration::where('student_id',$examregistration->student_id)
             ->whereIn('exam_type_id',[1,2,3])
             ->whereNull('report_date_id')
-            ->tanpaUjianUlang()
             ->get();
 
         foreach ($toAdd as $item) {
@@ -185,7 +184,6 @@ class ReportDateController extends Controller
         }
 
         $toAdd = ExamRegistration::whereNull('report_date_id')
-            ->tanpaUjianUlang()
             ->where(function ($q) use ($lecture) {
                 $q->where('pembimbing1_id', $lecture->id)
                     ->orWhere('pembimbing2_id', $lecture->id)
@@ -227,12 +225,6 @@ class ReportDateController extends Controller
         // kedua arah "ditambah/dikurangi" sekaligus.
         if ($report_date_id && ReportDate::find($report_date_id)?->is_locked) {
             throw new \RuntimeException('Penarikan laporan ini sedang terkunci, tidak bisa ditambah/dikurangi.');
-        }
-
-        // Arah "tambah ke laporan" (bukan retract): ujian ulang tidak boleh
-        // dilaporkan - honor jenis ujian ini hanya dibayar sekali.
-        if (empty($examregistration->report_date_id) && $request->filled('report_date_id') && $examregistration->isUjianUlang()) {
-            throw new \RuntimeException('Ujian ulang tidak dapat dilaporkan: honor jenis ujian ini hanya dihitung sekali.');
         }
 
         $data = $request->all();

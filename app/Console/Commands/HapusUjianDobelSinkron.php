@@ -2,14 +2,16 @@
 
 namespace App\Console\Commands;
 
+use App\Services\SintesysSyncService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 /**
- * Bersihkan baris exam_registrations BELUM dilaporkan yang terlanjur dibuat
- * oleh sinkronisasi Sintesys padahal ujian yang sama (mahasiswa, jenis
- * ujian, tanggal) sudah dilaporkan. Default hanya menampilkan kandidat;
+ * Bersihkan baris exam_registrations BELUM dilaporkan yang dobel (mahasiswa,
+ * jenis ujian, tanggal sama) - aturan yang sama dengan pembersihan otomatis
+ * saat sinkronisasi (SintesysSyncService::dobelQuery()), tapi untuk semua
+ * tanggal sekaligus. Default hanya menampilkan kandidat;
  * penghapusan butuh --force. Baris yang sudah dilaporkan TIDAK PERNAH
  * dihapus: syarat dilaporkan = 0 diulang di query DELETE, dan jumlah + ID
  * baris dilaporkan dicek sebelum/sesudah di dalam transaksi (rollback kalau
@@ -21,7 +23,7 @@ class HapusUjianDobelSinkron extends Command
         {--force : Benar-benar hapus (tanpa ini hanya menampilkan kandidat)}
         {--departement= : Batasi ke satu jurusan (id)}';
 
-    protected $description = 'Hapus ujian belum dilaporkan yang dobel dengan ujian sudah dilaporkan di tanggal yang sama';
+    protected $description = 'Hapus ujian belum dilaporkan yang dobel (mahasiswa, jenis, tanggal sama)';
 
     public function handle(): int
     {
@@ -34,9 +36,9 @@ class HapusUjianDobelSinkron extends Command
         }
 
         $this->table(
-            ['ID dobel', 'ID dilaporkan', 'NIM', 'Nama', 'Jenis', 'Tanggal', 'Ujian ke', 'Jurusan'],
+            ['ID dobel', 'NIM', 'Nama', 'Jenis', 'Tanggal', 'Ujian ke', 'Jurusan'],
             $kandidat->map(fn ($row) => [
-                $row->id, $row->id_dilaporkan, $row->nim, $row->nama, $row->singkat_ujian,
+                $row->id, $row->nim, $row->nama, $row->singkat_ujian,
                 $row->tanggal_ujian, $row->ujian_ke, $row->departement_id,
             ])->all(),
         );
@@ -85,24 +87,13 @@ class HapusUjianDobelSinkron extends Command
 
     private function kandidat()
     {
-        return DB::table('exam_registrations as u')
-            ->join('exam_registrations as r', function ($join) {
-                $join->on('r.student_id', '=', 'u.student_id')
-                    ->on('r.exam_type_id', '=', 'u.exam_type_id')
-                    ->whereRaw('DATE(r.tanggal_ujian) = DATE(u.tanggal_ujian)')
-                    ->where('r.dilaporkan', true);
-            })
+        $departementIds = $this->option('departement') ? [$this->option('departement')] : null;
+
+        return app(SintesysSyncService::class)->dobelQuery($departementIds)
             ->join('students as s', 's.id', '=', 'u.student_id')
             ->join('exam_types as t', 't.id', '=', 'u.exam_type_id')
-            ->where('u.dilaporkan', false)
-            ->when($this->option('departement'), fn ($q, $id) => $q->where('u.departement_id', $id))
             ->orderBy('u.tanggal_ujian')
-            ->get([
-                'u.id', 'r.id as id_dilaporkan', 's.nim', 's.nama', 't.singkat_ujian',
-                'u.tanggal_ujian', 'u.ujian_ke', 'u.departement_id',
-            ])
-            ->unique('id')
-            ->values();
+            ->get(['u.id', 's.nim', 's.nama', 't.singkat_ujian', 'u.tanggal_ujian', 'u.ujian_ke', 'u.departement_id']);
     }
 
     /**

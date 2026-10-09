@@ -84,65 +84,6 @@ class ExamRegistration extends Model
         return $query->whereRaw("DATE_FORMAT(tanggal_ujian, '%Y-%m') = ?", [$value]);
     }
 
-    // Kebijakan honor hanya membayar SATU kali per jenis ujian (sempro/semhas/
-    // sidang) per mahasiswa. "Ujian ulang" = ujian BELUM dilaporkan yang
-    // tidak dihitung lagi karena ada ujian jenis sama (mahasiswa sama) yang
-    // lebih baru, ATAU yang sudah dilaporkan (honornya sudah dibayar). Ujian
-    // ulang disembunyikan dari daftar/hitungan "belum dilaporkan" dan tidak
-    // bisa dilaporkan - hanya tampil di menu "Ujian Ulang". Ujian yang sudah
-    // dilaporkan TIDAK PERNAH dianggap ujian ulang (riwayat honor tetap utuh).
-    public function scopeUjianUlang($query)
-    {
-        $table = $query->getQuery()->from;
-
-        return $query->where("{$table}.dilaporkan", false)
-            ->whereExists(self::ujianPenggantiQuery($table));
-    }
-
-    public function scopeTanpaUjianUlang($query)
-    {
-        $table = $query->getQuery()->from;
-
-        return $query->where(fn ($q) => $q->where("{$table}.dilaporkan", true)
-            ->orWhereNotExists(self::ujianPenggantiQuery($table)));
-    }
-
-    public function isUjianUlang(): bool
-    {
-        return static::whereKey($this->getKey())->ujianUlang()->exists();
-    }
-
-    /**
-     * Ujian jenis sama yang membuat baris ini jadi ujian ulang: yang sudah
-     * dilaporkan diutamakan, kalau tidak ada -> yang terbaru.
-     */
-    public function ujianPengganti(): ?self
-    {
-        return static::where('student_id', $this->student_id)
-            ->where('exam_type_id', $this->exam_type_id)
-            ->whereKeyNot($this->getKey())
-            ->orderByDesc('dilaporkan')
-            ->orderByDesc('tanggal_ujian')
-            ->orderByDesc('id')
-            ->first();
-    }
-
-    // Ujian lain (mahasiswa & jenis sama) yang "menggantikan" baris $table:
-    // sudah dilaporkan, atau lebih baru (tanggal lebih besar; tanggal sama ->
-    // id lebih besar).
-    private static function ujianPenggantiQuery(string $table): \Closure
-    {
-        return fn ($sub) => $sub->selectRaw('1')
-            ->from('exam_registrations as ujian_lain')
-            ->whereColumn('ujian_lain.student_id', "{$table}.student_id")
-            ->whereColumn('ujian_lain.exam_type_id', "{$table}.exam_type_id")
-            ->whereColumn('ujian_lain.id', '<>', "{$table}.id")
-            ->where(fn ($q) => $q->where('ujian_lain.dilaporkan', true)
-                ->orWhereColumn('ujian_lain.tanggal_ujian', '>', "{$table}.tanggal_ujian")
-                ->orWhere(fn ($q) => $q->whereColumn('ujian_lain.tanggal_ujian', "{$table}.tanggal_ujian")
-                    ->whereColumn('ujian_lain.id', '>', "{$table}.id")));
-    }
-
     protected function kodeLaporan(): Attribute
     {
         return Attribute::make(get: fn () => $this->tanggal_ujian?->format('Y-m'));

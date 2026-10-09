@@ -239,11 +239,17 @@
                     @if (($summary['dilewati_sudah_dilaporkan'] ?? 0) > 0)
                         <x-filament::badge color="gray">Sudah dilaporkan: {{ $summary['dilewati_sudah_dilaporkan'] }}</x-filament::badge>
                     @endif
+                    @if (($summary['dobel_dihapus'] ?? 0) > 0)
+                        <x-filament::badge color="danger">Dobel dihapus: {{ $summary['dobel_dihapus'] }}</x-filament::badge>
+                    @endif
                     @if (($summary['mahasiswa_baru'] ?? 0) > 0)
                         <x-filament::badge color="danger">Mahasiswa baru: {{ $summary['mahasiswa_baru'] }}</x-filament::badge>
                     @endif
                     @if (($summary['dosen_baru'] ?? 0) > 0)
                         <x-filament::badge color="danger">Dosen baru: {{ $summary['dosen_baru'] }}</x-filament::badge>
+                    @endif
+                    @if (($summary['nuptk_diisi'] ?? 0) > 0)
+                        <x-filament::badge color="info">NUPTK diisi: {{ $summary['nuptk_diisi'] }}</x-filament::badge>
                     @endif
                 </div>
 
@@ -279,6 +285,11 @@
                                         @if (! empty($item['dosen_baru']))
                                             <x-filament::badge color="danger" size="xs">
                                                 {{ count($item['dosen_baru']) }} dosen baru
+                                            </x-filament::badge>
+                                        @endif
+                                        @if (! empty($item['dosen_isi_nuptk']))
+                                            <x-filament::badge color="info" size="xs" tooltip="{{ implode(', ', $item['dosen_isi_nuptk']) }}">
+                                                {{ count($item['dosen_isi_nuptk']) }} diisi NUPTK
                                             </x-filament::badge>
                                         @endif
                                     </td>
