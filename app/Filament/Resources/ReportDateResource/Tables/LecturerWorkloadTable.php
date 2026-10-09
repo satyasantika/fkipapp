@@ -60,19 +60,19 @@ class LecturerWorkloadTable extends Component implements Actions\Contracts\HasAc
     {
         return Lecture::query()
             ->where(function (Builder $q) {
-                $q->whereHas('pembimbing1Registrations', fn ($r) => $r->whereNull('report_date_id'))
-                    ->orWhereHas('pembimbing2Registrations', fn ($r) => $r->whereNull('report_date_id'))
-                    ->orWhereHas('penguji1Registrations', fn ($r) => $r->whereNull('report_date_id'))
-                    ->orWhereHas('penguji2Registrations', fn ($r) => $r->whereNull('report_date_id'))
-                    ->orWhereHas('penguji3Registrations', fn ($r) => $r->whereNull('report_date_id'));
+                $q->whereHas('pembimbing1Registrations', fn ($r) => $r->whereNull('report_date_id')->tanpaUjianUlang())
+                    ->orWhereHas('pembimbing2Registrations', fn ($r) => $r->whereNull('report_date_id')->tanpaUjianUlang())
+                    ->orWhereHas('penguji1Registrations', fn ($r) => $r->whereNull('report_date_id')->tanpaUjianUlang())
+                    ->orWhereHas('penguji2Registrations', fn ($r) => $r->whereNull('report_date_id')->tanpaUjianUlang())
+                    ->orWhereHas('penguji3Registrations', fn ($r) => $r->whereNull('report_date_id')->tanpaUjianUlang());
             })
             ->with([
                 'departement',
-                'pembimbing1Registrations' => fn ($q) => $q->whereNull('report_date_id')->with(['exam_type', 'student']),
-                'pembimbing2Registrations' => fn ($q) => $q->whereNull('report_date_id')->with(['exam_type', 'student']),
-                'penguji1Registrations' => fn ($q) => $q->whereNull('report_date_id')->with(['exam_type', 'student']),
-                'penguji2Registrations' => fn ($q) => $q->whereNull('report_date_id')->with(['exam_type', 'student']),
-                'penguji3Registrations' => fn ($q) => $q->whereNull('report_date_id')->with(['exam_type', 'student']),
+                'pembimbing1Registrations' => fn ($q) => $q->whereNull('report_date_id')->tanpaUjianUlang()->with(['exam_type', 'student']),
+                'pembimbing2Registrations' => fn ($q) => $q->whereNull('report_date_id')->tanpaUjianUlang()->with(['exam_type', 'student']),
+                'penguji1Registrations' => fn ($q) => $q->whereNull('report_date_id')->tanpaUjianUlang()->with(['exam_type', 'student']),
+                'penguji2Registrations' => fn ($q) => $q->whereNull('report_date_id')->tanpaUjianUlang()->with(['exam_type', 'student']),
+                'penguji3Registrations' => fn ($q) => $q->whereNull('report_date_id')->tanpaUjianUlang()->with(['exam_type', 'student']),
             ]);
     }
 

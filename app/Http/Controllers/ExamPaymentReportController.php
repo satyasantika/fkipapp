@@ -39,6 +39,10 @@ class ExamPaymentReportController extends Controller
      */
     public function store(Request $request)
     {
+        if (ExamRegistration::find($request->examregistration_id)?->isUjianUlang()) {
+            return back()->with('warning','Ujian ulang tidak dapat dilaporkan: honor jenis ujian ini hanya dihitung sekali.');
+        }
+
         try {
             $this->_reportStore($request->examregistration_id);
         } catch (\RuntimeException $e) {

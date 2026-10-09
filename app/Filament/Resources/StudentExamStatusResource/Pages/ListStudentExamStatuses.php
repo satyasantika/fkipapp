@@ -30,9 +30,9 @@ class ListStudentExamStatuses extends ListRecords
         return parent::table($table)
             ->modifyQueryUsing(fn (Builder $query): Builder => $this->belumDilaporkanOnly
                 ? $query->where(function (Builder $q) {
-                    $q->whereHas('latestSempro', fn (Builder $r) => $r->where('dilaporkan', false))
-                        ->orWhereHas('latestSemhas', fn (Builder $r) => $r->where('dilaporkan', false))
-                        ->orWhereHas('latestSidang', fn (Builder $r) => $r->where('dilaporkan', false));
+                    $q->whereHas('latestSempro', fn (Builder $r) => $r->where('dilaporkan', false)->tanpaUjianUlang())
+                        ->orWhereHas('latestSemhas', fn (Builder $r) => $r->where('dilaporkan', false)->tanpaUjianUlang())
+                        ->orWhereHas('latestSidang', fn (Builder $r) => $r->where('dilaporkan', false)->tanpaUjianUlang());
                 })
                 : $query);
     }

@@ -68,6 +68,7 @@ class ViewExamNotReportedDataTable extends DataTable
 
         if (auth()->user()->hasRole('keuangan')) {
             return $query->whereNull('report_date_id')
+                        ->tanpaUjianUlang()
                         ->newQuery();
         } else {
             return $query->newQuery();

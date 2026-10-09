@@ -236,6 +236,9 @@
                     <x-filament::badge color="success">Dibuat: {{ $summary['dibuat'] ?? 0 }}</x-filament::badge>
                     <x-filament::badge color="info">Diperbarui: {{ $summary['diperbarui'] ?? 0 }}</x-filament::badge>
                     <x-filament::badge color="warning">Dilewati: {{ $summary['dilewati_jenis_tidak_dikenal'] ?? 0 }}</x-filament::badge>
+                    @if (($summary['dilewati_sudah_dilaporkan'] ?? 0) > 0)
+                        <x-filament::badge color="gray">Sudah dilaporkan: {{ $summary['dilewati_sudah_dilaporkan'] }}</x-filament::badge>
+                    @endif
                     @if (($summary['mahasiswa_baru'] ?? 0) > 0)
                         <x-filament::badge color="danger">Mahasiswa baru: {{ $summary['mahasiswa_baru'] }}</x-filament::badge>
                     @endif
@@ -288,6 +291,8 @@
                                             <x-filament::badge color="success">Baru</x-filament::badge>
                                         @elseif ($item['status'] === 'diperbarui')
                                             <x-filament::badge color="info">Perbarui</x-filament::badge>
+                                        @elseif ($item['sudah_dilaporkan'] ?? false)
+                                            <x-filament::badge color="gray" tooltip="{{ $item['alasan'] }}">Sudah dilaporkan</x-filament::badge>
                                         @else
                                             <x-filament::badge color="warning" tooltip="{{ $item['alasan'] }}">Dilewati</x-filament::badge>
                                         @endif
