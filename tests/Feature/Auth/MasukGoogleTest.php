@@ -45,7 +45,7 @@ class MasukGoogleTest extends TestCase
 
     private function urlPanel(): string
     {
-        return \Filament\Facades\Filament::getPanel('admin')->getUrl();
+        return route('filament.admin.pages.dashboard');
     }
 
     public function test_fitur_nonaktif_kedua_rute_404_dan_halaman_masuk_tidak_memuat_tombol(): void
@@ -73,6 +73,16 @@ class MasukGoogleTest extends TestCase
         parse_str(parse_url($lokasi, PHP_URL_QUERY), $q);
         $this->assertSame(route('auth.google.callback'), $q['redirect_uri']);
         $this->assertStringContainsString('openid', urldecode($q['scope']));
+    }
+
+    public function test_asal_berupa_array_tidak_menyebabkan_galat_dan_tetap_mengarah_ke_google(): void
+    {
+        $lokasi = $this->get(route('auth.google.redirect', ['asal' => ['x']]))->assertRedirect()->headers->get('Location');
+
+        $this->assertStringStartsWith('https://accounts.google.com/', $lokasi);
+
+        $this->get(route('auth.google.callback', ['error' => 'access_denied']))
+            ->assertRedirect(route('login'));
     }
 
     public function test_memasukkan_akun_yang_sudah_ada_dan_menautkan_google_id(): void
@@ -174,6 +184,10 @@ class MasukGoogleTest extends TestCase
             ->assertRedirect(url('/halaman-x'));
 
         $this->withSession(['google_asal' => 'https://evil.example/'])
+            ->get(route('auth.google.callback', ['error' => 'access_denied']))
+            ->assertRedirect(route('login'));
+
+        $this->withSession(['google_asal' => rtrim(url('/'), '/').'.evil.example/'])
             ->get(route('auth.google.callback', ['error' => 'access_denied']))
             ->assertRedirect(route('login'));
     }
