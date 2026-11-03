@@ -65,6 +65,18 @@ class MasukGoogleTest extends TestCase
             ->assertSee(route('auth.google.redirect', ['asal' => route('login')]), false);
     }
 
+    public function test_tombol_tetap_memakai_url_halaman_masuk_setelah_render_ulang_livewire(): void
+    {
+        \Livewire\Livewire::test(\App\Filament\Auth\Login::class)
+            ->set('data.username', 'salah')
+            ->set('data.password', 'salah')
+            ->call('authenticate')
+            ->assertSeeHtml(route('auth.google.redirect'))
+            // Harness Livewire memakai endpoint uji sebagai path snapshot, jadi
+            // URL /login tidak bisa dibuktikan; yang dijaga: bukan /livewire/update.
+            ->assertDontSeeHtml(rawurlencode(url('/livewire/update')));
+    }
+
     public function test_mengarahkan_ke_google_dengan_redirect_uri_bawaan(): void
     {
         $lokasi = $this->get(route('auth.google.redirect'))->assertRedirect()->headers->get('Location');
