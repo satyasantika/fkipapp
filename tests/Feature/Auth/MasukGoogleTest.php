@@ -97,6 +97,21 @@ class MasukGoogleTest extends TestCase
             ->assertRedirect(route('login'));
     }
 
+    public function test_redirect_uri_kosong_di_konfigurasi_memakai_url_callback(): void
+    {
+        // GOOGLE_REDIRECT_URI= kosong di .env: env() mengembalikan '' dan harus jatuh ke bawaan.
+        $_ENV['GOOGLE_REDIRECT_URI'] = $_SERVER['GOOGLE_REDIRECT_URI'] = '';
+        putenv('GOOGLE_REDIRECT_URI=');
+        config(['services.google.redirect' => (require config_path('services.php'))['google']['redirect']]);
+        putenv('GOOGLE_REDIRECT_URI');
+        unset($_ENV['GOOGLE_REDIRECT_URI'], $_SERVER['GOOGLE_REDIRECT_URI']);
+
+        $lokasi = $this->get(route('auth.google.redirect'))->assertRedirect()->headers->get('Location');
+
+        parse_str(parse_url($lokasi, PHP_URL_QUERY), $q);
+        $this->assertSame(route('auth.google.callback'), $q['redirect_uri']);
+    }
+
     public function test_memasukkan_akun_yang_sudah_ada_dan_menautkan_google_id(): void
     {
         $user = $this->buatAdmin('budi@unsil.ac.id');
@@ -211,11 +226,11 @@ class MasukGoogleTest extends TestCase
         $this->actingAs($user)->get(route('auth.google.redirect'))->assertRedirect($this->urlPanel());
     }
 
-    public function test_membatasi_10_permintaan_per_menit_per_ip(): void
+    public function test_membatasi_60_permintaan_per_menit_per_ip(): void
     {
         $this->googleSebagai('x@gmail.com', ['email_verified' => false]);
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 60; $i++) {
             $this->get(route('auth.google.callback'))->assertRedirect();
         }
 

@@ -28,7 +28,7 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
-        RateLimiter::for('google-login', fn (Request $request) => Limit::perMinute(10)->by($request->ip()));
+        RateLimiter::for('google-login', fn (Request $request) => Limit::perMinute(60)->by($request->ip()));
 
         $this->routes(function () {
             Route::middleware('api')
