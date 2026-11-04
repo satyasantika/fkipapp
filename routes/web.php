@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\GoogleAuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -43,6 +44,11 @@ Route::get('/login', \App\Filament\Auth\Login::class)
         \Filament\Http\Middleware\DispatchServingFilamentEvent::class,
     ])
     ->name('login');
+
+Route::prefix('auth/google')->middleware('throttle:google-login')->group(function () {
+    Route::get('redirect', [GoogleAuthController::class, 'redirect'])->name('auth.google.redirect');
+    Route::get('callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
+});
 
 // 'logout' TIDAK ikut dimatikan otomatis oleh opsi di atas (beda dari
 // 'login'/'register') - lihat vendor/laravel/ui/src/AuthRouteMethods.php,

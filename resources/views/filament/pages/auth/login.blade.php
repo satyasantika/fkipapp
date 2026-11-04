@@ -593,6 +593,8 @@
                     </button>
                 </form>
 
+                @include('auth.tombol-google')
+
                 <p class="card-footnote">Hubungi admin fakultas bila mengalami kendala akses.</p>
             </section>
         </div>
