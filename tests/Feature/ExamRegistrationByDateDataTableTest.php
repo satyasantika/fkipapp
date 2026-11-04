@@ -53,7 +53,7 @@ class ExamRegistrationByDateDataTableTest extends TestCase
         $this->assertStringContainsString('bg-info', $semhasBadge['ujian']);
     }
 
-    public function test_default_sort_is_ruangan_asc_then_waktu_desc(): void
+    public function test_default_sort_is_waktu_asc_then_ruangan_asc(): void
     {
         $departement = $this->makeDepartement();
         $jurusan = $this->makeUserWithRole('jurusan', $departement->id);
@@ -61,6 +61,6 @@ class ExamRegistrationByDateDataTableTest extends TestCase
         $response = $this->actingAs($jurusan)->get('/exam/reports/date/2026-07-14');
 
         $response->assertOk();
-        $response->assertSee('"order":[[2,"asc"],[3,"desc"]]', false);
+        $response->assertSee('"order":[[3,"asc"],[2,"asc"]]', false);
     }
 }
